@@ -3,6 +3,11 @@
     --h2Color: #b8bb26;
     --h3Color: #fabd2f;
     --aColor: #83a598;
+    --preColor: #8ec07c;
+    --bg0: #282828;
+    --bg2: #504945;
+    --fg0: #fbf1c7;
+    --purplel: #d3869b;
 }
 
 html {
@@ -18,7 +23,7 @@ body {
     border: 6px solid #fe8019;
     border-radius: 16px;
     padding: 32px;
-    margin: 32px;
+    margin: auto;
 }
 
 h1 {
@@ -49,3 +54,59 @@ li {
     float: left;
     margin: 0 128px 0 0;
 }
+
+@media (min-width: 55em) {
+	.lol { display: inline-block; vertical-align: top ; }
+
+	.resright {
+		float: right;
+		padding: 20px ;
+		clear: both ;
+		max-width: 300px ;
+	}
+
+	body { max-width: 850px ; }
+}
+
+p {
+    text-align: justify;
+}
+
+/*
+org-mode specific stuff
+*/
+
+pre {
+    position: relative;
+    overflow: auto;
+    background: var(--bg0);
+	border: 4px solid var(--preColor);
+	border-radius: 4px;
+	padding: 20px;
+	margin: 30px;
+}
+
+.figure {
+    text-align: center;
+}
+
+img {
+    display: block;
+    margin: auto;
+    max-width: 100%;
+    height: auto;
+    object-fit: contain;
+
+    border: 4px solid var(--purplel);
+    border-radius: 4px;
+}
+
+code {
+    border-radius: 4px;
+    background-color: var(--bg2);
+    color: var(--fg0);
+    font-family: monospace;
+    margin: 0px 1px;
+    padding: 0px 2px;
+}
+
