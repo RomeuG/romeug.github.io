@@ -1,13 +1,120 @@
 <!DOCTYPE html>
 <html>
+
     <head>
         <title>Romeu Vieira's Website</title>
+        <!-- <link rel='stylesheet' type='text/css' href='style.css' /> -->
         <meta charset="utf-8">
         <!-- Still missing -->
         <link rel="shortcut icon" href="favicon.ico">
+
+        <style>
+            :root {
+                --h1Color: #cc241d;
+                --h2Color: #b8bb26;
+                --h3Color: #fabd2f;
+                --aColor: #83a598;
+            }
+
+            html {
+                padding-top: 16px;
+                margin-bottom: 16px;
+
+                background: radial-gradient(#1d2021, #7c6f64) no-repeat fixed;
+            }
+
+            body {
+                color: #fbf1c7;
+                background: #1d2021;
+                border: 6px solid #fe8019;
+                border-radius: 16px;
+                padding: 32px;
+                margin: 32px;
+            }
+
+            h1 {
+                color: var(--h1Color);
+                text-align: center;
+            }
+
+            h2 {
+                color: var(--h2Color);
+                text-align: center;
+            }
+
+            h3 {
+                color: var(--h3Color);
+            }
+
+            a {
+                color: var(--aColor);
+            }
+
+            ul,
+            li {
+                margin: 0;
+                padding: 0 0 0 15px;
+            }
+
+            .column {
+                float: left;
+                margin: 0 128px 0 0;
+            }
+        </style>
     </head>
 
     <body>
-    </body>
-</html>
+        <h1>Romeu Vieira's Website</h1>
 
+        <h2>Random Stuff</h2>
+        <div class="subdivision">
+
+            <div class="column">
+                <h3>Projects</h3>
+                <ul>
+                    <li><a href="writeups/htb/something.html">HackTheBox Write-Ups</a></li>
+                    <li></li>
+                    <li></li>
+                    <li></li>
+                    <li></li>
+                </ul>
+            </div>
+            <div class="column">
+                <h3>Write-Ups</h3>
+                <ul>
+                    <li><a href="writeups/htb/something.html">HackTheBox Write-Ups</a></li>
+                    <li></li>
+                    <li></li>
+                    <li></li>
+                    <li></li>
+                </ul>
+            </div>
+            <!-- Necessary hack because of float:left -->
+            <div style="clear:both;"></div>
+        </div>
+
+        <h2>Resources</h2>
+        <div class="subdivision">
+            <div class="column">
+                <h3>Low Level Software Development</h3>
+                <ul>
+                    <li></li>
+                    <li></li>
+                    <li></li>
+                </ul>
+            </div>
+            <div class="column">
+                <h3>Low Level Software Development</h3>
+                <ul>
+                    <li></li>
+                    <li></li>
+                    <li></li>
+                </ul>
+            </div>
+            <!-- Necessary hack because of float:left -->
+            <div style="clear:both;"></div>
+        </div>
+
+    </body>
+
+</html>
