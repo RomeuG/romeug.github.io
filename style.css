@@ -132,14 +132,15 @@ pre {
 	border: 4px solid var(--purplel);
 	border-radius: 4px;
 	padding: 20px;
-	margin: 30px;
+	margin: 32px;
 }
 
 .figure {
+    margin: 32px 40px 34px 32px;
     text-align: center;
 }
 
-img {
+.figure img {
     display: block;
     margin: auto;
     max-width: 100%;
