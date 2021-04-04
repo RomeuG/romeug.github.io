@@ -7,30 +7,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <title>Laboratory</title>
 <meta name="generator" content="Org mode" />
-<meta name="author" content="Romeu Vieira" />
 <link rel="stylesheet" type="text/css" href="/style.css"/>
-<script type="text/javascript">
-// @license magnet:?xt=urn:btih:e95b018ef3580986a04669f1b5879592219e2a7a&dn=public-domain.txt Public Domain
-<!--/*--><![CDATA[/*><!--*/
-     function CodeHighlightOn(elem, id)
-     {
-       var target = document.getElementById(id);
-       if(null != target) {
-         elem.classList.add("code-highlighted");
-         target.classList.add("code-highlighted");
-       }
-     }
-     function CodeHighlightOff(elem, id)
-     {
-       var target = document.getElementById(id);
-       if(null != target) {
-         elem.classList.remove("code-highlighted");
-         target.classList.remove("code-highlighted");
-       }
-     }
-    /*]]>*///-->
-// @license-end
-</script>
 </head>
 <body>
 <div id="content">
@@ -39,14 +16,15 @@
 <h2>Table of Contents</h2>
 <div id="text-table-of-contents">
 <ul>
-<li><a href="#org648c71e">Laboratory</a></li>
+<li><a href="#orgd9449af">Enumeration</a></li>
 </ul>
 </div>
 </div>
 
-<div id="outline-container-org648c71e" class="outline-2">
-<h2 id="org648c71e">Laboratory</h2>
-<div class="outline-text-2" id="text-org648c71e">
+
+<div id="outline-container-orgd9449af" class="outline-2">
+<h2 id="orgd9449af">Enumeration</h2>
+<div class="outline-text-2" id="text-orgd9449af">
 <p>
 We start by using Nmap right away:
 </p>
@@ -108,14 +86,15 @@ our own username here.
 </p>
 
 <p>
-If we try to register, unfortunately, we get this error: =1 error prohibited this user from being saved:
-=.
+If we try to register, unfortunately, we get this error: <code>1 error prohibited this user from being saved</code>.
 Probably they want us to register with their own domain?
 </p>
 
-<p>
-[<img src="images/img1.jpg" alt="img1.jpg" />]
+
+<div id="org6038c6f" class="figure">
+<p><img src="./images/img1.jpg" alt="img1.jpg" />
 </p>
+</div>
 
 <p>
 And then, after successfuly registering, we are redirected to the dashboard.
@@ -225,8 +204,7 @@ $ gitlab-rails console
 </pre>
 
 <p>
-There is a cheat-sheet with some commands, from GitLab:
-[<a href="https://docs.gitlab.com/ee/administration/troubleshooting/gitlab_rails_cheat_sheet.html">https://docs.gitlab.com/ee/administration/troubleshooting/gitlab_rails_cheat_sheet.html</a>].
+There is a cheat-sheet with some commands, from <a href="https://docs.gitlab.com/ee/administration/troubleshooting/gitlab_rails_cheat_sheet.html">GitLab</a>.
 There are some commands to find users, one of them being
 <code>User.find_by_username('someuser')</code>. What seems logical to try first is using
 this command but trying to find <code>admin</code> instead. Unfortunately, zero results.
@@ -235,13 +213,14 @@ Maybe we can execute something like <code>find_by_id</code>?
 
 <p>
 We know there is a user called <code>dexter</code>. Wonder if we can change the user data.
-There is another GitLab link that is very helpful:
-[<a href="https://docs.gitlab.com/ee/administration/troubleshooting/navigating_gitlab_via_rails_console.html">https://docs.gitlab.com/ee/administration/troubleshooting/navigating_gitlab_via_rails_console.html</a>].
+There is another <a href="https://docs.gitlab.com/ee/administration/troubleshooting/navigating_gitlab_via_rails_console.html">GitLab link</a> that is very helpful.
 </p>
 
-<p>
-[<img src="images/img3.jpg" alt="img3.jpg" />]
+
+<div id="org0c38713" class="figure">
+<p><img src="./images/img3.jpg" alt="img3.jpg" />
 </p>
+</div>
 
 <p>
 Let’s try setting our own password for <code>dexter</code>:
@@ -255,7 +234,7 @@ $ user.save!
 </pre>
 
 <p>
-Now if we go back to [<a href="https://git.laboratory.htb/">https://git.laboratory.htb/</a>] and login with
+Now if we go back to <code>https://git.laboratory.htb/</code> and login with
 <code>dexter:password</code>, we succeed! Let’s check his repositories.
 </p>
 
@@ -264,9 +243,11 @@ One of them is called <code>securedocker</code> and has <code>CONFIDENTIAL!</cod
 If we dig in, we can find the users’ <code>id_rsa</code> in the <code>.ssh</code> folder.
 </p>
 
-<p>
-[<img src="images/img4.jpg" alt="img4.jpg" />]
+
+<div id="orgd745d55" class="figure">
+<p><img src="./images/img4.jpg" alt="img4.jpg" />
 </p>
+</div>
 
 <p>
 We download the file, set permissions to 400 and login:
@@ -294,11 +275,10 @@ $ find / -perm -4000 -type f -print 2&gt;/dev/null
 </pre>
 
 <p>
-There are many binaries here and we can use GTFOBins
-[<a href="https://gtfobins.github.io/">https://gtfobins.github.io/</a>] to check if there are binaries we can get the
-advantage of because of SUID. In <code>/usr/bin</code> all binaries are useless. But there
-is one in <code>/usr/local/bin/</code> called <code>docker-security</code>. Running it yields no
-results, but we can use <code>ltrace</code> to see what it is trying to do during runtime:
+There are many binaries here and we can use
+<a href="https://gtfobins.github.io/">GTFOBins</a> to check if there are binaries we can get the advantage of because of SUID.
+In <code>/usr/bin</code> all binaries are useless. But there is one in <code>/usr/local/bin/</code>
+called <code>docker-security</code>. Running it yields no results, but we can use <code>ltrace</code> to see what it is trying to do during runtime:
 </p>
 
 <pre class="example">
@@ -338,12 +318,14 @@ $ ./usr/local/bin/docker-security
 <p>
 Root permissions! :-)
 </p>
+
+<hr>
+<footer>
+<p><a class="footer" href="/index.html">Homepage</a></p>
+<p><a class="footer" href="/writeups/htb/index.html">Back</a></p>
+</footer>
 </div>
 </div>
-</div>
-<div id="postamble" class="status">
-<p class="author">Author: Romeu Vieira</p>
-<p class="email">Email: <a href="mailto:romeu@xerxes">romeu@xerxes</a></p>
 </div>
 </body>
 </html>

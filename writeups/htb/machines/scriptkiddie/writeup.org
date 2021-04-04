@@ -12,6 +12,8 @@
 
 #+HTML_HEAD: <link rel="stylesheet" type="text/css" href="/style.css"/>
 
+#+EXPORT_FILE_NAME: scriptkiddie
+
 * Enumeration
 
 As usual, we start with an Nmap scan:
@@ -232,6 +234,6 @@ get the root flag.
 <hr>
 <footer>
 <p><a class="footer" href="/index.html">Homepage</a></p>
-<p><a class="footer" href="htb/index.html">Back</a></p>
+<p><a class="footer" href="/writeups/htb/index.html">Back</a></p>
 </footer>
 #+END_EXPORT
