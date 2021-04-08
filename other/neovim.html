@@ -12,10 +12,26 @@
 <body>
 <div id="content">
 <h1 class="title">Neovim Configuration</h1>
+<div id="table-of-contents">
+<h2>Table of Contents</h2>
+<div id="text-table-of-contents">
+<ul>
+<li><a href="#org98cb162"><code>~/.config/nvim/init.vim</code></a></li>
+<li><a href="#orgb916a2a"><code>~/.config/nvim/after/ftplugin/rust.vim</code></a></li>
+<li><a href="#org6ba8066"><code>~/.config/nvim/coc-settings.json</code></a></li>
+</ul>
+</div>
+</div>
+<p>
+This is my current working <code>NeoVim</code> configuration, used mainly for C, C++ and
+Rust development, with each relevant file. The configuration is meant to be self explanatory.
+</p>
+
+<div id="outline-container-org98cb162" class="outline-2">
+<h2 id="org98cb162"><code>~/.config/nvim/init.vim</code></h2>
+<div class="outline-text-2" id="text-org98cb162">
 <div class="org-src-container">
 <pre class="src src-vimrc"><span style="color: #fb4933;">filetype</span> plugin <span style="color: #fb4933;">on</span>
-
-<span style="color: #7c6f64;">" ============= Vim-Plug ============== "{{{</span>
 
 <span style="color: #7c6f64;">" auto-install vim-plug</span>
 <span style="color: #fb4933;">if</span> <span style="color: #fabd2f;">empty</span>(<span style="color: #fabd2f;">glob</span>(<span style="color: #b8bb26;">'~/.config/nvim/autoload/plug.vim'</span>))
@@ -26,76 +42,105 @@
 
 <span style="color: #fb4933;">call</span> plug#<span style="color: #fabd2f;">begin</span>(<span style="color: #fabd2f;">expand</span>(<span style="color: #b8bb26;">'~/.config/nvim/plugged'</span>))
 
-<span style="color: #7c6f64;">"}}}</span>
 
-<span style="color: #7c6f64;">" ================= UI ============================== "{{{</span>
+<span style="color: #7c6f64;">" theme</span>
 Plug <span style="color: #b8bb26;">'sainnhe/gruvbox-material'</span>
-Plug <span style="color: #b8bb26;">'vim-airline/vim-airline'</span>                          <span style="color: #7c6f64;">" airline status bar</span>
-
-<span style="color: #7c6f64;">"}}}</span>
-
-<span style="color: #7c6f64;">" ================= Functionalities ================= "{{{</span>
-
-Plug <span style="color: #b8bb26;">'neoclide/coc.nvim'</span>, {<span style="color: #b8bb26;">'branch'</span>: <span style="color: #b8bb26;">'release'</span>}         <span style="color: #7c6f64;">" LSP and more</span>
-
-Plug <span style="color: #b8bb26;">'junegunn/fzf'</span>                                     <span style="color: #7c6f64;">" fzf itself</span>
-Plug <span style="color: #b8bb26;">'junegunn/fzf.vim'</span>                                 <span style="color: #7c6f64;">" fuzzy search integration</span>
-
-Plug <span style="color: #b8bb26;">'rust-lang/rust.vim'</span>                               <span style="color: #7c6f64;">" better rust integration</span>
-
-Plug <span style="color: #b8bb26;">'tpope/vim-commentary'</span>                             <span style="color: #7c6f64;">" better commenting</span>
-
-Plug <span style="color: #b8bb26;">'tpope/vim-fugitive'</span>                               <span style="color: #7c6f64;">" git support</span>
-Plug <span style="color: #b8bb26;">'airblade/vim-gitgutter'</span>                           <span style="color: #7c6f64;">" git gutter</span>
-
-Plug <span style="color: #b8bb26;">'psliwka/vim-smoothie'</span>                             <span style="color: #7c6f64;">" some very smooth ass scrolling</span>
-Plug <span style="color: #b8bb26;">'tpope/vim-eunuch'</span>                                 <span style="color: #7c6f64;">" run common Unix commands inside Vim</span>
-Plug <span style="color: #b8bb26;">'jiangmiao/auto-pairs'</span>                             <span style="color: #7c6f64;">" autopairs (verify vim-closer)</span>
-Plug <span style="color: #b8bb26;">'machakann/vim-highlightedyank'</span>                    <span style="color: #7c6f64;">" highlight yanked area</span>
-Plug <span style="color: #b8bb26;">'AndrewRadev/splitjoin.vim'</span>                        <span style="color: #7c6f64;">" Split/Join oneliners into multiline</span>
-Plug <span style="color: #b8bb26;">'easymotion/vim-easymotion'</span>                        <span style="color: #7c6f64;">" Easy motion</span>
-Plug <span style="color: #b8bb26;">'terryma/vim-expand-region'</span>                        <span style="color: #7c6f64;">" Expand regions increasingly</span>
-
-Plug <span style="color: #b8bb26;">'mg979/vim-visual-multi'</span>, {<span style="color: #b8bb26;">'branch'</span>: <span style="color: #b8bb26;">'master'</span>}     <span style="color: #7c6f64;">" multiple cursors</span>
-Plug <span style="color: #b8bb26;">'t9md/vim-choosewin'</span>                               <span style="color: #7c6f64;">" window pick</span>
+<span style="color: #7c6f64;">" airline status bar</span>
+Plug <span style="color: #b8bb26;">'vim-airline/vim-airline'</span>
+<span style="color: #7c6f64;">" lsp</span>
+Plug <span style="color: #b8bb26;">'neoclide/coc.nvim'</span>, {<span style="color: #b8bb26;">'branch'</span>: <span style="color: #b8bb26;">'release'</span>}
+<span style="color: #7c6f64;">" fzf itself</span>
+Plug <span style="color: #b8bb26;">'junegunn/fzf'</span>
+<span style="color: #7c6f64;">" fuzzy search integration with fzf</span>
+Plug <span style="color: #b8bb26;">'junegunn/fzf.vim'</span>
+<span style="color: #7c6f64;">" better rust integration</span>
+Plug <span style="color: #b8bb26;">'rust-lang/rust.vim'</span>
+<span style="color: #7c6f64;">" better comments</span>
+Plug <span style="color: #b8bb26;">'tpope/vim-commentary'</span>
+<span style="color: #7c6f64;">" git support</span>
+Plug <span style="color: #b8bb26;">'tpope/vim-fugitive'</span>
+<span style="color: #7c6f64;">" git gutter</span>
+Plug <span style="color: #b8bb26;">'airblade/vim-gitgutter'</span>
+<span style="color: #7c6f64;">" smooth scrolling</span>
+Plug <span style="color: #b8bb26;">'psliwka/vim-smoothie'</span>
+<span style="color: #7c6f64;">" run common unix command in Vim</span>
+Plug <span style="color: #b8bb26;">'tpope/vim-eunuch'</span>
+<span style="color: #7c6f64;">" autopairing</span>
+Plug <span style="color: #b8bb26;">'jiangmiao/auto-pairs'</span>
+<span style="color: #7c6f64;">" highlight yanked area</span>
+Plug <span style="color: #b8bb26;">'machakann/vim-highlightedyank'</span>
+<span style="color: #7c6f64;">" split and join oneliners into multiline</span>
+Plug <span style="color: #b8bb26;">'AndrewRadev/splitjoin.vim'</span>
+<span style="color: #7c6f64;">" easier motion</span>
+Plug <span style="color: #b8bb26;">'easymotion/vim-easymotion'</span>
+<span style="color: #7c6f64;">" expand regions increasingly</span>
+Plug <span style="color: #b8bb26;">'terryma/vim-expand-region'</span>
+<span style="color: #7c6f64;">" multiple cursors</span>
+Plug <span style="color: #b8bb26;">'mg979/vim-visual-multi'</span>, {<span style="color: #b8bb26;">'branch'</span>: <span style="color: #b8bb26;">'master'</span>}
+<span style="color: #7c6f64;">" window chooser</span>
+Plug <span style="color: #b8bb26;">'t9md/vim-choosewin'</span>
 
 <span style="color: #fb4933;">call</span> plug#<span style="color: #fabd2f;">end</span>()
 
-<span style="color: #7c6f64;">"}}}</span>
 
-<span style="color: #7c6f64;">" ==================== general config ======================== "{{{</span>
-
+<span style="color: #7c6f64;">" terminal 256 colors</span>
 <span style="color: #fb4933;">set</span> t_Co<span style="color: #d3869b;">=</span><span style="color: #87ceeb;">256</span>
-<span style="color: #7c6f64;">"set termguicolors                                       " Opaque Background</span>
-<span style="color: #fb4933;">set</span> <span style="color: #83a598;">mouse</span><span style="color: #d3869b;">=</span>a                                             <span style="color: #7c6f64;">" enable mouse scrolling</span>
-<span style="color: #fb4933;">set</span> <span style="color: #83a598;">clipboard</span><span style="color: #d3869b;">+=</span>unnamedplus                              <span style="color: #7c6f64;">" use system clipboard by default</span>
-<span style="color: #fb4933;">set</span> <span style="color: #83a598;">tabstop</span><span style="color: #d3869b;">=</span><span style="color: #87ceeb;">4</span> <span style="color: #83a598;">softtabstop</span><span style="color: #d3869b;">=</span><span style="color: #87ceeb;">4</span> <span style="color: #83a598;">shiftwidth</span><span style="color: #d3869b;">=</span><span style="color: #87ceeb;">4</span> <span style="color: #83a598;">autoindent</span>     <span style="color: #7c6f64;">" tab width</span>
-<span style="color: #fb4933;">set</span> <span style="color: #83a598;">expandtab</span> smarttab                                  <span style="color: #7c6f64;">" tab key actions</span>
-<span style="color: #fb4933;">set</span> <span style="color: #83a598;">incsearch</span> ignorecase <span style="color: #83a598;">smartcase</span> hlsearch             <span style="color: #7c6f64;">" highlight text while searching</span>
-<span style="color: #7c6f64;">" set list listchars=trail:&#187;,tab:&#187;-                       " use tab to navigate in list mode</span>
-<span style="color: #fb4933;">set</span> <span style="color: #83a598;">fillchars</span><span style="color: #d3869b;">+=</span><span style="color: #fb4933;">vert</span>:\&#9615;                                  <span style="color: #7c6f64;">" requires a patched nerd font (try FiraCode)</span>
-<span style="color: #fb4933;">set</span> <span style="color: #83a598;">wrap</span> <span style="color: #83a598;">breakindent</span>                                    <span style="color: #7c6f64;">" wrap long lines to the width set by tw</span>
-<span style="color: #fb4933;">set</span> <span style="color: #83a598;">encoding</span><span style="color: #d3869b;">=</span>utf<span style="color: #87ceeb;">-8</span>                                      <span style="color: #7c6f64;">" text encoding</span>
-<span style="color: #fb4933;">set</span> <span style="color: #83a598;">number</span>                                              <span style="color: #7c6f64;">" enable numbers on the left</span>
-<span style="color: #fb4933;">set</span> <span style="color: #83a598;">title</span>                                               <span style="color: #7c6f64;">" tab title as file name</span>
-<span style="color: #fb4933;">set</span> <span style="color: #83a598;">noshowcmd</span>                                           <span style="color: #7c6f64;">" to get rid of display of last command</span>
-<span style="color: #fb4933;">set</span> <span style="color: #83a598;">conceallevel</span><span style="color: #d3869b;">=</span><span style="color: #87ceeb;">2</span>                                      <span style="color: #7c6f64;">" set this so we wont break indentation plugin</span>
-<span style="color: #fb4933;">set</span> <span style="color: #83a598;">splitright</span>                                          <span style="color: #7c6f64;">" open vertical split to the right</span>
-<span style="color: #fb4933;">set</span> <span style="color: #83a598;">splitbelow</span>                                          <span style="color: #7c6f64;">" open horizontal split to the bottom</span>
-<span style="color: #fb4933;">set</span> <span style="color: #83a598;">tw</span><span style="color: #d3869b;">=</span><span style="color: #87ceeb;">90</span>                                               <span style="color: #7c6f64;">" auto wrap lines that are longer than that</span>
-<span style="color: #fb4933;">set</span> emoji                                               <span style="color: #7c6f64;">" enable emojis</span>
-<span style="color: #fb4933;">set</span> <span style="color: #83a598;">history</span><span style="color: #d3869b;">=</span><span style="color: #87ceeb;">1000</span>                                        <span style="color: #7c6f64;">" history limit</span>
-<span style="color: #fb4933;">set</span> <span style="color: #83a598;">backspace</span><span style="color: #d3869b;">=</span>indent,<span style="color: #83a598;">eol</span>,start                          <span style="color: #7c6f64;">" sensible backspacing</span>
-<span style="color: #fb4933;">set</span> undofile                                            <span style="color: #7c6f64;">" enable persistent undo</span>
-<span style="color: #fb4933;">set</span> <span style="color: #83a598;">undodir</span><span style="color: #d3869b;">=</span>/tmp                                        <span style="color: #7c6f64;">" undo temp file directory</span>
-<span style="color: #fb4933;">set</span> <span style="color: #83a598;">foldlevel</span><span style="color: #d3869b;">=</span><span style="color: #87ceeb;">0</span>                                         <span style="color: #7c6f64;">" open all folds by default</span>
-<span style="color: #fb4933;">set</span> inccommand<span style="color: #d3869b;">=</span>nosplit                                  <span style="color: #7c6f64;">" visual feedback while substituting</span>
-<span style="color: #fb4933;">set</span> <span style="color: #83a598;">showtabline</span><span style="color: #d3869b;">=</span><span style="color: #87ceeb;">2</span>                                       <span style="color: #7c6f64;">" always show tabline</span>
-<span style="color: #fb4933;">set</span> <span style="color: #83a598;">grepprg</span><span style="color: #d3869b;">=</span>rg\ <span style="color: #d3869b;">--</span><span style="color: #fb4933;">vimgrep</span>                               <span style="color: #7c6f64;">" use rg as default grepper</span>
-<span style="color: #fb4933;">set</span> <span style="color: #83a598;">ruler</span>                                               <span style="color: #7c6f64;">" current position</span>
-<span style="color: #fb4933;">set</span> <span style="color: #83a598;">magic</span>                                               <span style="color: #7c6f64;">" magic on for regex</span>
-<span style="color: #fb4933;">set</span> <span style="color: #83a598;">showmatch</span>                                           <span style="color: #7c6f64;">" show matching brackets</span>
-<span style="color: #fb4933;">set</span> <span style="color: #83a598;">ffs</span><span style="color: #d3869b;">=</span>unix,dos,mac                                    <span style="color: #7c6f64;">" unix as standard file type</span>
+<span style="color: #7c6f64;">" enable mouse</span>
+<span style="color: #fb4933;">set</span> <span style="color: #83a598;">mouse</span><span style="color: #d3869b;">=</span>a
+<span style="color: #7c6f64;">" use system clipboard</span>
+<span style="color: #fb4933;">set</span> <span style="color: #83a598;">clipboard</span><span style="color: #d3869b;">+=</span>unnamedplus
+<span style="color: #7c6f64;">" tabs</span>
+<span style="color: #fb4933;">set</span> <span style="color: #83a598;">tabstop</span><span style="color: #d3869b;">=</span><span style="color: #87ceeb;">4</span> <span style="color: #83a598;">softtabstop</span><span style="color: #d3869b;">=</span><span style="color: #87ceeb;">4</span> <span style="color: #83a598;">shiftwidth</span><span style="color: #d3869b;">=</span><span style="color: #87ceeb;">4</span> <span style="color: #83a598;">autoindent</span>
+<span style="color: #7c6f64;">" tab key actions</span>
+<span style="color: #fb4933;">set</span> <span style="color: #83a598;">expandtab</span> smarttab
+<span style="color: #7c6f64;">" highlight text during search</span>
+<span style="color: #fb4933;">set</span> <span style="color: #83a598;">incsearch</span> ignorecase <span style="color: #83a598;">smartcase</span> hlsearch
+<span style="color: #7c6f64;">" TODO</span>
+<span style="color: #fb4933;">set</span> <span style="color: #83a598;">fillchars</span><span style="color: #d3869b;">+=</span><span style="color: #fb4933;">vert</span>:\&#9615;
+<span style="color: #7c6f64;">" wrap long lines set by tw</span>
+<span style="color: #fb4933;">set</span> <span style="color: #83a598;">wrap</span> <span style="color: #83a598;">breakindent</span>
+<span style="color: #7c6f64;">" text encoding</span>
+<span style="color: #fb4933;">set</span> <span style="color: #83a598;">encoding</span><span style="color: #d3869b;">=</span>utf<span style="color: #87ceeb;">-8</span>
+<span style="color: #7c6f64;">" enable numbers</span>
+<span style="color: #fb4933;">set</span> <span style="color: #83a598;">number</span>
+<span style="color: #7c6f64;">" tab title = file name</span>
+<span style="color: #fb4933;">set</span> <span style="color: #83a598;">title</span>
+<span style="color: #7c6f64;">" don't display last command</span>
+<span style="color: #fb4933;">set</span> <span style="color: #83a598;">noshowcmd</span>
+<span style="color: #7c6f64;">" for indentation plugin</span>
+<span style="color: #fb4933;">set</span> <span style="color: #83a598;">conceallevel</span><span style="color: #d3869b;">=</span><span style="color: #87ceeb;">2</span>
+<span style="color: #7c6f64;">" split to the right</span>
+<span style="color: #fb4933;">set</span> <span style="color: #83a598;">splitright</span>
+<span style="color: #7c6f64;">" split below</span>
+<span style="color: #fb4933;">set</span> <span style="color: #83a598;">splitbelow</span>
+<span style="color: #7c6f64;">" auto wrap lines after 90 chars</span>
+<span style="color: #fb4933;">set</span> <span style="color: #83a598;">tw</span><span style="color: #d3869b;">=</span><span style="color: #87ceeb;">90</span>
+<span style="color: #7c6f64;">" enables emojis :-)</span>
+<span style="color: #fb4933;">set</span> emoji
+<span style="color: #7c6f64;">" set history limit to 1000 lines</span>
+<span style="color: #fb4933;">set</span> <span style="color: #83a598;">history</span><span style="color: #d3869b;">=</span><span style="color: #87ceeb;">1000</span>
+<span style="color: #7c6f64;">" mindful and sensible backspace</span>
+<span style="color: #fb4933;">set</span> <span style="color: #83a598;">backspace</span><span style="color: #d3869b;">=</span>indent,<span style="color: #83a598;">eol</span>,start
+<span style="color: #7c6f64;">" persistent undo</span>
+<span style="color: #fb4933;">set</span> undofile
+<span style="color: #7c6f64;">" undo temporary directory</span>
+<span style="color: #fb4933;">set</span> <span style="color: #83a598;">undodir</span><span style="color: #d3869b;">=</span>/tmp
+<span style="color: #7c6f64;">" open all folds by default</span>
+<span style="color: #fb4933;">set</span> <span style="color: #83a598;">foldlevel</span><span style="color: #d3869b;">=</span><span style="color: #87ceeb;">0</span>
+<span style="color: #7c6f64;">" visual feedback while substituting</span>
+<span style="color: #fb4933;">set</span> inccommand<span style="color: #d3869b;">=</span>nosplit
+<span style="color: #7c6f64;">" TODO always show tabline</span>
+<span style="color: #fb4933;">set</span> <span style="color: #83a598;">showtabline</span><span style="color: #d3869b;">=</span><span style="color: #87ceeb;">2</span>
+<span style="color: #7c6f64;">" use rg as grep</span>
+<span style="color: #fb4933;">set</span> <span style="color: #83a598;">grepprg</span><span style="color: #d3869b;">=</span>rg\ <span style="color: #d3869b;">--</span><span style="color: #fb4933;">vimgrep</span>
+<span style="color: #7c6f64;">" show current position</span>
+<span style="color: #fb4933;">set</span> <span style="color: #83a598;">ruler</span>
+<span style="color: #7c6f64;">" magic on for regex</span>
+<span style="color: #fb4933;">set</span> <span style="color: #83a598;">magic</span>
+<span style="color: #7c6f64;">" show matching brackets, parenthesis, etc</span>
+<span style="color: #fb4933;">set</span> <span style="color: #83a598;">showmatch</span>
+<span style="color: #7c6f64;">" unix as standard file type</span>
+<span style="color: #fb4933;">set</span> <span style="color: #83a598;">ffs</span><span style="color: #d3869b;">=</span>unix,dos,mac
 
 <span style="color: #7c6f64;">" no annoyances</span>
 <span style="color: #fb4933;">set</span> <span style="color: #83a598;">noerrorbells</span>
@@ -119,50 +164,70 @@ Plug <span style="color: #b8bb26;">'t9md/vim-choosewin'</span>                  
 <span style="color: #fb4933;">set</span> <span style="color: #83a598;">shortmess</span><span style="color: #d3869b;">+=</span><span style="color: #fb4933;">c</span>
 <span style="color: #fb4933;">set</span> signcolumn<span style="color: #d3869b;">=</span>yes
 
-<span style="color: #7c6f64;">" others</span>
-<span style="color: #fb4933;">set</span> <span style="color: #83a598;">autoread</span> <span style="color: #7c6f64;">" read when file is changed from outside</span>
+<span style="color: #7c6f64;">" read when file is changed from outside</span>
+<span style="color: #fb4933;">set</span> <span style="color: #83a598;">autoread</span>
 
-<span style="color: #7c6f64;">" wildcards</span>
+<span style="color: #7c6f64;">" wildcards to ignore</span>
 <span style="color: #fb4933;">set</span> <span style="color: #83a598;">wildignore</span><span style="color: #d3869b;">+=</span>*/target/*,*/tmp/*,*<span style="color: #d3869b;">.</span>swp,*<span style="color: #d3869b;">.</span>pyc,*__pycache__/*
 
-<span style="color: #7c6f64;">" Themeing</span>
+<span style="color: #7c6f64;">" theme</span>
 <span style="color: #fb4933;">set</span> <span style="color: #83a598;">background</span><span style="color: #d3869b;">=</span>dark
 
-<span style="color: #7c6f64;">" gruvbox material</span>
+<span style="color: #7c6f64;">" gruvbox material settings</span>
 <span style="color: #fb4933;">let</span> <span style="color: #83a598;">g:gruvbox_material_background</span><span style="color: #d3869b;">=</span><span style="color: #b8bb26;">'hard'</span>
 <span style="color: #fb4933;">let</span> <span style="color: #83a598;">g:gruvbox_material_enable_italic</span><span style="color: #d3869b;">=</span><span style="color: #87ceeb;">1</span>
 
+<span style="color: #7c6f64;">" theme enable</span>
 <span style="color: #83a598;">syntax</span> enable
 <span style="color: #fb4933;">colorscheme</span> gruvbox<span style="color: #d3869b;">-</span>material
 
-<span style="color: #7c6f64;">" highlight matching parenthesis</span>
+<span style="color: #7c6f64;">" highlight matching parenthesis with a more visible color</span>
 <span style="color: #83a598;">hi</span> MatchParen cterm<span style="color: #d3869b;">=</span>bold cterm<span style="color: #d3869b;">=</span>underline ctermfg<span style="color: #d3869b;">=</span>blue
 
+<span style="color: #7c6f64;">" italics</span>
 <span style="color: #fb4933;">let</span> &amp;t_ZH<span style="color: #d3869b;">=</span><span style="color: #7c6f64;">"\e[3m"</span>
 <span style="color: #fb4933;">let</span> &amp;t_ZR<span style="color: #d3869b;">=</span><span style="color: #7c6f64;">"\e[23m"</span>
 
-<span style="color: #7c6f64;">"}}}</span>
+<span style="color: #7c6f64;">"</span>
+<span style="color: #7c6f64;">" --- Plugins ---</span>
+<span style="color: #7c6f64;">"</span>
 
-<span style="color: #7c6f64;">" ======================== Plugin Configurations ======================== "{{{</span>
+<span style="color: #7c6f64;">"" built in plugins</span>
+<span style="color: #7c6f64;">" disable netrw</span>
+<span style="color: #fb4933;">let</span> <span style="color: #83a598;">loaded_netrw</span> <span style="color: #d3869b;">=</span> <span style="color: #87ceeb;">0</span>
+<span style="color: #7c6f64;">" disable sql omni completion</span>
+<span style="color: #fb4933;">let</span> <span style="color: #83a598;">g:omni_sql_no_default_maps</span> <span style="color: #d3869b;">=</span> <span style="color: #87ceeb;">1</span>
+<span style="color: #7c6f64;">" disable python</span>
+<span style="color: #fb4933;">let</span> <span style="color: #83a598;">g:loaded_python_provider</span> <span style="color: #d3869b;">=</span> <span style="color: #87ceeb;">0</span>
+<span style="color: #7c6f64;">" disable perl</span>
+<span style="color: #fb4933;">let</span> <span style="color: #83a598;">g:loaded_perl_provider</span> <span style="color: #d3869b;">=</span> <span style="color: #87ceeb;">0</span>
+<span style="color: #7c6f64;">" disable ruby</span>
+<span style="color: #fb4933;">let</span> <span style="color: #83a598;">g:loaded_ruby_provider</span> <span style="color: #d3869b;">=</span> <span style="color: #87ceeb;">0</span>
+<span style="color: #7c6f64;">" define python3 binary</span>
+<span style="color: #fb4933;">let</span> <span style="color: #83a598;">g:python3_host_prog</span> <span style="color: #d3869b;">=</span> <span style="color: #fabd2f;">expand</span>(<span style="color: #b8bb26;">'/usr/bin/python3'</span>)
 
-<span style="color: #7c6f64;">" Airline</span>
 
-<span style="color: #7c6f64;">" let g:airline_theme='material'</span>
+<span style="color: #7c6f64;">"" Airline</span>
+<span style="color: #7c6f64;">" do not render empty sections</span>
 <span style="color: #fb4933;">let</span> <span style="color: #83a598;">g:airline_skip_empty_sections</span> <span style="color: #d3869b;">=</span> <span style="color: #87ceeb;">1</span>
-<span style="color: #7c6f64;">"let g:airline_section_warning = ''</span>
-<span style="color: #7c6f64;">"let g:airline_section_x=''</span>
-<span style="color: #fb4933;">let</span> <span style="color: #83a598;">g:airline_section_z</span> <span style="color: #d3869b;">=</span> airline#section#<span style="color: #fabd2f;">create</span>([<span style="color: #b8bb26;">'%3p%% '</span>, <span style="color: #b8bb26;">'linenr'</span>, <span style="color: #b8bb26;">':%c'</span>])
+<span style="color: #7c6f64;">" file encoding skip expected string</span>
 <span style="color: #fb4933;">let</span> <span style="color: #83a598;">g:airline#parts#ffenc#skip_expected_string</span><span style="color: #d3869b;">=</span><span style="color: #b8bb26;">'utf-8[unix]'</span>
+<span style="color: #7c6f64;">" enable tabline</span>
 <span style="color: #fb4933;">let</span> <span style="color: #83a598;">g:airline#extensions#tabline#enabled</span> <span style="color: #d3869b;">=</span> <span style="color: #87ceeb;">1</span>
-<span style="color: #fb4933;">let</span> <span style="color: #83a598;">g:airline#extensions#tabline#buffer_min_count</span> <span style="color: #d3869b;">=</span> <span style="color: #87ceeb;">2</span>   <span style="color: #7c6f64;">" show tabline only if there is more than 1 buffer</span>
-<span style="color: #fb4933;">let</span> <span style="color: #83a598;">g:airline#extensions#tabline#fnamemod</span> <span style="color: #d3869b;">=</span> <span style="color: #b8bb26;">':t'</span>        <span style="color: #7c6f64;">" show only file name on tabs</span>
-<span style="color: #fb4933;">let</span> <span style="color: #83a598;">airline#extensions#coc#error_symbol</span> <span style="color: #d3869b;">=</span> <span style="color: #b8bb26;">'x:'</span>
-<span style="color: #fb4933;">let</span> <span style="color: #83a598;">airline#extensions#coc#warning_symbol</span> <span style="color: #d3869b;">=</span> <span style="color: #b8bb26;">'!:'</span>
+<span style="color: #7c6f64;">" enable tabline only if there is more than 1 buffer</span>
+<span style="color: #fb4933;">let</span> <span style="color: #83a598;">g:airline#extensions#tabline#buffer_min_count</span> <span style="color: #d3869b;">=</span> <span style="color: #87ceeb;">2</span>
+<span style="color: #7c6f64;">" show only the filename in the tabline tabs</span>
+<span style="color: #fb4933;">let</span> <span style="color: #83a598;">g:airline#extensions#tabline#fnamemod</span> <span style="color: #d3869b;">=</span> <span style="color: #b8bb26;">':t'</span>
+<span style="color: #7c6f64;">" error symbol for coc</span>
+<span style="color: #fb4933;">let</span> <span style="color: #83a598;">airline#extensions#coc#error_symbol</span> <span style="color: #d3869b;">=</span> <span style="color: #b8bb26;">'e:'</span>
+<span style="color: #7c6f64;">" warning symbol for coc</span>
+<span style="color: #fb4933;">let</span> <span style="color: #83a598;">airline#extensions#coc#warning_symbol</span> <span style="color: #d3869b;">=</span> <span style="color: #b8bb26;">'w:'</span>
+<span style="color: #7c6f64;">" initialize airline symbols if not defined</span>
 <span style="color: #fb4933;">if</span> <span style="color: #d3869b;">!</span><span style="color: #fabd2f;">exists</span>(<span style="color: #b8bb26;">'g:airline_symbols'</span>)
   <span style="color: #fb4933;">let</span> <span style="color: #83a598;">g:airline_symbols</span> <span style="color: #d3869b;">=</span> {}
 <span style="color: #fb4933;">endif</span>
 
-<span style="color: #7c6f64;">" unicode symbols</span>
+<span style="color: #7c6f64;">" airline plaintext/unicode symbols</span>
 <span style="color: #fb4933;">let</span> <span style="color: #83a598;">g:airline_symbols</span><span style="color: #d3869b;">.</span>branch <span style="color: #d3869b;">=</span> <span style="color: #b8bb26;">'&#12096;'</span>
 <span style="color: #fb4933;">let</span> <span style="color: #83a598;">g:airline_symbols</span><span style="color: #d3869b;">.</span>dirty<span style="color: #d3869b;">=</span> <span style="color: #b8bb26;">' &#9839;'</span>
 <span style="color: #fb4933;">let</span> <span style="color: #83a598;">g:airline_left_sep</span> <span style="color: #d3869b;">=</span> <span style="color: #b8bb26;">'&#9654;'</span>
@@ -171,70 +236,63 @@ Plug <span style="color: #b8bb26;">'t9md/vim-choosewin'</span>                  
 <span style="color: #fb4933;">let</span> <span style="color: #83a598;">g:airline_symbols</span><span style="color: #d3869b;">.</span><span style="color: #83a598;">paste</span> <span style="color: #d3869b;">=</span> <span style="color: #b8bb26;">'&#961;'</span>
 <span style="color: #fb4933;">let</span> <span style="color: #83a598;">g:airline_symbols</span><span style="color: #d3869b;">.</span>whitespace <span style="color: #d3869b;">=</span> <span style="color: #b8bb26;">'&#926;'</span>
 
-<span style="color: #7c6f64;">"" built in plugins</span>
-<span style="color: #fb4933;">let</span> <span style="color: #83a598;">loaded_netrw</span> <span style="color: #d3869b;">=</span> <span style="color: #87ceeb;">0</span>                                    <span style="color: #7c6f64;">" diable netew</span>
-<span style="color: #fb4933;">let</span> <span style="color: #83a598;">g:omni_sql_no_default_maps</span> <span style="color: #d3869b;">=</span> <span style="color: #87ceeb;">1</span>                      <span style="color: #7c6f64;">" disable sql omni completion</span>
-<span style="color: #fb4933;">let</span> <span style="color: #83a598;">g:loaded_python_provider</span> <span style="color: #d3869b;">=</span> <span style="color: #87ceeb;">0</span>
-<span style="color: #fb4933;">let</span> <span style="color: #83a598;">g:loaded_perl_provider</span> <span style="color: #d3869b;">=</span> <span style="color: #87ceeb;">0</span>
-<span style="color: #fb4933;">let</span> <span style="color: #83a598;">g:loaded_ruby_provider</span> <span style="color: #d3869b;">=</span> <span style="color: #87ceeb;">0</span>
-<span style="color: #fb4933;">let</span> <span style="color: #83a598;">g:python3_host_prog</span> <span style="color: #d3869b;">=</span> <span style="color: #fabd2f;">expand</span>(<span style="color: #b8bb26;">'/usr/bin/python3'</span>)
-
 <span style="color: #7c6f64;">"" coc</span>
-
-<span style="color: #7c6f64;">" Navigate snippet placeholders using tab</span>
+<span style="color: #7c6f64;">" navigate snippet placeholders using tab</span>
 <span style="color: #fb4933;">let</span> <span style="color: #83a598;">g:coc_snippet_next</span> <span style="color: #d3869b;">=</span> <span style="color: #b8bb26;">'&lt;Tab&gt;'</span>
 <span style="color: #fb4933;">let</span> <span style="color: #83a598;">g:coc_snippet_prev</span> <span style="color: #d3869b;">=</span> <span style="color: #b8bb26;">'&lt;S-Tab&gt;'</span>
-
 <span style="color: #7c6f64;">" list of the extensions to make sure are always installed</span>
-<span style="color: #fb4933;">let</span> <span style="color: #83a598;">g:coc_global_extensions</span> <span style="color: #d3869b;">=</span> [
-            \'coc<span style="color: #d3869b;">-</span>lists<span style="color: #b8bb26;">',</span>
-<span style="color: #b8bb26;">            \'coc-clangd'</span>,
-            \'coc<span style="color: #d3869b;">-</span><span style="color: #83a598;">highlight</span><span style="color: #b8bb26;">',</span>
-<span style="color: #b8bb26;">            \]</span>
+<span style="color: #fb4933;">let</span> <span style="color: #83a598;">g:coc_global_extensions</span> <span style="color: #d3869b;">=</span> [<span style="color: #b8bb26;">'coc-lists'</span>, <span style="color: #b8bb26;">'coc-clangd'</span>, <span style="color: #b8bb26;">'coc-highlight'</span>,]
 
-<span style="color: #b8bb26;">"" FZF</span>
-<span style="color: #b8bb26;">let g:fzf_action = {</span>
-<span style="color: #b8bb26;">  \ '</span>ctrl<span style="color: #d3869b;">-</span><span style="color: #fb4933;">t</span><span style="color: #b8bb26;">': '</span><span style="color: #fb4933;">tab</span> split<span style="color: #b8bb26;">',</span>
-<span style="color: #b8bb26;">  \ '</span>ctrl<span style="color: #d3869b;">-</span><span style="color: #fb4933;">x</span><span style="color: #b8bb26;">': '</span><span style="color: #fb4933;">split</span><span style="color: #b8bb26;">',</span>
-<span style="color: #b8bb26;">  \ '</span>ctrl<span style="color: #d3869b;">-</span>v<span style="color: #b8bb26;">': '</span><span style="color: #fb4933;">vsplit</span><span style="color: #b8bb26;">' }</span>
+<span style="color: #7c6f64;">"" fzf</span>
+<span style="color: #7c6f64;">" fzf actions</span>
+<span style="color: #fb4933;">let</span> <span style="color: #83a598;">g:fzf_action</span> <span style="color: #d3869b;">=</span> {
+  \ <span style="color: #b8bb26;">'ctrl-t'</span>: <span style="color: #b8bb26;">'tab split'</span>,
+  \ <span style="color: #b8bb26;">'ctrl-x'</span>: <span style="color: #b8bb26;">'split'</span>,
+  \ <span style="color: #b8bb26;">'ctrl-v'</span>: <span style="color: #b8bb26;">'vsplit'</span>}
+<span style="color: #7c6f64;">" fzf layout</span>
+<span style="color: #fb4933;">let</span> <span style="color: #83a598;">g:fzf_layout</span> <span style="color: #d3869b;">=</span> {<span style="color: #b8bb26;">'up'</span>:<span style="color: #b8bb26;">'~90%'</span>, <span style="color: #b8bb26;">'window'</span>: { <span style="color: #b8bb26;">'width'</span>: <span style="color: #87ceeb;">0.8</span>, <span style="color: #b8bb26;">'height'</span>: <span style="color: #87ceeb;">0.8</span>,<span style="color: #b8bb26;">'yoffset'</span>:<span style="color: #87ceeb;">0.5</span>,<span style="color: #b8bb26;">'xoffset'</span>: <span style="color: #87ceeb;">0.5</span>, <span style="color: #b8bb26;">'border'</span>: <span style="color: #b8bb26;">'sharp'</span> } }
+<span style="color: #7c6f64;">" fzf tag command (if available)</span>
+<span style="color: #fb4933;">let</span> <span style="color: #83a598;">g:fzf_tags_command</span> <span style="color: #d3869b;">=</span> <span style="color: #b8bb26;">'ctags -R'</span>
+<span style="color: #7c6f64;">" define fzf environment variables</span>
+<span style="color: #fb4933;">let</span> $FZF_DEFAULT_OPTS <span style="color: #d3869b;">=</span> <span style="color: #b8bb26;">'--layout=reverse --inline-info'</span>
+<span style="color: #fb4933;">let</span> $FZF_DEFAULT_COMMAND <span style="color: #d3869b;">=</span> <span style="color: #7c6f64;">"rg --files --hidden --glob '!.git/**' --glob '!build/**' --glob '!.dart_tool/**' --glob '!.idea' --glob '!node_modules'"</span>
 
-<span style="color: #b8bb26;">let g:fzf_layout = {'</span><span style="color: #fb4933;">up</span><span style="color: #b8bb26;">':'</span>~<span style="color: #87ceeb;">90</span>%<span style="color: #b8bb26;">', '</span><span style="color: #83a598;">window</span><span style="color: #b8bb26;">': { '</span>width<span style="color: #b8bb26;">': 0.8, '</span>height<span style="color: #b8bb26;">': 0.8,'</span>yoffset<span style="color: #b8bb26;">':0.5,'</span>xoffset<span style="color: #b8bb26;">': 0.5, '</span>border<span style="color: #b8bb26;">': '</span>sharp<span style="color: #b8bb26;">' } }</span>
-<span style="color: #b8bb26;">let g:fzf_tags_command = '</span>ctags <span style="color: #d3869b;">-</span>R<span style="color: #b8bb26;">'</span>
+<span style="color: #7c6f64;">"" highlightyank</span>
+<span style="color: #7c6f64;">" highlight yanked area duration (1 second)</span>
+<span style="color: #fb4933;">let</span> <span style="color: #83a598;">g:highlightedyank_highlight_duration</span> <span style="color: #d3869b;">=</span> <span style="color: #87ceeb;">1000</span>
 
-<span style="color: #b8bb26;">let $FZF_DEFAULT_OPTS = '</span><span style="color: #d3869b;">--</span>layout<span style="color: #d3869b;">=</span>reverse <span style="color: #d3869b;">--</span>inline<span style="color: #d3869b;">-</span>info<span style="color: #b8bb26;">'</span>
-<span style="color: #b8bb26;">let $FZF_DEFAULT_COMMAND = "rg --files --hidden --glob '</span><span style="color: #d3869b;">!.</span>git/**<span style="color: #b8bb26;">' --glob '</span><span style="color: #d3869b;">!</span>build/**<span style="color: #b8bb26;">' --glob '</span><span style="color: #d3869b;">!.</span>dart_tool/**<span style="color: #b8bb26;">' --glob '</span><span style="color: #d3869b;">!.</span>idea<span style="color: #b8bb26;">' --glob '</span><span style="color: #d3869b;">!</span>node_modules<span style="color: #b8bb26;">'"</span>
+<span style="color: #7c6f64;">"</span>
+<span style="color: #7c6f64;">" --- Commands --</span>
+<span style="color: #7c6f64;">"</span>
 
-<span style="color: #b8bb26;">" highlight yanked area</span>
-<span style="color: #b8bb26;">let g:highlightedyank_highlight_duration = 1000</span>
+<span style="color: #7c6f64;">" don't auto comment on newlines</span>
+<span style="color: #fb4933;">au</span> BufEnter * <span style="color: #fb4933;">set</span> <span style="color: #83a598;">fo</span><span style="color: #d3869b;">-=</span><span style="color: #fb4933;">c</span> <span style="color: #83a598;">fo</span><span style="color: #d3869b;">-=</span><span style="color: #fb4933;">r</span> <span style="color: #83a598;">fo</span><span style="color: #d3869b;">-=</span><span style="color: #fb4933;">o</span>
+<span style="color: #7c6f64;">" help in vertical split</span>
+<span style="color: #fb4933;">au</span> FileType help <span style="color: #fb4933;">wincmd</span> L
+<span style="color: #7c6f64;">" remove trailing whitespaces</span>
+<span style="color: #fb4933;">au</span> BufWritePre * :%s/\s\<span style="color: #d3869b;">+</span>$//<span style="color: #fb4933;">e</span>
+<span style="color: #7c6f64;">" highlight match on cursor hold (coc)</span>
+<span style="color: #fb4933;">au</span> CursorHold * <span style="color: #fb4933;">silent</span> call <span style="color: #fabd2f;">CocActionAsync</span>(<span style="color: #b8bb26;">'highlight'</span>)
+<span style="color: #7c6f64;">" when to check if the file has been changed in another program</span>
+<span style="color: #fb4933;">au</span> FocusGained,BufEnter * <span style="color: #fb4933;">checktime</span>
 
-<span style="color: #b8bb26;">"}}}</span>
+<span style="color: #7c6f64;">" Insert mode when it enters terminal</span>
+<span style="color: #fb4933;">autocmd</span> TermOpen * <span style="color: #fb4933;">startinsert</span>
 
-<span style="color: #b8bb26;">" ======================== Commands ============================= "{{{</span>
+<span style="color: #7c6f64;">" coc completion popup</span>
+<span style="color: #fb4933;">autocmd</span><span style="color: #d3869b;">!</span> CompleteDone * <span style="color: #fb4933;">if</span> <span style="color: #fabd2f;">pumvisible</span>() <span style="color: #d3869b;">==</span> <span style="color: #87ceeb;">0</span> | <span style="color: #fb4933;">pclose</span> | <span style="color: #fb4933;">endif</span>
 
-<span style="color: #b8bb26;">au BufEnter * set fo-=c fo-=r fo-=o                     " stop annoying auto commenting on new lines</span>
-<span style="color: #b8bb26;">au FileType help wincmd L                               " open help in vertical split</span>
-<span style="color: #b8bb26;">au BufWritePre * :%s/\s\+$//e                           " remove trailing whitespaces before saving</span>
-<span style="color: #b8bb26;">au CursorHold * silent call CocActionAsync('</span><span style="color: #83a598;">highlight</span><span style="color: #b8bb26;">') " highlight match on cursor hold</span>
-<span style="color: #b8bb26;">au FocusGained,BufEnter * checktime                     " when to check if file has been changed from outside</span>
+<span style="color: #7c6f64;">" fzf if passed argument is a folder</span>
+<span style="color: #fb4933;">augroup</span> folderarg
+    <span style="color: #7c6f64;">" change working directory to passed directory</span>
+    <span style="color: #fb4933;">autocmd</span> VimEnter * <span style="color: #fb4933;">if</span> <span style="color: #fabd2f;">argc</span>() <span style="color: #d3869b;">!=</span> <span style="color: #87ceeb;">0</span> <span style="color: #d3869b;">&amp;&amp;</span> <span style="color: #fabd2f;">isdirectory</span>(<span style="color: #fabd2f;">argv</span>()[<span style="color: #87ceeb;">0</span>]) | <span style="color: #fb4933;">execute</span> <span style="color: #b8bb26;">'cd'</span> <span style="color: #fabd2f;">fnameescape</span>(<span style="color: #fabd2f;">argv</span>()[<span style="color: #87ceeb;">0</span>])  | <span style="color: #fb4933;">endif</span>
+    <span style="color: #7c6f64;">" start fzf on passed directory</span>
+    <span style="color: #fb4933;">autocmd</span> VimEnter * <span style="color: #fb4933;">if</span> <span style="color: #fabd2f;">argc</span>() <span style="color: #d3869b;">!=</span> <span style="color: #87ceeb;">0</span> <span style="color: #d3869b;">&amp;&amp;</span> <span style="color: #fabd2f;">isdirectory</span>(<span style="color: #fabd2f;">argv</span>()[<span style="color: #87ceeb;">0</span>]) | <span style="color: #fb4933;">execute</span> <span style="color: #b8bb26;">'Files '</span> <span style="color: #fabd2f;">fnameescape</span>(<span style="color: #fabd2f;">argv</span>()[<span style="color: #87ceeb;">0</span>]) | <span style="color: #fb4933;">endif</span>
+<span style="color: #fb4933;">augroup</span> END
 
-<span style="color: #b8bb26;">" Term BufEnter</span>
-<span style="color: #b8bb26;">autocmd TermOpen * startinsert</span>
-
-<span style="color: #b8bb26;">" coc completion popup</span>
-<span style="color: #b8bb26;">autocmd! CompleteDone * if pumvisible() == 0 | pclose | endif</span>
-
-<span style="color: #b8bb26;">" fzf if passed argument is a folder</span>
-<span style="color: #b8bb26;">augroup folderarg</span>
-<span style="color: #b8bb26;">    " change working directory to passed directory</span>
-<span style="color: #b8bb26;">    autocmd VimEnter * if argc() != 0 &amp;&amp; isdirectory(argv()[0]) | execute '</span><span style="color: #83a598;">cd</span><span style="color: #b8bb26;">' fnameescape(argv()[0])  | endif</span>
-
-<span style="color: #b8bb26;">    " start fzf on passed directory</span>
-<span style="color: #b8bb26;">    autocmd VimEnter * if argc() != 0 &amp;&amp; isdirectory(argv()[0]) | execute '</span>Files <span style="color: #b8bb26;">' fnameescape(argv()[0]) | endif</span>
-<span style="color: #b8bb26;">augroup END</span>
-
-<span style="color: #b8bb26;">" Return to last edit position when opening files</span>
-<span style="color: #b8bb26;">autocmd BufReadPost *</span>
-<span style="color: #b8bb26;">     \ if line("'</span>\"<span style="color: #7c6f64;">") &gt; 0 &amp;&amp; line("'\"") &lt;= line("$") |</span>
+<span style="color: #7c6f64;">" Return to last edit position when opening files</span>
+<span style="color: #fb4933;">autocmd</span> BufReadPost *
+     \ <span style="color: #fb4933;">if</span> <span style="color: #fabd2f;">line</span>(<span style="color: #7c6f64;">"'\"") &gt; 0 &amp;&amp; line("'\"") &lt;= line("$") |</span>
      \   <span style="color: #fb4933;">exe</span> <span style="color: #7c6f64;">"normal! g`\"" |</span>
      \ <span style="color: #fb4933;">endif</span>
 
@@ -261,9 +319,9 @@ Plug <span style="color: #b8bb26;">'t9md/vim-choosewin'</span>                  
 <span style="color: #7c6f64;">" timestamp</span>
 <span style="color: #fb4933;">command</span><span style="color: #d3869b;">!</span> TimeStamp <span style="color: #fb4933;">call</span> <span style="color: #fabd2f;">InsertDateStamp</span>()
 
-<span style="color: #7c6f64;">"}}}</span>
-
-<span style="color: #7c6f64;">" ================== Custom Functions ===================== "{{{</span>
+<span style="color: #7c6f64;">"</span>
+<span style="color: #7c6f64;">" --- Functions ---</span>
+<span style="color: #7c6f64;">"</span>
 
 <span style="color: #7c6f64;">" advanced grep(faster with preview)</span>
 <span style="color: #fb4933;">function</span><span style="color: #d3869b;">!</span> <span style="color: #fabd2f;">RipgrepFzf</span>(query, fullscreen)
@@ -280,7 +338,7 @@ Plug <span style="color: #b8bb26;">'t9md/vim-choosewin'</span>                  
   <span style="color: #fb4933;">return</span> <span style="color: #d3869b;">!</span><span style="color: #fb4933;">col</span> <span style="color: #d3869b;">||</span> <span style="color: #fabd2f;">getline</span>(<span style="color: #b8bb26;">'.'</span>)[<span style="color: #fb4933;">col</span> <span style="color: #d3869b;">-</span> <span style="color: #87ceeb;">1</span>]  <span style="color: #d3869b;">=~#</span> <span style="color: #b8bb26;">'\s'</span>
 <span style="color: #fb4933;">endfunction</span>
 
-<span style="color: #7c6f64;">" show docs on things with K</span>
+<span style="color: #7c6f64;">" show docs on things with &lt;S-k&gt;</span>
 <span style="color: #fb4933;">function</span><span style="color: #d3869b;">!</span> <span style="color: #fabd2f;">s:show_documentation</span>()
   <span style="color: #fb4933;">if</span> (<span style="color: #fabd2f;">index</span>([<span style="color: #b8bb26;">'vim'</span>,<span style="color: #b8bb26;">'help'</span>], &amp;<span style="color: #83a598;">filetype</span>) <span style="color: #d3869b;">&gt;=</span> <span style="color: #87ceeb;">0</span>)
     <span style="color: #fb4933;">execute</span> <span style="color: #b8bb26;">'h '</span><span style="color: #d3869b;">.</span><span style="color: #fabd2f;">expand</span>(<span style="color: #b8bb26;">'&lt;cword&gt;'</span>)
@@ -302,34 +360,30 @@ Plug <span style="color: #b8bb26;">'t9md/vim-choosewin'</span>                  
     :<span style="color: #fb4933;">set</span> <span style="color: #83a598;">ft</span><span style="color: #d3869b;">=</span>scratch
 <span style="color: #fb4933;">endfunction</span>
 
+<span style="color: #7c6f64;">" function to insert time stamp</span>
 <span style="color: #fb4933;">function</span><span style="color: #d3869b;">!</span> <span style="color: #fabd2f;">InsertDateStamp</span>()
     <span style="color: #fb4933;">let</span> <span style="color: #83a598;">l:date</span> <span style="color: #d3869b;">=</span> <span style="color: #fabd2f;">system</span>(<span style="color: #b8bb26;">'date +\%F'</span>)
     <span style="color: #fb4933;">let</span> <span style="color: #83a598;">l:oneline_date</span> <span style="color: #d3869b;">=</span> <span style="color: #fabd2f;">split</span>(date, <span style="color: #7c6f64;">"\n")[0]</span>
     <span style="color: #fb4933;">execute</span> <span style="color: #7c6f64;">"normal! a" . oneline_date . "\&lt;Esc&gt;"</span>
 <span style="color: #fb4933;">endfunction</span>
 
-<span style="color: #7c6f64;">"}}}</span>
-
-<span style="color: #7c6f64;">" ======================== Custom Mappings ====================== "{{{</span>
-
-<span style="color: #7c6f64;">"" main customs</span>
-
-<span style="color: #7c6f64;">"" multiple cursors</span>
-<span style="color: #fb4933;">let</span> <span style="color: #83a598;">g:VM_leader</span><span style="color: #d3869b;">=</span><span style="color: #7c6f64;">"\\"</span>
-<span style="color: #fb4933;">let</span> <span style="color: #83a598;">g:VM_default_mappings</span> <span style="color: #d3869b;">=</span> <span style="color: #87ceeb;">0</span>
-
-<span style="color: #fb4933;">let</span> <span style="color: #83a598;">g:VM_maps</span> <span style="color: #d3869b;">=</span> {}
-<span style="color: #fb4933;">let</span> <span style="color: #83a598;">g:VM_maps</span>[<span style="color: #b8bb26;">'Find Under'</span>]         <span style="color: #d3869b;">=</span> <span style="color: #b8bb26;">'&lt;M-j&gt;'</span>           <span style="color: #7c6f64;">" replace C-n</span>
-<span style="color: #fb4933;">let</span> <span style="color: #83a598;">g:VM_maps</span>[<span style="color: #b8bb26;">'Find Subword Under'</span>] <span style="color: #d3869b;">=</span> <span style="color: #b8bb26;">'&lt;M-j&gt;'</span>           <span style="color: #7c6f64;">" replace visual C-n</span>
+<span style="color: #7c6f64;">"</span>
+<span style="color: #7c6f64;">" --- Mappings ---</span>
+<span style="color: #7c6f64;">"</span>
 
 <span style="color: #7c6f64;">"" the essentials</span>
+<span style="color: #7c6f64;">" leader</span>
 <span style="color: #fb4933;">let</span> <span style="color: #83a598;">mapleader</span><span style="color: #d3869b;">=</span><span style="color: #7c6f64;">","</span>
 
 <span style="color: #fb4933;">nnoremap</span> ; :
 
+<span style="color: #7c6f64;">" open config file</span>
 <span style="color: #fb4933;">nmap</span> <span style="color: #d3869b;">&lt;</span>leader<span style="color: #d3869b;">&gt;</span><span style="color: #fb4933;">r</span> :<span style="color: #83a598;">so</span> ~/<span style="color: #d3869b;">.</span>config/nvim/init<span style="color: #d3869b;">.</span><span style="color: #fb4933;">vim</span><span style="color: #d3869b;">&lt;</span>CR<span style="color: #d3869b;">&gt;</span>
+<span style="color: #7c6f64;">" close buffer</span>
 <span style="color: #fb4933;">nmap</span> <span style="color: #d3869b;">&lt;</span>leader<span style="color: #d3869b;">&gt;</span><span style="color: #fb4933;">q</span> :<span style="color: #fb4933;">bd</span><span style="color: #d3869b;">&lt;</span>CR<span style="color: #d3869b;">&gt;</span>
+<span style="color: #7c6f64;">" save</span>
 <span style="color: #fb4933;">nmap</span> <span style="color: #d3869b;">&lt;</span>leader<span style="color: #d3869b;">&gt;</span><span style="color: #fb4933;">w</span> :<span style="color: #fb4933;">w</span><span style="color: #d3869b;">&lt;</span>CR<span style="color: #d3869b;">&gt;</span>
+<span style="color: #7c6f64;">" format (if available)</span>
 <span style="color: #fb4933;">map</span> <span style="color: #d3869b;">&lt;</span>leader<span style="color: #d3869b;">&gt;</span>s :Format<span style="color: #d3869b;">&lt;</span>CR<span style="color: #d3869b;">&gt;</span>
 
 <span style="color: #7c6f64;">" buffer change</span>
@@ -343,18 +397,12 @@ Plug <span style="color: #b8bb26;">'t9md/vim-choosewin'</span>                  
 <span style="color: #fb4933;">map</span> <span style="color: #d3869b;">&lt;</span>Home<span style="color: #d3869b;">&gt;</span> ^
 <span style="color: #fb4933;">imap</span> <span style="color: #d3869b;">&lt;</span>Home<span style="color: #d3869b;">&gt;</span> <span style="color: #d3869b;">&lt;</span>Esc<span style="color: #d3869b;">&gt;</span>^i
 
-<span style="color: #7c6f64;">" use a different register for delete and paste</span>
-<span style="color: #7c6f64;">" nnoremap d "_d</span>
-<span style="color: #7c6f64;">" vnoremap d "_d</span>
-<span style="color: #7c6f64;">" vnoremap p "_dP</span>
-<span style="color: #7c6f64;">" nnoremap x "_x</span>
-
-<span style="color: #7c6f64;">" " switch between splits using ctrl + shift + {left,right,up,down}</span>
+<span style="color: #7c6f64;">" switch between splits using ctrl + shift + {left,right,up,down}</span>
 <span style="color: #83a598;">noremap</span> <span style="color: #d3869b;">&lt;</span>C<span style="color: #d3869b;">-</span>S<span style="color: #d3869b;">-</span>Down<span style="color: #d3869b;">&gt;</span> <span style="color: #d3869b;">&lt;</span>C<span style="color: #d3869b;">-</span>W<span style="color: #d3869b;">&gt;&lt;</span>C<span style="color: #d3869b;">-</span>J<span style="color: #d3869b;">&gt;</span>
 <span style="color: #fb4933;">nnoremap</span> <span style="color: #d3869b;">&lt;</span>C<span style="color: #d3869b;">-</span>S<span style="color: #d3869b;">-</span>Up<span style="color: #d3869b;">&gt;</span> <span style="color: #d3869b;">&lt;</span>C<span style="color: #d3869b;">-</span>W<span style="color: #d3869b;">&gt;&lt;</span>C<span style="color: #d3869b;">-</span>K<span style="color: #d3869b;">&gt;</span>
 <span style="color: #fb4933;">nnoremap</span> <span style="color: #d3869b;">&lt;</span>C<span style="color: #d3869b;">-</span>S<span style="color: #d3869b;">-</span>Right<span style="color: #d3869b;">&gt;</span> <span style="color: #d3869b;">&lt;</span>C<span style="color: #d3869b;">-</span>W<span style="color: #d3869b;">&gt;&lt;</span>C<span style="color: #d3869b;">-</span>L<span style="color: #d3869b;">&gt;</span>
 <span style="color: #fb4933;">nnoremap</span> <span style="color: #d3869b;">&lt;</span>C<span style="color: #d3869b;">-</span>S<span style="color: #d3869b;">-</span>Left<span style="color: #d3869b;">&gt;</span> <span style="color: #d3869b;">&lt;</span>C<span style="color: #d3869b;">-</span>W<span style="color: #d3869b;">&gt;&lt;</span>C<span style="color: #d3869b;">-</span>H<span style="color: #d3869b;">&gt;</span>
-
+<span style="color: #7c6f64;">" switch between splits</span>
 <span style="color: #fb4933;">nnoremap</span> <span style="color: #d3869b;">&lt;</span>C<span style="color: #d3869b;">-</span>h<span style="color: #d3869b;">&gt;</span> <span style="color: #d3869b;">&lt;</span>C<span style="color: #d3869b;">-</span><span style="color: #fb4933;">w</span><span style="color: #d3869b;">&gt;</span>h
 <span style="color: #83a598;">noremap</span> <span style="color: #d3869b;">&lt;</span>C<span style="color: #d3869b;">-</span><span style="color: #fb4933;">j</span><span style="color: #d3869b;">&gt;</span> <span style="color: #d3869b;">&lt;</span>C<span style="color: #d3869b;">-</span><span style="color: #fb4933;">w</span><span style="color: #d3869b;">&gt;</span>j
 <span style="color: #fb4933;">nnoremap</span> <span style="color: #d3869b;">&lt;</span>C<span style="color: #d3869b;">-</span><span style="color: #fb4933;">k</span><span style="color: #d3869b;">&gt;</span> <span style="color: #d3869b;">&lt;</span>C<span style="color: #d3869b;">-</span><span style="color: #fb4933;">w</span><span style="color: #d3869b;">&gt;</span>k
@@ -363,19 +411,26 @@ Plug <span style="color: #b8bb26;">'t9md/vim-choosewin'</span>                  
 <span style="color: #7c6f64;">" disable hl with 2 esc</span>
 <span style="color: #83a598;">noremap</span> <span style="color: #d3869b;">&lt;</span><span style="color: #fb4933;">silent</span><span style="color: #d3869b;">&gt;&lt;</span>esc<span style="color: #d3869b;">&gt;</span> <span style="color: #d3869b;">&lt;</span>esc<span style="color: #d3869b;">&gt;</span>:<span style="color: #fb4933;">noh</span><span style="color: #d3869b;">&lt;</span>CR<span style="color: #d3869b;">&gt;&lt;</span>esc<span style="color: #d3869b;">&gt;</span>
 
-<span style="color: #7c6f64;">" trim white spaces</span>
+<span style="color: #7c6f64;">" trim white spaces with F2</span>
 <span style="color: #fb4933;">nnoremap</span> <span style="color: #d3869b;">&lt;</span>F2<span style="color: #d3869b;">&gt;</span> :<span style="color: #fb4933;">let</span> _s<span style="color: #d3869b;">=</span>@/<span style="color: #d3869b;">&lt;</span>Bar<span style="color: #d3869b;">&gt;</span>:%s/\s\<span style="color: #d3869b;">+</span>$//<span style="color: #fb4933;">e</span><span style="color: #d3869b;">&lt;</span>Bar<span style="color: #d3869b;">&gt;</span>:<span style="color: #fb4933;">let</span> @/<span style="color: #d3869b;">=</span>_s<span style="color: #d3869b;">&lt;</span>Bar<span style="color: #d3869b;">&gt;&lt;</span>CR<span style="color: #d3869b;">&gt;</span>
 
 <span style="color: #7c6f64;">" comments</span>
 <span style="color: #fb4933;">map</span> <span style="color: #d3869b;">&lt;</span><span style="color: #fb4933;">silent</span><span style="color: #d3869b;">&gt;&lt;</span>nowait<span style="color: #d3869b;">&gt;</span> <span style="color: #d3869b;">&lt;</span>space<span style="color: #d3869b;">&gt;</span><span style="color: #fb4933;">cl</span> gc
 
-<span style="color: #7c6f64;">"" FZF</span>
+<span style="color: #7c6f64;">"" fzf</span>
+<span style="color: #7c6f64;">" show files</span>
 <span style="color: #fb4933;">nnoremap</span> <span style="color: #d3869b;">&lt;</span><span style="color: #fb4933;">silent</span><span style="color: #d3869b;">&gt;</span> <span style="color: #d3869b;">&lt;</span>leader<span style="color: #d3869b;">&gt;</span>zf :Files<span style="color: #d3869b;">&lt;</span>CR<span style="color: #d3869b;">&gt;</span>
+<span style="color: #7c6f64;">" show buffers</span>
 <span style="color: #fb4933;">nmap</span> <span style="color: #d3869b;">&lt;</span>leader<span style="color: #d3869b;">&gt;</span>zb :Buffers<span style="color: #d3869b;">&lt;</span>CR<span style="color: #d3869b;">&gt;</span>
+<span style="color: #7c6f64;">" show commands</span>
 <span style="color: #fb4933;">nmap</span> <span style="color: #d3869b;">&lt;</span>leader<span style="color: #d3869b;">&gt;</span>zc :Commands<span style="color: #d3869b;">&lt;</span>CR<span style="color: #d3869b;">&gt;</span>
+<span style="color: #7c6f64;">" execute rg with fzf</span>
 <span style="color: #fb4933;">nmap</span> <span style="color: #d3869b;">&lt;</span>leader<span style="color: #d3869b;">&gt;</span>/ :Rg<span style="color: #d3869b;">&lt;</span>CR<span style="color: #d3869b;">&gt;</span>
+<span style="color: #7c6f64;">" show commits</span>
 <span style="color: #fb4933;">nmap</span> <span style="color: #d3869b;">&lt;</span>leader<span style="color: #d3869b;">&gt;</span>gc :Commits<span style="color: #d3869b;">&lt;</span>CR<span style="color: #d3869b;">&gt;</span>
+<span style="color: #7c6f64;">" show files under git</span>
 <span style="color: #fb4933;">nmap</span> <span style="color: #d3869b;">&lt;</span>leader<span style="color: #d3869b;">&gt;</span>gs :GFiles?<span style="color: #d3869b;">&lt;</span>CR<span style="color: #d3869b;">&gt;</span>
+<span style="color: #7c6f64;">" show history</span>
 <span style="color: #fb4933;">nmap</span> <span style="color: #d3869b;">&lt;</span>leader<span style="color: #d3869b;">&gt;</span><span style="color: #83a598;">sh</span> :History/<span style="color: #d3869b;">&lt;</span>CR<span style="color: #d3869b;">&gt;</span>
 
 <span style="color: #7c6f64;">" show mapping on all modes with F1</span>
@@ -383,25 +438,32 @@ Plug <span style="color: #b8bb26;">'t9md/vim-choosewin'</span>                  
 <span style="color: #fb4933;">imap</span> <span style="color: #d3869b;">&lt;</span>F1<span style="color: #d3869b;">&gt;</span> <span style="color: #d3869b;">&lt;</span>plug<span style="color: #d3869b;">&gt;</span>(fzf<span style="color: #d3869b;">-</span>maps<span style="color: #d3869b;">-</span>i)
 <span style="color: #fb4933;">vmap</span> <span style="color: #d3869b;">&lt;</span>F1<span style="color: #d3869b;">&gt;</span> <span style="color: #d3869b;">&lt;</span>plug<span style="color: #d3869b;">&gt;</span>(fzf<span style="color: #d3869b;">-</span>maps<span style="color: #d3869b;">-</span><span style="color: #fb4933;">x</span>)
 
-<span style="color: #7c6f64;">" multi cursor shortcuts</span>
-<span style="color: #fb4933;">nmap</span> <span style="color: #d3869b;">&lt;</span><span style="color: #fb4933;">silent</span><span style="color: #d3869b;">&gt;</span> <span style="color: #d3869b;">&lt;</span>C<span style="color: #d3869b;">-</span>a<span style="color: #d3869b;">&gt;</span> <span style="color: #d3869b;">&lt;</span>Plug<span style="color: #d3869b;">&gt;</span>(coc<span style="color: #d3869b;">-</span>cursors<span style="color: #d3869b;">-</span>word)
-<span style="color: #fb4933;">xmap</span> <span style="color: #d3869b;">&lt;</span><span style="color: #fb4933;">silent</span><span style="color: #d3869b;">&gt;</span> <span style="color: #d3869b;">&lt;</span>C<span style="color: #d3869b;">-</span>a<span style="color: #d3869b;">&gt;</span> <span style="color: #d3869b;">&lt;</span>Plug<span style="color: #d3869b;">&gt;</span>(coc<span style="color: #d3869b;">-</span>cursors<span style="color: #d3869b;">-</span>range)
+<span style="color: #7c6f64;">"" multiple cursors</span>
+<span style="color: #fb4933;">let</span> <span style="color: #83a598;">g:VM_leader</span><span style="color: #d3869b;">=</span><span style="color: #7c6f64;">"\\"</span>
+<span style="color: #fb4933;">let</span> <span style="color: #83a598;">g:VM_default_mappings</span> <span style="color: #d3869b;">=</span> <span style="color: #87ceeb;">0</span>
+<span style="color: #7c6f64;">" multiple cursors mappings</span>
+<span style="color: #fb4933;">let</span> <span style="color: #83a598;">g:VM_maps</span> <span style="color: #d3869b;">=</span> {}
+<span style="color: #fb4933;">let</span> <span style="color: #83a598;">g:VM_maps</span>[<span style="color: #b8bb26;">'Find Under'</span>]         <span style="color: #d3869b;">=</span> <span style="color: #b8bb26;">'&lt;M-j&gt;'</span>
+<span style="color: #fb4933;">let</span> <span style="color: #83a598;">g:VM_maps</span>[<span style="color: #b8bb26;">'Find Subword Under'</span>] <span style="color: #d3869b;">=</span> <span style="color: #b8bb26;">'&lt;M-j&gt;'</span>
 
-<span style="color: #7c6f64;">" Use `[g` and `]g` to navigate diagnostics</span>
+<span style="color: #7c6f64;">" Use [g and ]g to navigate diagnostics</span>
 <span style="color: #fb4933;">nmap</span> <span style="color: #d3869b;">&lt;</span><span style="color: #fb4933;">silent</span><span style="color: #d3869b;">&gt;</span> [g <span style="color: #d3869b;">&lt;</span>Plug<span style="color: #d3869b;">&gt;</span>(coc<span style="color: #d3869b;">-</span>diagnostic<span style="color: #d3869b;">-</span><span style="color: #fb4933;">prev</span>)
 <span style="color: #fb4933;">nmap</span> <span style="color: #d3869b;">&lt;</span><span style="color: #fb4933;">silent</span><span style="color: #d3869b;">&gt;</span> ]g <span style="color: #d3869b;">&lt;</span>Plug<span style="color: #d3869b;">&gt;</span>(coc<span style="color: #d3869b;">-</span>diagnostic<span style="color: #d3869b;">-</span><span style="color: #fb4933;">next</span>)
 
-<span style="color: #7c6f64;">" other stuff</span>
+<span style="color: #7c6f64;">" coc rename</span>
 <span style="color: #fb4933;">nmap</span> <span style="color: #d3869b;">&lt;</span>leader<span style="color: #d3869b;">&gt;</span><span style="color: #fb4933;">rn</span> <span style="color: #d3869b;">&lt;</span>Plug<span style="color: #d3869b;">&gt;</span>(coc<span style="color: #d3869b;">-</span>rename)
 <span style="color: #fb4933;">nmap</span> <span style="color: #d3869b;">&lt;</span>leader<span style="color: #d3869b;">&gt;</span><span style="color: #fb4933;">o</span> :OR <span style="color: #d3869b;">&lt;</span>CR<span style="color: #d3869b;">&gt;</span>
 
-<span style="color: #7c6f64;">" jump stuff</span>
+<span style="color: #7c6f64;">" coc jump to definition</span>
 <span style="color: #fb4933;">nmap</span> <span style="color: #d3869b;">&lt;</span>leader<span style="color: #d3869b;">&gt;</span><span style="color: #83a598;">cd</span> <span style="color: #d3869b;">&lt;</span>Plug<span style="color: #d3869b;">&gt;</span>(coc<span style="color: #d3869b;">-</span>definition)
+<span style="color: #7c6f64;">" coc jump to type definition</span>
 <span style="color: #fb4933;">nmap</span> <span style="color: #d3869b;">&lt;</span>leader<span style="color: #d3869b;">&gt;</span>cy <span style="color: #d3869b;">&lt;</span>Plug<span style="color: #d3869b;">&gt;</span>(coc<span style="color: #d3869b;">-</span>type<span style="color: #d3869b;">-</span>definition)
+<span style="color: #7c6f64;">" coc jump to implementation</span>
 <span style="color: #fb4933;">nmap</span> <span style="color: #d3869b;">&lt;</span>leader<span style="color: #d3869b;">&gt;</span><span style="color: #83a598;">ci</span> <span style="color: #d3869b;">&lt;</span>Plug<span style="color: #d3869b;">&gt;</span>(coc<span style="color: #d3869b;">-</span>implementation)
+<span style="color: #7c6f64;">" coc jump to references (1 or multiple)</span>
 <span style="color: #fb4933;">nmap</span> <span style="color: #d3869b;">&lt;</span>leader<span style="color: #d3869b;">&gt;</span><span style="color: #fb4933;">cr</span> <span style="color: #d3869b;">&lt;</span>Plug<span style="color: #d3869b;">&gt;</span>(coc<span style="color: #d3869b;">-</span>references)
 
-<span style="color: #7c6f64;">" Choosewin</span>
+<span style="color: #7c6f64;">" choosewin</span>
 <span style="color: #fb4933;">nmap</span> <span style="color: #d3869b;">-</span> <span style="color: #d3869b;">&lt;</span>Plug<span style="color: #d3869b;">&gt;</span>(choosewin)
 
 <span style="color: #7c6f64;">" Use &lt;c-space&gt; to trigger completion.</span>
@@ -427,8 +489,95 @@ Plug <span style="color: #b8bb26;">'t9md/vim-choosewin'</span>                  
 <span style="color: #fb4933;">nnoremap</span> <span style="color: #d3869b;">&lt;</span><span style="color: #fb4933;">silent</span><span style="color: #d3869b;">&gt;&lt;</span>nowait<span style="color: #d3869b;">&gt;</span> <span style="color: #d3869b;">&lt;</span>space<span style="color: #d3869b;">&gt;</span>cs  :<span style="color: #d3869b;">&lt;</span>C<span style="color: #d3869b;">-</span>u<span style="color: #d3869b;">&gt;</span>CocList <span style="color: #d3869b;">-</span>I symbols<span style="color: #d3869b;">&lt;</span><span style="color: #fb4933;">cr</span><span style="color: #d3869b;">&gt;</span>
 <span style="color: #7c6f64;">" Resume latest coc list.</span>
 <span style="color: #fb4933;">nnoremap</span> <span style="color: #d3869b;">&lt;</span><span style="color: #fb4933;">silent</span><span style="color: #d3869b;">&gt;&lt;</span>nowait<span style="color: #d3869b;">&gt;</span> <span style="color: #d3869b;">&lt;</span>space<span style="color: #d3869b;">&gt;</span><span style="color: #83a598;">cp</span>  :<span style="color: #d3869b;">&lt;</span>C<span style="color: #d3869b;">-</span>u<span style="color: #d3869b;">&gt;</span>CocListResume<span style="color: #d3869b;">&lt;</span>CR<span style="color: #d3869b;">&gt;</span>
+</pre>
+</div>
+</div>
+</div>
 
-<span style="color: #7c6f64;">"}}}</span>
+<div id="outline-container-orgb916a2a" class="outline-2">
+<h2 id="orgb916a2a"><code>~/.config/nvim/after/ftplugin/rust.vim</code></h2>
+<div class="outline-text-2" id="text-orgb916a2a">
+<div class="org-src-container">
+<pre class="src src-vimrc"><span style="color: #7c6f64;">" general</span>
+<span style="color: #fb4933;">set</span> <span style="color: #83a598;">makeprg</span><span style="color: #d3869b;">=</span>cargo
+
+<span style="color: #7c6f64;">" Rust documentation checking</span>
+
+<span style="color: #fb4933;">function</span><span style="color: #d3869b;">!</span> <span style="color: #fabd2f;">RustDocs</span>()
+    <span style="color: #fb4933;">let</span> <span style="color: #83a598;">l:word</span> <span style="color: #d3869b;">=</span> <span style="color: #fabd2f;">expand</span>(<span style="color: #7c6f64;">"&lt;cword&gt;")</span>
+    :<span style="color: #fb4933;">call</span> <span style="color: #fabd2f;">RustMan</span>(word)
+<span style="color: #fb4933;">endfunction</span>
+
+<span style="color: #fb4933;">function</span><span style="color: #d3869b;">!</span> <span style="color: #fabd2f;">RustMan</span>(word)
+    <span style="color: #fb4933;">let</span> <span style="color: #83a598;">l:command</span>  <span style="color: #d3869b;">=</span> <span style="color: #b8bb26;">':split | :te rusty-man '</span> <span style="color: #d3869b;">.</span> <span style="color: #83a598;">a:word</span>
+    <span style="color: #fb4933;">execute</span> command
+<span style="color: #fb4933;">endfunction</span>
+
+:<span style="color: #fb4933;">command</span><span style="color: #d3869b;">!</span> <span style="color: #d3869b;">-</span>nargs<span style="color: #d3869b;">=</span><span style="color: #87ceeb;">1</span> Rman <span style="color: #fb4933;">call</span> <span style="color: #fabd2f;">RustMan</span>(<span style="color: #d3869b;">&lt;</span><span style="color: #fb4933;">f</span><span style="color: #d3869b;">-</span>args<span style="color: #d3869b;">&gt;</span>)
+
+<span style="color: #7c6f64;">" commands</span>
+<span style="color: #fb4933;">autocmd</span> TermClose <span style="color: #83a598;">term</span>://*:rusty<span style="color: #d3869b;">-</span>man* <span style="color: #fb4933;">q</span>
+
+<span style="color: #7c6f64;">" keybindings</span>
+<span style="color: #fb4933;">nmap</span> <span style="color: #d3869b;">&lt;</span>S<span style="color: #d3869b;">-</span><span style="color: #fb4933;">l</span><span style="color: #d3869b;">&gt;</span> :<span style="color: #fb4933;">call</span> <span style="color: #fabd2f;">RustDocs</span>()<span style="color: #d3869b;">&lt;</span>CR<span style="color: #d3869b;">&gt;</span>
+<span style="color: #fb4933;">map</span> <span style="color: #d3869b;">&lt;</span>C<span style="color: #d3869b;">-</span><span style="color: #fb4933;">b</span><span style="color: #d3869b;">&gt;</span> :<span style="color: #d3869b;">!</span>clear; cargo check<span style="color: #d3869b;">&lt;</span>CR<span style="color: #d3869b;">&gt;</span>
+
+<span style="color: #7c6f64;">" abbreviations</span>
+<span style="color: #fb4933;">abclear</span>
+<span style="color: #7c6f64;">"ia dd #[derive(Debug)]</span>
+</pre>
+</div>
+</div>
+</div>
+
+<div id="outline-container-org6ba8066" class="outline-2">
+<h2 id="org6ba8066"><code>~/.config/nvim/coc-settings.json</code></h2>
+<div class="outline-text-2" id="text-org6ba8066">
+<div class="org-src-container">
+<pre class="src src-js">{
+    <span style="color: #7c6f64;">// </span><span style="color: #7c6f64;">normal settings</span>
+    <span style="color: #b8bb26;">"coc.preferences.colorSupport"</span>: <span style="color: #d3869b;">true</span>,
+    <span style="color: #b8bb26;">"coc.preferences.snippetStatusText"</span>: <span style="color: #b8bb26;">"&#9416; "</span>,
+    <span style="color: #b8bb26;">"coc.preferences.formatOnSaveFiletypes"</span>: [
+        <span style="color: #b8bb26;">"markdown"</span>,
+        <span style="color: #b8bb26;">"python"</span>,
+        <span style="color: #b8bb26;">"rust"</span>
+    ],
+    <span style="color: #7c6f64;">// </span><span style="color: #7c6f64;">suggest settings</span>
+    <span style="color: #b8bb26;">"suggest.noselect"</span>: <span style="color: #d3869b;">false</span>,
+    <span style="color: #b8bb26;">"suggest.detailField"</span>: <span style="color: #b8bb26;">"abbr"</span>,
+    <span style="color: #b8bb26;">"suggest.snippetIndicator"</span>: <span style="color: #b8bb26;">""</span>,
+    <span style="color: #b8bb26;">"suggest.removeDuplicateItems"</span>: <span style="color: #d3869b;">true</span>,
+    <span style="color: #b8bb26;">"suggest.triggerAfterInsertEnter"</span>: <span style="color: #d3869b;">true</span>,
+    <span style="color: #b8bb26;">"suggest.timeout"</span>: 2000,
+    <span style="color: #b8bb26;">"suggest.minTriggerInputLength"</span>: 1,
+    <span style="color: #7c6f64;">// </span><span style="color: #7c6f64;">diagnostic settings</span>
+    <span style="color: #b8bb26;">"diagnostic.displayByAle"</span>: <span style="color: #d3869b;">false</span>,
+    <span style="color: #b8bb26;">"diagnostic.refreshOnInsertMode"</span>: <span style="color: #d3869b;">true</span>,
+    <span style="color: #b8bb26;">"diagnostic.errorSign"</span>: <span style="color: #b8bb26;">"&#10008;"</span>,
+    <span style="color: #b8bb26;">"diagnostic.warningSign"</span>: <span style="color: #b8bb26;">"&#9873;"</span>,
+    <span style="color: #b8bb26;">"diagnostic.infoSign"</span>: <span style="color: #b8bb26;">"&#8627;"</span>,
+    <span style="color: #b8bb26;">"diagnostic.hintSign"</span>: <span style="color: #b8bb26;">"&#8902;"</span>,
+    <span style="color: #b8bb26;">"diagnostic.checkCurrentLine"</span>: <span style="color: #d3869b;">true</span>,
+    <span style="color: #b8bb26;">"diagnostic.virtualTextPrefix"</span>: <span style="color: #b8bb26;">" &#10095;&#10095;&#10095; "</span>,
+    <span style="color: #b8bb26;">"diagnostic.virtualText"</span>: <span style="color: #d3869b;">true</span>,
+    <span style="color: #b8bb26;">"diagnostic.enableMessage"</span>: <span style="color: #b8bb26;">"never"</span>,
+    <span style="color: #7c6f64;">// </span><span style="color: #7c6f64;">list settings</span>
+    <span style="color: #b8bb26;">"list.source.grep.command"</span>: <span style="color: #b8bb26;">"rg"</span>,
+    <span style="color: #7c6f64;">// </span><span style="color: #7c6f64;">git settings</span>
+    <span style="color: #b8bb26;">"git.topRemovedSign.text"</span>: <span style="color: #b8bb26;">"&#9612;"</span>,
+    <span style="color: #b8bb26;">"git.changeRemovedSign.text"</span>: <span style="color: #b8bb26;">"&#9612;"</span>,
+    <span style="color: #b8bb26;">"git.removedSign.text"</span>: <span style="color: #b8bb26;">"&#9612;"</span>,
+    <span style="color: #b8bb26;">"git.addedSign.text"</span>: <span style="color: #b8bb26;">"&#9612;"</span>,
+    <span style="color: #b8bb26;">"git.changedSign.text"</span>: <span style="color: #b8bb26;">"&#9612;"</span>,
+    <span style="color: #7c6f64;">// </span><span style="color: #7c6f64;">coc-html</span>
+    <span style="color: #b8bb26;">"html.autoClosingTags"</span>: <span style="color: #d3869b;">true</span>,
+    <span style="color: #b8bb26;">"html.format.wrapLineLength"</span>: 0,
+    <span style="color: #b8bb26;">"html.format.indentInnerHtml"</span>: <span style="color: #d3869b;">true</span>,
+    <span style="color: #b8bb26;">"html.suggest.angular1"</span>: <span style="color: #d3869b;">false</span>,
+    <span style="color: #b8bb26;">"html.suggest.ionic"</span>: <span style="color: #d3869b;">false</span>,
+    <span style="color: #b8bb26;">"coc.source.ultisnips.filetypes"</span>: []
+}
 </pre>
 </div>
 
@@ -436,6 +585,8 @@ Plug <span style="color: #b8bb26;">'t9md/vim-choosewin'</span>                  
 <footer>
 <p><a class="footer" href="/index.html">Back</a></p>
 </footer>
+</div>
+</div>
 </div>
 </body>
 </html>
