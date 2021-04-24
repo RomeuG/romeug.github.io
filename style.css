@@ -44,6 +44,7 @@ h1 {
 h2 {
     color: var(--h2Color);
     text-align: center;
+    margin-top: 64px;
 }
 
 h3 {
@@ -158,5 +159,13 @@ code {
     font-family: monospace;
     margin: 0px 1px;
     padding: 0px 2px;
+}
+
+.org-ul {
+    margin-left: 32px;
+}
+
+#text-table-of-contents {
+    margin-left: 16px;
 }
 

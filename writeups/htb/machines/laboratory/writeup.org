@@ -83,7 +83,7 @@ version is higher than the one we are working with. Alongside this, there is a
 full explanation of how the exploit works. There’s even a video of a
 demonstration.
 
-* User Flag
+* User
 
 Metasploit has made our lives easier by having a script that does it all.
 
@@ -210,7 +210,7 @@ dexter@laboratory:~$
 
 After that, we just get the user flag!
 
-* Root Flag
+* Root
 
 Now, we don’t have the user password, so we can’t actually run =sudo -l= to
 check if the user can run some program as superuser.
