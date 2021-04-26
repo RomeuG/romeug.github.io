@@ -1,0 +1,234 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+"http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
+<head>
+<meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Headache</title>
+<meta name="generator" content="Org mode" />
+<link rel="stylesheet" type="text/css" href="/style.css"/>
+</head>
+<body>
+<div id="content">
+<h1 class="title">Headache</h1>
+<p>
+After downloading the file, we unzip and try to find out what we’re working
+with.
+First we’ll run <code>file</code> on it:
+</p>
+
+<pre class="example">
+$ file headache
+headache: ELF 64-bit LSB pie executable, x86-64, version 1 (SYSV), dynamically linked, interpreter /lib64/ld-linux-x86-64.so.2, stripped
+</pre>
+
+<p>
+It is a 64-bit ELF file, dynamically linked and it is also stripped. Since it is
+an ELF file, it is possible to run <code>elfparser</code> on it:
+</p>
+
+<pre class="example">
+$ elfparser -f headache -r
+headache - Score: 40 [Family: Undetermined]
+---- Scoring Reasons ----
+30 -&gt; Found 2+ PT_LOAD. Possible post-compilation addition of code (cryptor or packer)
+10 -&gt; Anti debug techniques
+</pre>
+
+<p>
+The binary has some kind of anti-debug technique, let’s assume its <code>ptrace</code>. The
+binary also has two <code>PT_LOAD</code> segments that will be loaded into memory.
+Running <code>strings</code> on the file doesn’t show anything useful, except this:
+</p>
+
+<pre class="example">
+$ strings headache
+...
+a15abe90c112d09369d9f9da9a8c046e
+Initialising
+Enter the key:
+Login Failed!
+Login success!
+open:
+mmap:
+mprotect:
+;*3$"
+ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/
+HTB{not_so_easy_lol}
+GCC: (Debian 8.3.0-19) 8.3.0
+.data
+.text
+.shstrtab
+</pre>
+
+<p>
+There is a flag in there, but as the name suggests, it is a fake flag. It is
+time to fire up IDA Pro and check whatever is in there. After loading the
+binary, there isn’t much information about the flow of the program, but in
+<code>_init_proc</code> we can see that <code>rax</code> is called, so this probably means we have to
+debug the binary to understand how it works. Before that, running it on the
+terminal results in this:
+</p>
+
+<pre class="example">
+$ ./headache
+Initialising.....
+Enter the key: test-key
+Login Failed!
+</pre>
+
+<p>
+It prints out <code>Initialising.....</code>, with some kind of <code>sleep</code> function being ran
+between the <code>.</code> print out. It then asks for an input key, and then prints <code>Login
+Failed!</code>.
+</p>
+
+<p>
+Having a general overview of the way it works on the surface, it is time to
+debug in IDA Pro. Once there is a breakpoint in the first call instruction in
+<code>start</code> subroutine, we should start the debug session:
+</p>
+
+
+<div id="org4d8e795" class="figure">
+<p><img src="./images/img1.jpg" alt="img1.jpg" />
+</p>
+</div>
+
+<p>
+After some steps and entering in the functions that are called, we go through a
+<code>ptrace</code> check using a <code>syscall</code> instruction (anti-debugging). After the
+<code>syscall</code>, the value of <code>eax</code> holds the return value <code>0xFFFFFFFFFFFFFFFF</code> which
+is -1, as we can verify through the <code>ptrace</code> man pages:
+</p>
+
+<pre class="example">
+RETURN VALUE
+       On success, the PTRACE_PEEK* requests return the requested data (but see NOTES), the PTRACE_SECCOMP_GET_FILTER request returns the number of instructions in the BPF program, and other requests return zero.
+
+       On  error,  all requests return -1, and errno is set to indicate the error.  Since the value returned by a successful PTRACE_PEEK* request may be -1, the caller must clear errno before the call, and then check it afterward to
+       determine whether or not an error occurred.
+</pre>
+
+<p>
+The result in <code>eax</code> is <code>-1</code> therefore it is considered an error.
+</p>
+
+
+<div id="orgc751646" class="figure">
+<p><img src="./images/img2.jpg" alt="img2.jpg" />
+</p>
+</div>
+
+<p>
+In the next instruction, the result code of <code>ptrace</code> is moved to the stack. But
+we have to bypass this check, therefore, before stepping, we just change <code>eax</code>
+to <code>0x0</code>, since it is a valid return value for <code>ptrace</code>, and then we proceed.
+</p>
+
+<p>
+While stepping, we should go through the different functions that print out
+strings to the command-line, until we arrive at a point where the function for
+input is called. Before writing anything, there are some things that should be
+considered.
+First, in the disassembly, it is possible to see a flag a bit after the input
+instructions:
+</p>
+
+
+<div id="orgdf35830" class="figure">
+<p><img src="./images/img3.jpg" alt="img3.jpg" />
+</p>
+</div>
+
+<p>
+The flag is <code>HTB{w0w_th4ts_c000l}</code>. And no, this is still not the real flag.
+This challenge as many troll flags.
+Second, after the flag instructions, there is a call to <code>__strlen_avx2</code> and a
+comparison with the number <code>20</code> and a <code>jz</code> right after, that goes over the
+“Login Failed!” code. Therefore, it seems we have to input a 20 character string
+(I don’t think the content matters, could be <code>aaaaaaaaaaaaaaaaaaaa</code>). We keep
+going, and eventually another troll flag can be found in the stack: <code>HTB{th4t_w4s_h4rd}</code>.
+And then we hit a very large block of code with a lot of <code>mov</code>, <code>add</code>, <code>xor</code>,
+<code>shl</code> and many other operations:
+</p>
+
+<div class="org-src-container">
+<pre class="src src-nasm"><span style="color: #fabd2f;">.data</span>:<span style="color: #d3869b;">0000564F559132AC</span> loc_<span style="color: #d3869b;">564F559132AC</span>:                       <span style="color: #7c6f64;">; CODE XREF: .data:0000564F55913668&#8595;j</span>
+<span style="color: #fabd2f;">.data</span>:<span style="color: #d3869b;">0000564F559132AC</span> <span style="color: #fe8019;">mov</span>     <span style="color: #83a598;">eax</span>, [<span style="color: #83a598;">rbp</span>-<span style="color: #d3869b;">8</span>]
+<span style="color: #fabd2f;">.data</span>:<span style="color: #d3869b;">0000564F559132AF</span> <span style="color: #fe8019;">movzx</span>   <span style="color: #83a598;">eax</span>, <span style="color: #d3869b;">byte</span> ptr [<span style="color: #83a598;">rbp</span>+<span style="color: #83a598;">rax</span>-<span style="color: #d3869b;">0C0h</span>]
+<span style="color: #fabd2f;">.data</span>:<span style="color: #d3869b;">0000564F559132B7</span> <span style="color: #fe8019;">mov</span>     [<span style="color: #83a598;">rbp</span>-<span style="color: #d3869b;">19h</span>], <span style="color: #83a598;">al</span>
+<span style="color: #fabd2f;">.data</span>:<span style="color: #d3869b;">0000564F559132BA</span> <span style="color: #fe8019;">movzx</span>   <span style="color: #83a598;">eax</span>, <span style="color: #d3869b;">byte</span> ptr [<span style="color: #83a598;">rbp</span>-<span style="color: #d3869b;">19h</span>]
+<span style="color: #fabd2f;">.data</span>:<span style="color: #d3869b;">0000564F559132BE</span> <span style="color: #fe8019;">shr</span>     <span style="color: #83a598;">al</span>, <span style="color: #d3869b;">5</span>
+<span style="color: #fabd2f;">.data</span>:<span style="color: #d3869b;">0000564F559132C1</span> <span style="color: #fe8019;">mov</span>     <span style="color: #83a598;">edx</span>, <span style="color: #83a598;">eax</span>
+<span style="color: #fabd2f;">.data</span>:<span style="color: #d3869b;">0000564F559132C3</span> <span style="color: #fe8019;">movzx</span>   <span style="color: #83a598;">eax</span>, <span style="color: #d3869b;">byte</span> ptr [<span style="color: #83a598;">rbp</span>-<span style="color: #d3869b;">19h</span>]
+<span style="color: #fabd2f;">.data</span>:<span style="color: #d3869b;">0000564F559132C7</span> <span style="color: #fe8019;">shl</span>     <span style="color: #83a598;">eax</span>, <span style="color: #d3869b;">3</span>
+<span style="color: #fabd2f;">.data</span>:<span style="color: #d3869b;">0000564F559132CA</span> <span style="color: #fe8019;">or</span>      <span style="color: #83a598;">eax</span>, <span style="color: #83a598;">edx</span>
+<span style="color: #fabd2f;">.data</span>:<span style="color: #d3869b;">0000564F559132CC</span> <span style="color: #fe8019;">mov</span>     [<span style="color: #83a598;">rbp</span>-<span style="color: #d3869b;">19h</span>], <span style="color: #83a598;">al</span>
+<span style="color: #fabd2f;">.data</span>:<span style="color: #d3869b;">0000564F559132CF</span> <span style="color: #fe8019;">not</span>     <span style="color: #d3869b;">byte</span> ptr [<span style="color: #83a598;">rbp</span>-<span style="color: #d3869b;">19h</span>]
+<span style="color: #fabd2f;">.data</span>:<span style="color: #d3869b;">0000564F559132D2</span> <span style="color: #fe8019;">add</span>     <span style="color: #d3869b;">byte</span> ptr [<span style="color: #83a598;">rbp</span>-<span style="color: #d3869b;">19h</span>], <span style="color: #d3869b;">2Fh</span> <span style="color: #7c6f64;">; '/'</span>
+<span style="color: #fabd2f;">.data</span>:<span style="color: #d3869b;">0000564F559132D6</span> <span style="color: #fe8019;">xor</span>     <span style="color: #d3869b;">byte</span> ptr [<span style="color: #83a598;">rbp</span>-<span style="color: #d3869b;">19h</span>], <span style="color: #d3869b;">26h</span>
+<span style="color: #fabd2f;">.data</span>:<span style="color: #d3869b;">0000564F559132DA</span> <span style="color: #fe8019;">movzx</span>   <span style="color: #83a598;">eax</span>, <span style="color: #d3869b;">byte</span> ptr [<span style="color: #83a598;">rbp</span>-<span style="color: #d3869b;">19h</span>]
+<span style="color: #fabd2f;">.data</span>:<span style="color: #d3869b;">0000564F559132DE</span> <span style="color: #fe8019;">shr</span>     <span style="color: #83a598;">al</span>, <span style="color: #d3869b;">5</span>
+<span style="color: #fabd2f;">.data</span>:<span style="color: #d3869b;">0000564F559132E1</span> <span style="color: #fe8019;">mov</span>     <span style="color: #83a598;">edx</span>, <span style="color: #83a598;">eax</span>
+<span style="color: #fabd2f;">.data</span>:<span style="color: #d3869b;">0000564F559132E3</span> <span style="color: #fe8019;">movzx</span>   <span style="color: #83a598;">eax</span>, <span style="color: #d3869b;">byte</span> ptr [<span style="color: #83a598;">rbp</span>-<span style="color: #d3869b;">19h</span>]
+<span style="color: #fabd2f;">.data</span>:<span style="color: #d3869b;">0000564F559132E7</span> <span style="color: #fe8019;">shl</span>     <span style="color: #83a598;">eax</span>, <span style="color: #d3869b;">3</span>
+<span style="color: #fabd2f;">.data</span>:<span style="color: #d3869b;">0000564F559132EA</span> <span style="color: #fe8019;">or</span>      <span style="color: #83a598;">eax</span>, <span style="color: #83a598;">edx</span>
+<span style="color: #fabd2f;">.data</span>:<span style="color: #d3869b;">0000564F559132EC</span> <span style="color: #fe8019;">mov</span>     [<span style="color: #83a598;">rbp</span>-<span style="color: #d3869b;">19h</span>], <span style="color: #83a598;">al</span>
+<span style="color: #fabd2f;">.data</span>:<span style="color: #d3869b;">0000564F559132EF</span> <span style="color: #fe8019;">sub</span>     <span style="color: #d3869b;">byte</span> ptr [<span style="color: #83a598;">rbp</span>-<span style="color: #d3869b;">19h</span>], <span style="color: #d3869b;">2</span>
+<span style="color: #fabd2f;">.data</span>:<span style="color: #d3869b;">0000564F559132F3</span> <span style="color: #fe8019;">neg</span>     <span style="color: #d3869b;">byte</span> ptr [<span style="color: #83a598;">rbp</span>-<span style="color: #d3869b;">19h</span>]
+<span style="color: #fabd2f;">.data</span>:<span style="color: #d3869b;">0000564F559132F6</span> <span style="color: #fe8019;">movzx</span>   <span style="color: #83a598;">eax</span>, <span style="color: #d3869b;">byte</span> ptr [<span style="color: #83a598;">rbp</span>-<span style="color: #d3869b;">19h</span>]
+<span style="color: #fabd2f;">.data</span>:<span style="color: #d3869b;">0000564F559132FA</span> <span style="color: #fe8019;">shr</span>     <span style="color: #83a598;">al</span>, <span style="color: #d3869b;">2</span>
+<span style="color: #fabd2f;">.data</span>:<span style="color: #d3869b;">0000564F559132FD</span> <span style="color: #fe8019;">mov</span>     <span style="color: #83a598;">edx</span>, <span style="color: #83a598;">eax</span>
+<span style="color: #fabd2f;">.data</span>:<span style="color: #d3869b;">0000564F559132FF</span> <span style="color: #fe8019;">movzx</span>   <span style="color: #83a598;">eax</span>, <span style="color: #d3869b;">byte</span> ptr [<span style="color: #83a598;">rbp</span>-<span style="color: #d3869b;">19h</span>]
+<span style="color: #fabd2f;">.data</span>:<span style="color: #d3869b;">0000564F55913303</span> <span style="color: #fe8019;">shl</span>     <span style="color: #83a598;">eax</span>, <span style="color: #d3869b;">6</span>
+<span style="color: #fabd2f;">.data</span>:<span style="color: #d3869b;">0000564F55913306</span> <span style="color: #fe8019;">or</span>      <span style="color: #83a598;">eax</span>, <span style="color: #83a598;">edx</span>
+<span style="color: #fabd2f;">.data</span>:<span style="color: #d3869b;">0000564F55913308</span> <span style="color: #fe8019;">mov</span>     [<span style="color: #83a598;">rbp</span>-<span style="color: #d3869b;">19h</span>], <span style="color: #83a598;">al</span>
+<span style="color: #fabd2f;">.data</span>:<span style="color: #d3869b;">0000564F5591330B</span> <span style="color: #fe8019;">not</span>     <span style="color: #d3869b;">byte</span> ptr [<span style="color: #83a598;">rbp</span>-<span style="color: #d3869b;">19h</span>]
+<span style="color: #fabd2f;">.data</span>:<span style="color: #d3869b;">0000564F5591330E</span> <span style="color: #fe8019;">add</span>     <span style="color: #d3869b;">byte</span> ptr [<span style="color: #83a598;">rbp</span>-<span style="color: #d3869b;">19h</span>], <span style="color: #d3869b;">47h</span> <span style="color: #7c6f64;">; 'G'</span>
+<span style="color: #fabd2f;">.data</span>:<span style="color: #d3869b;">0000564F55913312</span> <span style="color: #fe8019;">not</span>     <span style="color: #d3869b;">byte</span> ptr [<span style="color: #83a598;">rbp</span>-<span style="color: #d3869b;">19h</span>]
+<span style="color: #fabd2f;">.data</span>:<span style="color: #d3869b;">0000564F55913315</span> <span style="color: #fe8019;">xor</span>     <span style="color: #d3869b;">byte</span> ptr [<span style="color: #83a598;">rbp</span>-<span style="color: #d3869b;">19h</span>], <span style="color: #d3869b;">43h</span>
+<span style="color: #fabd2f;">.data</span>:<span style="color: #d3869b;">0000564F55913319</span> <span style="color: #fe8019;">sub</span>     <span style="color: #d3869b;">byte</span> ptr [<span style="color: #83a598;">rbp</span>-<span style="color: #d3869b;">19h</span>], <span style="color: #d3869b;">7Bh</span> <span style="color: #7c6f64;">; '{'</span>
+<span style="color: #fabd2f;">.data</span>:<span style="color: #d3869b;">0000564F5591331D</span> <span style="color: #fe8019;">movzx</span>   <span style="color: #83a598;">eax</span>, <span style="color: #d3869b;">byte</span> ptr [<span style="color: #83a598;">rbp</span>-<span style="color: #d3869b;">19h</span>]
+<span style="color: #fabd2f;">.data</span>:<span style="color: #d3869b;">0000564F55913321</span> <span style="color: #fe8019;">shr</span>     <span style="color: #83a598;">al</span>, <span style="color: #d3869b;">5</span>
+<span style="color: #fabd2f;">.data</span>:<span style="color: #d3869b;">0000564F55913324</span> <span style="color: #fe8019;">mov</span>     <span style="color: #83a598;">edx</span>, <span style="color: #83a598;">eax</span>
+<span style="color: #fabd2f;">.data</span>:<span style="color: #d3869b;">0000564F55913326</span> <span style="color: #fe8019;">movzx</span>   <span style="color: #83a598;">eax</span>, <span style="color: #d3869b;">byte</span> ptr [<span style="color: #83a598;">rbp</span>-<span style="color: #d3869b;">19h</span>]
+<span style="color: #fabd2f;">.data</span>:<span style="color: #d3869b;">0000564F5591332A</span> <span style="color: #fe8019;">shl</span>     <span style="color: #83a598;">eax</span>, <span style="color: #d3869b;">3</span>
+</pre>
+</div>
+
+<p>
+Here we can see that the value pointed to by <code>[rbp-19h]</code> is used a lot. If we go
+through the loop till the end, before a <code>cmp</code> instruction, we see that
+<code>[rbp-19h]</code> now holds the character <code>H</code>. But now there is a comparison being done,
+and it does not return zero, therefore it exits the program after printing
+“Login Failed!”.
+</p>
+
+
+<div id="org885f41b" class="figure">
+<p><img src="./images/img4.jpg" alt="img4.jpg" />
+</p>
+</div>
+
+
+<p>
+We have to change the value of <code>edx</code> to match the value of <code>eax</code> so the <code>jz</code> can
+execute the jump. After some steps, we can see that we’re in a loop, which
+executes that big block of code each time. This second time, after going through
+the loop, <code>[rbp-19h]</code> holds the character <code>T</code>. The third time, it holds the
+character <code>B</code>. It is now easy to understand where this is going. Each loop
+iteration will put the next character of the flag in <code>[rbp-19h]</code> and we have to
+keep track of it until the end of the loop. After the loop ends, we have the
+flag and “Login success!” is printed out.
+</p>
+
+<hr>
+<footer>
+<p><a class="footer" href="/index.html">Homepage</a></p>
+<p><a class="footer" href="/writeups/htb/index.html">Back</a></p>
+</footer>
+</div>
+</body>
+</html>
