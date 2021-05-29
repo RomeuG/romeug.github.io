@@ -54,7 +54,7 @@ But let us not forget about the commands that are running server-side.
 From the website, we know that the server is running =nmap=, =msfvenom= and
 =searchsploit=.
 
-* User Flag
+* User
 
 Using the =searchsploit= utility from the website, we can search =nmap= or
 =msfvenom= exploits. =Nmap= has a couple exploits, but =msfvenom= has one that
@@ -144,7 +144,7 @@ user =kid=:
 
 In =kid= home directory, we can get the =user.txt= flag.
 
-* Root Flag
+* Root
 
 There are some rabbit holes we can get into. We can rapidly see that there is an
 odd file (=/home/kid/logs/hackers=).

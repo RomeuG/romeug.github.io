@@ -16,16 +16,16 @@
 <h2>Table of Contents</h2>
 <div id="text-table-of-contents">
 <ul>
-<li><a href="#org0e8fa95">Enumeration</a></li>
+<li><a href="#orge9ffb53">Enumeration</a></li>
+<li><a href="#orgd93681b">User</a></li>
+<li><a href="#orgcfe234f">Root</a></li>
 </ul>
 </div>
 </div>
 
-
-
-<div id="outline-container-org0e8fa95" class="outline-2">
-<h2 id="org0e8fa95">Enumeration</h2>
-<div class="outline-text-2" id="text-org0e8fa95">
+<div id="outline-container-orge9ffb53" class="outline-2">
+<h2 id="orge9ffb53">Enumeration</h2>
+<div class="outline-text-2" id="text-orge9ffb53">
 <p>
 We start by using Nmap right away:
 </p>
@@ -76,7 +76,7 @@ we add it to the <code>/etc/hosts</code> file alongside the <code>laboratory.htb
 
 <p>
 By looking at the <code>laboratory.htb</code> website, we do not find anything interesting
-really. At least at a first glance. No URLs to other pages, no interesting JS
+really. At least at a first glance. No URLs to other pages, no interesting JavaScript
 files.
 </p>
 
@@ -92,7 +92,7 @@ Probably they want us to register with their own domain?
 </p>
 
 
-<div id="org543e108" class="figure">
+<div id="org582d397" class="figure">
 <p><img src="./images/img1.jpg" alt="img1.jpg" />
 </p>
 </div>
@@ -112,7 +112,12 @@ version is higher than the one we are working with. Alongside this, there is a
 full explanation of how the exploit works. There’s even a video of a
 demonstration.
 </p>
+</div>
+</div>
 
+<div id="outline-container-orgd93681b" class="outline-2">
+<h2 id="orgd93681b">User</h2>
+<div class="outline-text-2" id="text-orgd93681b">
 <p>
 Metasploit has made our lives easier by having a script that does it all.
 </p>
@@ -218,7 +223,7 @@ There is another <a href="https://docs.gitlab.com/ee/administration/troubleshoot
 </p>
 
 
-<div id="orgd5b66ec" class="figure">
+<div id="org557bc1c" class="figure">
 <p><img src="./images/img3.jpg" alt="img3.jpg" />
 </p>
 </div>
@@ -245,7 +250,7 @@ If we dig in, we can find the users’ <code>id_rsa</code> in the <code>.ssh</co
 </p>
 
 
-<div id="orgd149e93" class="figure">
+<div id="orgc7e1f7e" class="figure">
 <p><img src="./images/img4.jpg" alt="img4.jpg" />
 </p>
 </div>
@@ -263,7 +268,12 @@ dexter@laboratory:~$
 <p>
 After that, we just get the user flag!
 </p>
+</div>
+</div>
 
+<div id="outline-container-orgcfe234f" class="outline-2">
+<h2 id="orgcfe234f">Root</h2>
+<div class="outline-text-2" id="text-orgcfe234f">
 <p>
 Now, we don’t have the user password, so we can’t actually run <code>sudo -l</code> to
 check if the user can run some program as superuser.
