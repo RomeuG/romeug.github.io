@@ -103,6 +103,11 @@ In the next instruction, the result code of =ptrace= is moved to the stack. But
 we have to bypass this check, therefore, before stepping, we just change =eax=
 to =0x0=, since it is a valid return value for =ptrace=, and then we proceed.
 
+After some steps, in the function where it prints out text to the command-line,
+there is another =ptrace= call, but throught =libc= and not through a syscall.
+
+[[./images/img2-1.jpg]]
+
 While stepping, we should go through the different functions that print out
 strings to the command-line, until we arrive at a point where the function for
 input is called. Before writing anything, there are some things that should be
