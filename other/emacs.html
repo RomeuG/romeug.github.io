@@ -13,21 +13,15 @@
 <div id="content">
 <h1 class="title">Emacs Configuration</h1>
 <div class="org-src-container">
-<pre class="src src-elisp"><span style="color: #7c6f64;">;; </span><span style="color: #7c6f64;">(add-hook 'emacs-startup-hook</span>
-<span style="color: #7c6f64;">;; </span><span style="color: #7c6f64;">   (lambda ()</span>
-<span style="color: #7c6f64;">;; </span><span style="color: #7c6f64;">     (setq gc-cons-threshold 16777216 ; 16mb</span>
-<span style="color: #7c6f64;">;; </span><span style="color: #7c6f64;">       gc-cons-percentage 0.1)))</span>
-
-<span style="color: #7c6f64;">;; </span><span style="color: #7c6f64;">(setq gc-cons-threshold 60000000) ; 100mb</span>
-(<span style="color: #fb4933;">setq</span> gc-cons-threshold most-positive-fixnum)
+<pre class="src src-elisp">(<span style="color: #fb4933;">setq</span> gc-cons-threshold 60000000) <span style="color: #7c6f64;">; </span><span style="color: #7c6f64;">100mb</span>
 
 <span style="color: #7c6f64;">;; </span><span style="color: #7c6f64;">file-name-handler-list optimization</span>
 (<span style="color: #fb4933;">defvar</span> <span style="color: #83a598;">my--file-name-handler-alist</span> file-name-handler-alist)
 (<span style="color: #fb4933;">setq</span> file-name-handler-alist nil)
 
 (add-hook 'emacs-startup-hook
-          (<span style="color: #fb4933;">lambda</span> ()
-            (<span style="color: #fb4933;">setq</span> file-name-handler-alist my--file-name-handler-alist)))
+                  (<span style="color: #fb4933;">lambda</span> ()
+                        (<span style="color: #fb4933;">setq</span> file-name-handler-alist my--file-name-handler-alist)))
 
 <span style="color: #7c6f64;">;; </span><span style="color: #7c6f64;">Window System</span>
 <span style="color: #7c6f64;">;; </span><span style="color: #7c6f64;">(unless (display-graphic-p)</span>
@@ -57,6 +51,7 @@
   (package-refresh-contents)
   (package-install 'use-package))
 
+<span style="color: #7c6f64;">;; </span><span style="color: #7c6f64;">load theme earlier because of off-emacs org-mode conversion</span>
 (load-theme 'gruvbox-dark-hard t)
 (set-face-attribute 'mode-line nil <span style="color: #fe8019;">:background</span> <span style="color: #b8bb26;">"#1d2021"</span> <span style="color: #fe8019;">:foreground</span> <span style="color: #b8bb26;">"#fbf1c7"</span> <span style="color: #fe8019;">:box</span> <span style="color: #b8bb26;">"#fe8019"</span>)
 
@@ -104,35 +99,35 @@
       (beginning-of-line)
       <span style="color: #7c6f64;">;; </span><span style="color: #7c6f64;">get rid of tabs at beginning of line</span>
       (<span style="color: #fb4933;">when</span> (looking-at <span style="color: #b8bb26;">"^\\s-+"</span>)
-        (untabify (match-beginning 0) (match-end 0)))
-      (<span style="color: #fb4933;">when</span> (looking-at <span style="color: #b8bb26;">"^    "</span>)
-        (replace-match <span style="color: #b8bb26;">""</span>)))))
+                (untabify (match-beginning 0) (match-end 0)))
+      (<span style="color: #fb4933;">when</span> (looking-at <span style="color: #b8bb26;">"^        "</span>)
+                (replace-match <span style="color: #b8bb26;">""</span>)))))
 
 (<span style="color: #fb4933;">defun</span> <span style="color: #fabd2f;">duplicate-line</span> (arg)
   <span style="color: #b8bb26;">"Duplicate current line, leaving point in lower line."</span>
   (<span style="color: #fb4933;">interactive</span> <span style="color: #b8bb26;">"*p"</span>)
   (<span style="color: #fb4933;">setq</span> buffer-undo-list (cons (point) buffer-undo-list))
   (<span style="color: #fb4933;">let</span> ((bol (<span style="color: #fb4933;">save-excursion</span> (beginning-of-line) (point)))
-        eol)
+                eol)
     (<span style="color: #fb4933;">save-excursion</span>
       (end-of-line)
       (<span style="color: #fb4933;">setq</span> eol (point))
       (<span style="color: #fb4933;">let</span> ((line (buffer-substring bol eol))
-            (buffer-undo-list t)
-            (count arg))
-        (<span style="color: #fb4933;">while</span> (&gt; count 0)
-          (newline)         <span style="color: #7c6f64;">;; </span><span style="color: #7c6f64;">because there is no newline in 'line'</span>
-          (insert line)
-          (<span style="color: #fb4933;">setq</span> count (1- count)))
-        )
+                        (buffer-undo-list t)
+                        (count arg))
+                (<span style="color: #fb4933;">while</span> (&gt; count 0)
+                  (newline)                     <span style="color: #7c6f64;">;; </span><span style="color: #7c6f64;">because there is no newline in 'line'</span>
+                  (insert line)
+                  (<span style="color: #fb4933;">setq</span> count (1- count)))
+                )
       (<span style="color: #fb4933;">setq</span> buffer-undo-list (cons (cons eol (point)) buffer-undo-list)))
     )
   (next-line arg))
 
 (<span style="color: #fb4933;">defun</span> <span style="color: #fabd2f;">my/disable-scroll-bars</span> (frame)
   (modify-frame-parameters frame
-                           '((vertical-scroll-bars . nil)
-                             (horizontal-scroll-bars . nil))))
+                                                   '((vertical-scroll-bars . nil)
+                                                         (horizontal-scroll-bars . nil))))
 
 (<span style="color: #fb4933;">defun</span> <span style="color: #fabd2f;">endless/flycheck-dir</span> (dir)
   <span style="color: #b8bb26;">"Run flycheck for each file in current directory.</span>
@@ -141,67 +136,67 @@
   (<span style="color: #fb4933;">displaying-byte-compile-warnings</span>
    (<span style="color: #fb4933;">let</span> ((p nil))
      (<span style="color: #fb4933;">with-current-buffer</span> (get-buffer-create
-                           byte-compile-log-buffer)
+                                                   byte-compile-log-buffer)
        (<span style="color: #fb4933;">setq</span> default-directory dir)
        (<span style="color: #fb4933;">unless</span> (eq major-mode 'compilation-mode)
-         (compilation-mode))
+                 (compilation-mode))
        (goto-char (point-max))
        (<span style="color: #fb4933;">let</span> ((inhibit-read-only t))
-         (insert <span style="color: #b8bb26;">"\n\xc\n\n"</span>))
+                 (insert <span style="color: #b8bb26;">"\n\xc\n\n"</span>))
        (<span style="color: #fb4933;">setq</span> p (point)))
      (<span style="color: #fb4933;">dolist</span> (file (directory-files <span style="color: #b8bb26;">"./"</span> nil
-                                    <span style="color: #b8bb26;">"\\`[</span><span style="color: #b8bb26;">^</span><span style="color: #b8bb26;">\\.].*\\'"</span>))
+                                                                        <span style="color: #b8bb26;">"\\`[</span><span style="color: #b8bb26;">^</span><span style="color: #b8bb26;">\\.].*\\'"</span>))
        (endless/-flycheck-file file))
      (<span style="color: #fb4933;">with-selected-window</span> (display-buffer
-                            byte-compile-log-buffer)
+                                                        byte-compile-log-buffer)
        (goto-char p)
        (recenter 1)))))
 
 (<span style="color: #fb4933;">defun</span> <span style="color: #fabd2f;">endless/-report-error</span> (fmt <span style="color: #d3869b;">&amp;rest</span> args)
   <span style="color: #b8bb26;">"Print an error on `</span><span style="color: #d3869b;">byte-compile-log-buffer</span><span style="color: #b8bb26;">'."</span>
   (<span style="color: #fb4933;">let</span> ((inhibit-read-only t)
-        (fill-prefix <span style="color: #b8bb26;">"    "</span>))
+                (fill-prefix <span style="color: #b8bb26;">"    "</span>))
     (<span style="color: #fb4933;">with-current-buffer</span> byte-compile-log-buffer
       (<span style="color: #fb4933;">let</span> ((l (point)))
-        (insert <span style="color: #b8bb26;">"\n"</span> (apply #'format fmt args))
-        (fill-region (1+ l) (point))))))
+                (insert <span style="color: #b8bb26;">"\n"</span> (apply #'format fmt args))
+                (fill-region (1+ l) (point))))))
 
 (<span style="color: #fb4933;">defun</span> <span style="color: #fabd2f;">endless/-flycheck-file</span> (file)
   <span style="color: #b8bb26;">"Check FILE and report to `</span><span style="color: #d3869b;">byte-compile-log-buffer</span><span style="color: #b8bb26;">'."</span>
   (<span style="color: #fb4933;">let</span> ((was-visited (find-buffer-visiting file)))
     (<span style="color: #fb4933;">with-current-buffer</span> (<span style="color: #fb4933;">or</span> was-visited
-                             (<span style="color: #fb4933;">progn</span> (find-file file)
-                                    (current-buffer)))
+                                                         (<span style="color: #fb4933;">progn</span> (find-file file)
+                                                                        (current-buffer)))
       (<span style="color: #fb4933;">when</span> (<span style="color: #fb4933;">ignore-errors</span> (flycheck-buffer))
-        (<span style="color: #fb4933;">while</span> (flycheck-running-p)
-          (accept-process-output nil 0.1))
-        (<span style="color: #fb4933;">pcase</span> flycheck-last-status-change
-          ((<span style="color: #fb4933;">or</span> `errored `suspicious)
-           (endless/-report-error
-            <span style="color: #b8bb26;">"%s: Something wrong here!"</span>
-            (file-name-nondirectory (buffer-file-name))))
-          (`finished
-           (<span style="color: #fb4933;">dolist</span> (e flycheck-current-errors)
-             (endless/-report-error
-              <span style="color: #b8bb26;">"%s:%s:%s:%s: %s"</span>
-              (file-name-nondirectory (buffer-file-name))
-              (flycheck-error-line e)
-              (flycheck-error-column e)
-              (flycheck-error-level e)
-              (flycheck-error-message e))))))
+                (<span style="color: #fb4933;">while</span> (flycheck-running-p)
+                  (accept-process-output nil 0.1))
+                (<span style="color: #fb4933;">pcase</span> flycheck-last-status-change
+                  ((<span style="color: #fb4933;">or</span> `errored `suspicious)
+                   (endless/-report-error
+                        <span style="color: #b8bb26;">"%s: Something wrong here!"</span>
+                        (file-name-nondirectory (buffer-file-name))))
+                  (`finished
+                   (<span style="color: #fb4933;">dolist</span> (e flycheck-current-errors)
+                         (endless/-report-error
+                          <span style="color: #b8bb26;">"%s:%s:%s:%s: %s"</span>
+                          (file-name-nondirectory (buffer-file-name))
+                          (flycheck-error-line e)
+                          (flycheck-error-column e)
+                          (flycheck-error-level e)
+                          (flycheck-error-message e))))))
       (<span style="color: #fb4933;">if</span> was-visited
-          (bury-buffer was-visited)
-        (kill-buffer (current-buffer))))))
+                  (bury-buffer was-visited)
+                (kill-buffer (current-buffer))))))
 
 (<span style="color: #fb4933;">defun</span> <span style="color: #fabd2f;">insert-date</span> (prefix)
   <span style="color: #b8bb26;">"Insert the current date. With prefix-argument, use ISO format. With</span>
 <span style="color: #b8bb26;">   two prefix arguments, write out the day and month name."</span>
   (<span style="color: #fb4933;">interactive</span> <span style="color: #b8bb26;">"P"</span>)
   (<span style="color: #fb4933;">let</span> ((format (<span style="color: #fb4933;">cond</span>
-                 ((not prefix) <span style="color: #b8bb26;">"%d.%m.%Y"</span>)
-                 ((equal prefix '(4)) <span style="color: #b8bb26;">"%Y-%m-%d"</span>)
-                 ((equal prefix '(16)) <span style="color: #b8bb26;">"%A, %d. %B %Y"</span>)))
-        (system-time-locale <span style="color: #b8bb26;">"de_DE"</span>))
+                                 ((not prefix) <span style="color: #b8bb26;">"%d.%m.%Y"</span>)
+                                 ((equal prefix '(4)) <span style="color: #b8bb26;">"%Y-%m-%d"</span>)
+                                 ((equal prefix '(16)) <span style="color: #b8bb26;">"%A, %d. %B %Y"</span>)))
+                (system-time-locale <span style="color: #b8bb26;">"de_DE"</span>))
     (insert (format-time-string format))))
 
 (<span style="color: #fb4933;">defadvice</span> <span style="color: #fabd2f;">move-beginning-of-line</span> (around smarter-bol activate)
@@ -254,7 +249,7 @@
    (format <span style="color: #b8bb26;">"https://pypi.python.org/pypi?%%3Aaction=search&amp;term=%s&amp;submit=search"</span>
            (read-string <span style="color: #b8bb26;">"Pip: "</span>)
            (message <span style="color: #b8bb26;">"Searching pip."</span>)
-           )))
+                   )))
 
 (<span style="color: #fb4933;">defun</span> <span style="color: #fabd2f;">python/doc-search</span> ()
   <span style="color: #b8bb26;">"Search Python3 official documentation. at: https://docs.python.org"</span>
@@ -325,13 +320,13 @@
   (<span style="color: #fb4933;">interactive</span>)
   (message <span style="color: #b8bb26;">"Deleting old backup files..."</span>)
   (<span style="color: #fb4933;">let</span> ((week (* 60 60 24 7))
-        (current (float-time (current-time))))
+                (current (float-time (current-time))))
     (<span style="color: #fb4933;">dolist</span> (file (directory-files temporary-file-directory t))
       (<span style="color: #fb4933;">when</span> (<span style="color: #fb4933;">and</span> (backup-file-name-p file)
-                 (&gt; (- current (float-time (fifth (file-attributes file))))
-                    week))
-        (message <span style="color: #b8bb26;">"%s"</span> file)
-        (delete-file file)))))
+                                 (&gt; (- current (float-time (fifth (file-attributes file))))
+                                        week))
+                (message <span style="color: #b8bb26;">"%s"</span> file)
+                (delete-file file)))))
 
 (<span style="color: #fb4933;">defun</span> <span style="color: #fabd2f;">my-delete-word</span> (arg)
   <span style="color: #b8bb26;">"Delete characters forward until encountering the end of a word.</span>
@@ -414,21 +409,7 @@
 <span style="color: #7c6f64;">;; </span><span style="color: #7c6f64;">CONFIGS</span>
 <span style="color: #7c6f64;">;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;</span>
 
-<span style="color: #7c6f64;">;; </span><span style="color: #7c6f64;">;; local packages</span>
-<span style="color: #7c6f64;">;; </span><span style="color: #7c6f64;">(add-to-list 'load-path "~/.config/emacs/local/")</span>
-
-<span style="color: #7c6f64;">;; </span><span style="color: #7c6f64;">(require 'nothings-mode)</span>
-<span style="color: #7c6f64;">;; </span><span style="color: #7c6f64;">(add-to-list 'auto-mode-alist '("\\.[hc]\\'" . nothings-mode))</span>
-
-<span style="color: #7c6f64;">;; </span><span style="color: #7c6f64;">(require 'nothingspp-mode)</span>
-<span style="color: #7c6f64;">;; </span><span style="color: #7c6f64;">(add-to-list 'auto-mode-alist '("\\.\\(cpp\\||hpp\\)\\'" . nothingspp-mode))</span>
-
-<span style="color: #7c6f64;">;; </span><span style="color: #7c6f64;">terminal keybinds</span>
-<span style="color: #7c6f64;">;; </span><span style="color: #7c6f64;">(define-key input-decode-map "\e[1;5A" [C-up])</span>
-<span style="color: #7c6f64;">;; </span><span style="color: #7c6f64;">(define-key input-decode-map "\e[1;5B" [C-down])</span>
-<span style="color: #7c6f64;">;; </span><span style="color: #7c6f64;">(define-key input-decode-map "\e[1;5D" [C-left])</span>
-<span style="color: #7c6f64;">;; </span><span style="color: #7c6f64;">(define-key input-decode-map "\e[1;5C" [C-right])</span>
-
+<span style="color: #7c6f64;">;; </span><span style="color: #7c6f64;">terminal bindings</span>
 (<span style="color: #fb4933;">unless</span> (display-graphic-p)
   (<span style="color: #fb4933;">progn</span>
     (define-key input-decode-map <span style="color: #b8bb26;">"\e[1;2A"</span> [(shift up)])
@@ -561,9 +542,9 @@
 (<span style="color: #fb4933;">setq-default</span> sentence-end <span style="color: #b8bb26;">"</span><span style="color: #b8bb26; font-weight: bold;">\\</span><span style="color: #b8bb26; font-weight: bold;">(</span><span style="color: #b8bb26;">[&#12290;&#12289;&#65281;&#65311;]</span><span style="color: #b8bb26; font-weight: bold;">\\</span><span style="color: #b8bb26; font-weight: bold;">|</span><span style="color: #b8bb26;">&#8230;&#8230;</span><span style="color: #b8bb26; font-weight: bold;">\\</span><span style="color: #b8bb26; font-weight: bold;">|</span><span style="color: #b8bb26;">[,.?!][]\"')}]*</span><span style="color: #b8bb26; font-weight: bold;">\\</span><span style="color: #b8bb26; font-weight: bold;">(</span><span style="color: #b8bb26;">$</span><span style="color: #b8bb26; font-weight: bold;">\\</span><span style="color: #b8bb26; font-weight: bold;">|</span><span style="color: #b8bb26;">[ \t]</span><span style="color: #b8bb26; font-weight: bold;">\\</span><span style="color: #b8bb26; font-weight: bold;">)</span><span style="color: #b8bb26; font-weight: bold;">\\</span><span style="color: #b8bb26; font-weight: bold;">)</span><span style="color: #b8bb26;">[ \t\n]*"</span>)
 (<span style="color: #fb4933;">setq-default</span> sentence-end-double-space nil)
 (<span style="color: #fb4933;">setq-default</span> set-mark-command-repeat-pop t)  <span style="color: #7c6f64;">; </span><span style="color: #7c6f64;">Repeating set-mark after popping mark pops it again</span>
-(<span style="color: #fb4933;">setq-default</span> track-eol t)          <span style="color: #7c6f64;">; </span><span style="color: #7c6f64;">Keep cursor at end of lines.</span>
-(<span style="color: #fb4933;">setq-default</span> line-move-visual nil)     <span style="color: #7c6f64;">; </span><span style="color: #7c6f64;">To be required by track-eol</span>
-(<span style="color: #fb4933;">setq-default</span> kill-whole-line t)    <span style="color: #7c6f64;">; </span><span style="color: #7c6f64;">Kill line including '\n'</span>
+(<span style="color: #fb4933;">setq-default</span> track-eol t)                      <span style="color: #7c6f64;">; </span><span style="color: #7c6f64;">Keep cursor at end of lines.</span>
+(<span style="color: #fb4933;">setq-default</span> line-move-visual nil)             <span style="color: #7c6f64;">; </span><span style="color: #7c6f64;">To be required by track-eol</span>
+(<span style="color: #fb4933;">setq-default</span> kill-whole-line t)        <span style="color: #7c6f64;">; </span><span style="color: #7c6f64;">Kill line including '\n'</span>
 (<span style="color: #fb4933;">setq-default</span> indent-tabs-mode nil)   <span style="color: #7c6f64;">; </span><span style="color: #7c6f64;">use space</span>
 
 (<span style="color: #fb4933;">defalias</span> '<span style="color: #fabd2f;">yes-or-no-p</span> #'y-or-n-p)
@@ -603,10 +584,10 @@
 (<span style="color: #fb4933;">setq-default</span> inhibit-compacting-font-caches t)
 
 (<span style="color: #fb4933;">cond</span> ((string-equal system-type <span style="color: #b8bb26;">"gnu/linux"</span>)
-       (<span style="color: #fb4933;">setq-default</span> default-font-family <span style="color: #b8bb26;">"Fira Code Retina"</span>)
-       (set-frame-font <span style="color: #b8bb26;">"Fira Code Retina-11"</span>)
-       (<span style="color: #fb4933;">setq-default</span> default-frame-alist '((font . <span style="color: #b8bb26;">"Fira Code Retina-11"</span>)
-                                           (height . 75)))
+       (<span style="color: #fb4933;">setq-default</span> default-font-family <span style="color: #b8bb26;">"Sarasa Term K"</span>)
+       (set-frame-font <span style="color: #b8bb26;">"Sarasa Term K-12"</span>)
+       (<span style="color: #fb4933;">setq-default</span> default-frame-alist '((font . <span style="color: #b8bb26;">"Sarasa Term K-12"</span>)
+                                                                                   (height . 75)))
        )
       )
 
@@ -634,8 +615,8 @@
 
 <span style="color: #7c6f64;">;; </span><span style="color: #7c6f64;">disable warning when killing buffers</span>
 (<span style="color: #fb4933;">setq-default</span> kill-buffer-query-functions
-              (remq 'process-kill-buffer-query-function
-                    kill-buffer-query-functions))
+                          (remq 'process-kill-buffer-query-function
+                                        kill-buffer-query-functions))
 
 <span style="color: #7c6f64;">;; </span><span style="color: #7c6f64;">custom file</span>
 (<span style="color: #fb4933;">setq-default</span> custom-file <span style="color: #b8bb26;">"~/.config/emacs/custom.el"</span>)
@@ -647,9 +628,9 @@
 (<span style="color: #fb4933;">setq-default</span> history-delete-duplicates t)
 (<span style="color: #fb4933;">setq-default</span> savehist-save-minibuffer-history 1)
 (<span style="color: #fb4933;">setq-default</span> savehist-additional-variables
-              '(kill-ring
-                search-ring
-                regexp-search-ring))
+                          '(kill-ring
+                                search-ring
+                                regexp-search-ring))
 
 <span style="color: #7c6f64;">;; </span><span style="color: #7c6f64;">save disk space</span>
 (<span style="color: #fb4933;">setq-default</span> delete-old-versions t)
@@ -682,30 +663,30 @@
        )
 
 (global-set-key (kbd <span style="color: #b8bb26;">"M-0"</span>)
-                '(lambda () (<span style="color: #fb4933;">interactive</span>)
-                   (global-text-scale-adjust (- text-scale-mode-amount))
-                   (global-text-scale-mode -1)))
+                                '(lambda () (<span style="color: #fb4933;">interactive</span>)
+                                   (global-text-scale-adjust (- text-scale-mode-amount))
+                                   (global-text-scale-mode -1)))
 (global-set-key (kbd <span style="color: #b8bb26;">"M-+"</span>)
-                '(lambda () (<span style="color: #fb4933;">interactive</span>) (global-text-scale-adjust 1)))
+                                '(lambda () (<span style="color: #fb4933;">interactive</span>) (global-text-scale-adjust 1)))
 (global-set-key (kbd <span style="color: #b8bb26;">"M--"</span>)
-                '(lambda () (<span style="color: #fb4933;">interactive</span>) (global-text-scale-adjust -1)))
+                                '(lambda () (<span style="color: #fb4933;">interactive</span>) (global-text-scale-adjust -1)))
 
 <span style="color: #7c6f64;">;; </span><span style="color: #7c6f64;">highlight </span><span style="color: #006400; font-weight: bold; text-decoration: underline;">NOTE</span><span style="color: #7c6f64;"> and </span><span style="color: #ff0000; font-weight: bold; text-decoration: underline;">TODO</span>
 (<span style="color: #fb4933;">setq-default</span> fixme-modes '(c++-mode c-mode emacs-lisp-mode))
 (make-face 'font-lock-fixme-face)
 (make-face 'font-lock-note-face)
 (mapc (<span style="color: #fb4933;">lambda</span> (mode)
-        (font-lock-add-keywords
-         mode
-         '((<span style="color: #b8bb26;">"\\&lt;</span><span style="color: #b8bb26; font-weight: bold;">\\</span><span style="color: #b8bb26; font-weight: bold;">(</span><span style="color: #ff0000; font-weight: bold; text-decoration: underline;">TODO</span><span style="color: #b8bb26; font-weight: bold;">\\</span><span style="color: #b8bb26; font-weight: bold;">)</span><span style="color: #b8bb26;">"</span> 1 'font-lock-fixme-face t)
-           (<span style="color: #b8bb26;">"\\&lt;</span><span style="color: #b8bb26; font-weight: bold;">\\</span><span style="color: #b8bb26; font-weight: bold;">(</span><span style="color: #006400; font-weight: bold; text-decoration: underline;">NOTE</span><span style="color: #b8bb26; font-weight: bold;">\\</span><span style="color: #b8bb26; font-weight: bold;">)</span><span style="color: #b8bb26;">"</span> 1 'font-lock-note-face t))))
+                (font-lock-add-keywords
+                 mode
+                 '((<span style="color: #b8bb26;">"\\&lt;</span><span style="color: #b8bb26; font-weight: bold;">\\</span><span style="color: #b8bb26; font-weight: bold;">(</span><span style="color: #ff0000; font-weight: bold; text-decoration: underline;">TODO</span><span style="color: #b8bb26; font-weight: bold;">\\</span><span style="color: #b8bb26; font-weight: bold;">)</span><span style="color: #b8bb26;">"</span> 1 'font-lock-fixme-face t)
+                   (<span style="color: #b8bb26;">"\\&lt;</span><span style="color: #b8bb26; font-weight: bold;">\\</span><span style="color: #b8bb26; font-weight: bold;">(</span><span style="color: #006400; font-weight: bold; text-decoration: underline;">NOTE</span><span style="color: #b8bb26; font-weight: bold;">\\</span><span style="color: #b8bb26; font-weight: bold;">)</span><span style="color: #b8bb26;">"</span> 1 'font-lock-note-face t))))
       fixme-modes)
 (modify-face 'font-lock-fixme-face <span style="color: #b8bb26;">"Red"</span> nil nil t nil t nil nil)
 (modify-face 'font-lock-note-face <span style="color: #b8bb26;">"Dark Green"</span> nil nil t nil t nil nil)
 
 (global-set-key (kbd <span style="color: #b8bb26;">"&lt;f5&gt;"</span>) (<span style="color: #fb4933;">lambda</span> ()
-                               (<span style="color: #fb4933;">interactive</span>)
-                               (call-interactively 'recompile)))
+                                                           (<span style="color: #fb4933;">interactive</span>)
+                                                           (call-interactively 'recompile)))
 
 <span style="color: #7c6f64;">;; </span><span style="color: #7c6f64;">disable recentf</span>
 (recentf-mode -1)
@@ -713,7 +694,7 @@
 
 <span style="color: #7c6f64;">;; </span><span style="color: #7c6f64;">GDB</span>
 (<span style="color: #fb4933;">setq-default</span> gdb-many-windows t)
-(<span style="color: #fb4933;">setq-default</span> gdb-show-main    t)
+(<span style="color: #fb4933;">setq-default</span> gdb-show-main        t)
 
 (add-hook 'c-mode-hook (<span style="color: #fb4933;">lambda</span> () (local-unset-key (kbd <span style="color: #b8bb26;">"C-d"</span>))))
 (add-hook 'c++-mode-hook (<span style="color: #fb4933;">lambda</span> () (local-unset-key (kbd <span style="color: #b8bb26;">"C-d"</span>))))
@@ -752,6 +733,22 @@
          (<span style="color: #b8bb26;">"C-&lt;"</span>     . mc/mark-previous-like-this)
          (<span style="color: #b8bb26;">"C-c C-&lt;"</span> . mc/mark-all-like-this)))
 
+
+(<span style="color: #fb4933;">use-package</span> <span style="color: #d3869b;">hungry-delete</span>
+  <span style="color: #fe8019;">:diminish</span>
+  <span style="color: #fe8019;">:config</span>
+  (<span style="color: #fb4933;">setq</span> hungry-delete-chars-to-skip <span style="color: #b8bb26;">" \t\r\f\v"</span>)
+
+  (<span style="color: #fb4933;">defun</span> <span style="color: #fabd2f;">rvg/hungry-delete-off</span> ()
+    (hungry-delete-mode -1))
+
+  <span style="color: #7c6f64;">;; </span><span style="color: #7c6f64;">hungry delete mode doesnt play well with multiple cursors...</span>
+  (add-hook 'multiple-cursors-mode-enabled-hook #'rvg/hungry-delete-off)
+  (add-hook 'multiple-cursors-mode-disabled-hook #'rvg/hungry-delete-off)
+
+  (global-hungry-delete-mode)
+  )
+
 (<span style="color: #fb4933;">use-package</span> <span style="color: #d3869b;">paren</span>
   <span style="color: #fe8019;">:config</span>
   (<span style="color: #fb4933;">setq</span> show-paren-style 'parenthesis)
@@ -783,32 +780,6 @@
                              (electric-pair-mode 1)
                              (electric-quote-mode 1)))
   )
-
-<span style="color: #7c6f64;">;; </span><span style="color: #7c6f64;">(use-package time</span>
-<span style="color: #7c6f64;">;;   </span><span style="color: #7c6f64;">:defer 10</span>
-<span style="color: #7c6f64;">;;   </span><span style="color: #7c6f64;">:config</span>
-<span style="color: #7c6f64;">;;   </span><span style="color: #7c6f64;">;; Only show loads of above 0.9 in the modeline</span>
-<span style="color: #7c6f64;">;;   </span><span style="color: #7c6f64;">(setq display-time-load-average-threshold 0.9)</span>
-<span style="color: #7c6f64;">;;   </span><span style="color: #7c6f64;">;; A list of timezones to show for `display-time-world`</span>
-<span style="color: #7c6f64;">;;   </span><span style="color: #7c6f64;">(setq zoneinfo-style-world-list</span>
-<span style="color: #7c6f64;">;;         </span><span style="color: #7c6f64;">'(("Asia/Kuala_Lumpur" "Kuala Lumpur")</span>
-<span style="color: #7c6f64;">;;           </span><span style="color: #7c6f64;">("Europe/Berlin" "Berlin")</span>
-<span style="color: #7c6f64;">;;           </span><span style="color: #7c6f64;">("America/Los_Angeles" "Los Angeles")</span>
-<span style="color: #7c6f64;">;;           </span><span style="color: #7c6f64;">("America/New_York" "New York")</span>
-<span style="color: #7c6f64;">;;           </span><span style="color: #7c6f64;">("Australia/Sydney" "Sydney")))</span>
-
-<span style="color: #7c6f64;">;;   </span><span style="color: #7c6f64;">(setq display-time-24hr-format t)</span>
-<span style="color: #7c6f64;">;;   </span><span style="color: #7c6f64;">;; Show time in modeline</span>
-<span style="color: #7c6f64;">;;   </span><span style="color: #7c6f64;">(display-time-mode)</span>
-<span style="color: #7c6f64;">;;   </span><span style="color: #7c6f64;">;; Right align time and org clocked-in task</span>
-<span style="color: #7c6f64;">;;   </span><span style="color: #7c6f64;">(add-to-list</span>
-<span style="color: #7c6f64;">;;    </span><span style="color: #7c6f64;">'global-mode-string</span>
-<span style="color: #7c6f64;">;;    </span><span style="color: #7c6f64;">'(:eval (propertize " " 'display `((space :align-to (- right</span>
-<span style="color: #7c6f64;">;;                                                           </span><span style="color: #7c6f64;">,(length display-time-string)</span>
-<span style="color: #7c6f64;">;;                                                           </span><span style="color: #7c6f64;">,(if (org-clocking-p)</span>
-<span style="color: #7c6f64;">;;                                                                </span><span style="color: #7c6f64;">(length org-mode-line-string)</span>
-<span style="color: #7c6f64;">;;                                                              </span><span style="color: #7c6f64;">0)</span>
-<span style="color: #7c6f64;">;;                                                           </span><span style="color: #7c6f64;">1)))))))</span>
 
 (<span style="color: #fb4933;">use-package</span> <span style="color: #d3869b;">ansi-color</span>
   <span style="color: #fe8019;">:commands</span> ansi-color-display
@@ -1005,20 +976,6 @@
   <span style="color: #fe8019;">:diminish</span>
   <span style="color: #fe8019;">:hook</span> (after-init-hook . global-auto-revert-mode))
 
-<span style="color: #7c6f64;">;; </span><span style="color: #006400; font-weight: bold; text-decoration: underline;">NOTE</span><span style="color: #7c6f64;">: This affects backspace when using multiple cursors</span>
-<span style="color: #7c6f64;">;; </span><span style="color: #7c6f64;">Hungry deletion</span>
-<span style="color: #7c6f64;">;; </span><span style="color: #7c6f64;">(use-package hungry-delete</span>
-<span style="color: #7c6f64;">;;   </span><span style="color: #7c6f64;">:diminish</span>
-<span style="color: #7c6f64;">;;   </span><span style="color: #7c6f64;">:hook</span>
-<span style="color: #7c6f64;">;;   </span><span style="color: #7c6f64;">(c-mode-hook . hungry-delete-mode)</span>
-<span style="color: #7c6f64;">;;   </span><span style="color: #7c6f64;">(c++-mode-hook . hungry-delete-mode)</span>
-<span style="color: #7c6f64;">;;   </span><span style="color: #7c6f64;">(typescript-mode-hook . hungry-delete-mode)</span>
-<span style="color: #7c6f64;">;;   </span><span style="color: #7c6f64;">(python-mode-hook . hungry-delete-mode)</span>
-<span style="color: #7c6f64;">;;   </span><span style="color: #7c6f64;">(rust-mode-hook . hungry-delete-mode)</span>
-<span style="color: #7c6f64;">;;   </span><span style="color: #7c6f64;">:config</span>
-<span style="color: #7c6f64;">;;   </span><span style="color: #7c6f64;">(setq-default hungry-delete-chars-to-skip " \t\f\v")</span>
-<span style="color: #7c6f64;">;;   </span><span style="color: #7c6f64;">)</span>
-
 <span style="color: #7c6f64;">;; </span><span style="color: #7c6f64;">Remember location in file</span>
 (<span style="color: #fb4933;">use-package</span> <span style="color: #d3869b;">saveplace</span>
   <span style="color: #fe8019;">:ensure</span> nil
@@ -1044,7 +1001,9 @@
   <span style="color: #fe8019;">:config</span>
   (<span style="color: #fb4933;">setq-default</span> c-default-style <span style="color: #b8bb26;">"bsd"</span>)
   (<span style="color: #fb4933;">setq-default</span> c-basic-offset 4)
-  (global-set-key (kbd <span style="color: #b8bb26;">"RET"</span>) 'newline-and-indent)  <span style="color: #7c6f64;">; </span><span style="color: #7c6f64;">automatically indent when press RET</span>
+
+                                                                                <span style="color: #7c6f64;">; </span><span style="color: #7c6f64;">automatically indent when press RET</span>
+  (global-set-key (kbd <span style="color: #b8bb26;">"RET"</span>) 'newline-and-indent)
 
   (global-set-key (kbd <span style="color: #b8bb26;">"C-c w"</span>) 'whitespace-mode)
   (add-hook 'prog-mode-hook (<span style="color: #fb4933;">lambda</span> () (<span style="color: #fb4933;">interactive</span>) (<span style="color: #fb4933;">setq</span> show-trailing-whitespace 1)))
@@ -1056,16 +1015,16 @@
   (fset 'c-indent-region 'clang-format-region)
 
   (add-hook 'before-save-hook
-            (<span style="color: #fb4933;">lambda</span> ()
-              (<span style="color: #fb4933;">when</span> (member major-mode '(c-mode c++-mode))
-                (<span style="color: #fb4933;">progn</span>
-                  (<span style="color: #fb4933;">if</span> (string= (file-name-extension (buffer-name)) <span style="color: #b8bb26;">"h"</span>)
-                      (message <span style="color: #b8bb26;">"Clang-format won&#8217;t work with this file format."</span>)
-                    (<span style="color: #fb4933;">when</span> (locate-dominating-file <span style="color: #b8bb26;">"."</span> <span style="color: #b8bb26;">".clang-format"</span>)
-                      (clang-format-buffer))
-                    )
-                  <span style="color: #7c6f64;">;; </span><span style="color: #7c6f64;">Return nil, to continue saving.</span>
-                  nil))))
+                        (<span style="color: #fb4933;">lambda</span> ()
+                          (<span style="color: #fb4933;">when</span> (member major-mode '(c-mode c++-mode))
+                                (<span style="color: #fb4933;">progn</span>
+                                  (<span style="color: #fb4933;">if</span> (string= (file-name-extension (buffer-name)) <span style="color: #b8bb26;">"h"</span>)
+                                          (message <span style="color: #b8bb26;">"Clang-format won&#8217;t work with this file format."</span>)
+                                        (<span style="color: #fb4933;">when</span> (locate-dominating-file <span style="color: #b8bb26;">"."</span> <span style="color: #b8bb26;">".clang-format"</span>)
+                                          (clang-format-buffer))
+                                        )
+                                  <span style="color: #7c6f64;">;; </span><span style="color: #7c6f64;">Return nil, to continue saving.</span>
+                                  nil))))
   )
 
 (<span style="color: #fb4933;">use-package</span> <span style="color: #d3869b;">uniquify</span>
@@ -1164,7 +1123,7 @@
   (<span style="color: #fb4933;">defun</span> <span style="color: #fabd2f;">my-git-publish</span> (ppl)
     (<span style="color: #fb4933;">let</span> ((publish-script (format <span style="color: #b8bb26;">"%s/publish.sh"</span> my-org-publish-dir)))
       (<span style="color: #fb4933;">when</span> (file-executable-p publish-script)
-        (start-process-shell-command <span style="color: #b8bb26;">"pub"</span> nil publish-script))))
+                (start-process-shell-command <span style="color: #b8bb26;">"pub"</span> nil publish-script))))
 
   (<span style="color: #fb4933;">defun</span> <span style="color: #fabd2f;">my-publish</span> (a b c)
     (<span style="color: #fb4933;">setq</span> org-export-with-toc t)
@@ -1191,18 +1150,18 @@
     <span style="color: #b8bb26;">"Insert custom inline css"</span>
     (<span style="color: #fb4933;">when</span> (eq exporter 'html)
       (<span style="color: #fb4933;">let*</span> ((dir (<span style="color: #fb4933;">ignore-errors</span> (file-name-directory (buffer-file-name))))
-             (path (concat dir <span style="color: #b8bb26;">"style.css"</span>))
-             (homestyle (<span style="color: #fb4933;">or</span> (null dir) (null (file-exists-p path))))
-             (final (<span style="color: #fb4933;">if</span> homestyle <span style="color: #b8bb26;">"~/.config/emacs/org-style.css"</span> path)))
-        (<span style="color: #fb4933;">setq</span> org-html-head-include-default-style nil)
-        (<span style="color: #fb4933;">setq</span> org-html-head (concat
-                             <span style="color: #b8bb26;">"&lt;style type=\"text/css\"&gt;\n"</span>
-                             <span style="color: #b8bb26;">"&lt;!--/*--&gt;&lt;![CDATA[/*&gt;&lt;!--*/\n"</span>
-                             (<span style="color: #fb4933;">with-temp-buffer</span>
+                         (path (concat dir <span style="color: #b8bb26;">"style.css"</span>))
+                         (homestyle (<span style="color: #fb4933;">or</span> (null dir) (null (file-exists-p path))))
+                         (final (<span style="color: #fb4933;">if</span> homestyle <span style="color: #b8bb26;">"~/.config/emacs/org-style.css"</span> path)))
+                (<span style="color: #fb4933;">setq</span> org-html-head-include-default-style nil)
+                (<span style="color: #fb4933;">setq</span> org-html-head (concat
+                                                         <span style="color: #b8bb26;">"&lt;style type=\"text/css\"&gt;\n"</span>
+                                                         <span style="color: #b8bb26;">"&lt;!--/*--&gt;&lt;![CDATA[/*&gt;&lt;!--*/\n"</span>
+                                                         (<span style="color: #fb4933;">with-temp-buffer</span>
                                (insert-file-contents final)
                                (buffer-string))
-                             <span style="color: #b8bb26;">"/*]]&gt;*/--&gt;\n"</span>
-                             <span style="color: #b8bb26;">"&lt;/style&gt;\n"</span>)))))
+                                                         <span style="color: #b8bb26;">"/*]]&gt;*/--&gt;\n"</span>
+                                                         <span style="color: #b8bb26;">"&lt;/style&gt;\n"</span>)))))
 
   (add-hook 'org-export-before-processing-hook 'my-org-inline-css-hook)
 
@@ -1219,9 +1178,9 @@
   (<span style="color: #fb4933;">setq</span> org-metadir my-org-meta-dir)
   (<span style="color: #fb4933;">setq</span> org-archive-location my-org-archive-dir)
   (<span style="color: #fb4933;">setq</span> org-agenda-files (list
-                          <span style="color: #b8bb26;">"/home/romeu/Documents/Org/Agenda/todo.org"</span>
-                          <span style="color: #b8bb26;">"/home/romeu/Documents/Org/Agenda/work.org"</span>
-                          <span style="color: #b8bb26;">"/home/romeu/Documents/Org/Agenda/birthdays.org"</span>
+                                                  <span style="color: #b8bb26;">"/home/romeu/Documents/Org/Agenda/todo.org"</span>
+                                                  <span style="color: #b8bb26;">"/home/romeu/Documents/Org/Agenda/work.org"</span>
+                                                  <span style="color: #b8bb26;">"/home/romeu/Documents/Org/Agenda/birthdays.org"</span>
                           ))
   (<span style="color: #fb4933;">setq</span> diary-file my-org-diary-file)
 
@@ -1399,22 +1358,22 @@
   <span style="color: #7c6f64;">;; </span><span style="color: #ff0000; font-weight: bold; text-decoration: underline;">TODO</span><span style="color: #7c6f64;">: improve and add more templates</span>
   (<span style="color: #fb4933;">setq</span> org-capture-templates
         '(
-          (<span style="color: #b8bb26;">"c"</span> <span style="color: #b8bb26;">"Code"</span>)
+                  (<span style="color: #b8bb26;">"c"</span> <span style="color: #b8bb26;">"Code"</span>)
 
-          (<span style="color: #b8bb26;">"cc"</span> <span style="color: #b8bb26;">"Cpp"</span>)
-          (<span style="color: #b8bb26;">"ccs"</span> <span style="color: #b8bb26;">"Cpp Snippets"</span> entry (file+olp <span style="color: #b8bb26;">"Code/Cpp.org"</span> <span style="color: #b8bb26;">"Cpp"</span> <span style="color: #b8bb26;">"Snippets"</span>)
+                  (<span style="color: #b8bb26;">"cc"</span> <span style="color: #b8bb26;">"Cpp"</span>)
+                  (<span style="color: #b8bb26;">"ccs"</span> <span style="color: #b8bb26;">"Cpp Snippets"</span> entry (file+olp <span style="color: #b8bb26;">"Code/Cpp.org"</span> <span style="color: #b8bb26;">"Cpp"</span> <span style="color: #b8bb26;">"Snippets"</span>)
+                   <span style="color: #b8bb26;">"* %? %t"</span> <span style="color: #fe8019;">:empty-lines</span> 1)
+
+                  (<span style="color: #b8bb26;">"ck"</span> <span style="color: #b8bb26;">"Kotlin"</span>)
+                  (<span style="color: #b8bb26;">"cks"</span> <span style="color: #b8bb26;">"Kotlin Snippets"</span> entry (file+olp <span style="color: #b8bb26;">"Code/Kotlin.org"</span> <span style="color: #b8bb26;">"Kotlin"</span> <span style="color: #b8bb26;">"Snippets"</span>)
+                   <span style="color: #b8bb26;">"* %? %t"</span> <span style="color: #fe8019;">:empty-lines</span> 1)
+                  (<span style="color: #b8bb26;">"ckl"</span> <span style="color: #b8bb26;">"Kotlin Libs"</span>)
+                  (<span style="color: #b8bb26;">"ckln"</span> <span style="color: #b8bb26;">"Kotlin Native"</span> entry (file+headline <span style="color: #b8bb26;">"Code/Kotlin.org"</span> <span style="color: #b8bb26;">"Kotlin Native"</span>)
            <span style="color: #b8bb26;">"* %? %t"</span> <span style="color: #fe8019;">:empty-lines</span> 1)
 
-          (<span style="color: #b8bb26;">"ck"</span> <span style="color: #b8bb26;">"Kotlin"</span>)
-          (<span style="color: #b8bb26;">"cks"</span> <span style="color: #b8bb26;">"Kotlin Snippets"</span> entry (file+olp <span style="color: #b8bb26;">"Code/Kotlin.org"</span> <span style="color: #b8bb26;">"Kotlin"</span> <span style="color: #b8bb26;">"Snippets"</span>)
-           <span style="color: #b8bb26;">"* %? %t"</span> <span style="color: #fe8019;">:empty-lines</span> 1)
-          (<span style="color: #b8bb26;">"ckl"</span> <span style="color: #b8bb26;">"Kotlin Libs"</span>)
-          (<span style="color: #b8bb26;">"ckln"</span> <span style="color: #b8bb26;">"Kotlin Native"</span> entry (file+headline <span style="color: #b8bb26;">"Code/Kotlin.org"</span> <span style="color: #b8bb26;">"Kotlin Native"</span>)
-           <span style="color: #b8bb26;">"* %? %t"</span> <span style="color: #fe8019;">:empty-lines</span> 1)
-
-          (<span style="color: #b8bb26;">"cr"</span> <span style="color: #b8bb26;">"Rust"</span>)
-          (<span style="color: #b8bb26;">"crs"</span> <span style="color: #b8bb26;">"Rust Snippets"</span> entry (file+olp <span style="color: #b8bb26;">"Code/Rust.org"</span> <span style="color: #b8bb26;">"Rust"</span> <span style="color: #b8bb26;">"Snippets"</span>)
-           <span style="color: #b8bb26;">"* %? %t"</span> <span style="color: #fe8019;">:empty-lines</span> 1)
+                  (<span style="color: #b8bb26;">"cr"</span> <span style="color: #b8bb26;">"Rust"</span>)
+                  (<span style="color: #b8bb26;">"crs"</span> <span style="color: #b8bb26;">"Rust Snippets"</span> entry (file+olp <span style="color: #b8bb26;">"Code/Rust.org"</span> <span style="color: #b8bb26;">"Rust"</span> <span style="color: #b8bb26;">"Snippets"</span>)
+                   <span style="color: #b8bb26;">"* %? %t"</span> <span style="color: #fe8019;">:empty-lines</span> 1)
 
           (<span style="color: #b8bb26;">"j"</span> <span style="color: #b8bb26;">"Personal Journal"</span> entry (file+datetree rg/get-journal-file-year)
            <span style="color: #b8bb26;">"* Entry %(rg/date-sha256) %T %^G\n\n%?\n"</span> <span style="color: #fe8019;">:kill-buffer</span> t <span style="color: #fe8019;">:empty-lines</span> 1)
@@ -1442,15 +1401,11 @@
      (emacs-lisp . t)
      (dot . t)))
 
-  <span style="color: #7c6f64;">;; </span><span style="color: #7c6f64;">org latex</span>
-  <span style="color: #7c6f64;">;; </span><span style="color: #7c6f64;">(require 'ox-latex)</span>
-  <span style="color: #7c6f64;">;; </span><span style="color: #7c6f64;">(add-to-list 'org-latex-packages-alist '("" "minted"))</span>
-  <span style="color: #7c6f64;">;; </span><span style="color: #7c6f64;">(setq org-latex-listings 'minted)</span>
   (<span style="color: #fb4933;">setq</span> org-latex-listings 'minted
-        org-latex-packages-alist '((<span style="color: #b8bb26;">"newfloat"</span> <span style="color: #b8bb26;">"minted"</span>))
-        org-latex-pdf-process
-        '(<span style="color: #b8bb26;">"pdflatex -shell-escape -interaction nonstopmode -output-directory %o %f"</span>
-          <span style="color: #b8bb26;">"pdflatex -shell-escape -interaction nonstopmode -output-directory %o %f"</span>))
+                org-latex-packages-alist '((<span style="color: #b8bb26;">"newfloat"</span> <span style="color: #b8bb26;">"minted"</span>))
+                org-latex-pdf-process
+                '(<span style="color: #b8bb26;">"pdflatex -shell-escape -interaction nonstopmode -output-directory %o %f"</span>
+                  <span style="color: #b8bb26;">"pdflatex -shell-escape -interaction nonstopmode -output-directory %o %f"</span>))
 
 
   <span style="color: #7c6f64;">;; </span><span style="color: #7c6f64;">org crypt</span>
@@ -1519,23 +1474,23 @@
 <span style="color: #b8bb26;">produces dates with a fixed length."</span>
     (<span style="color: #fb4933;">require</span> '<span style="color: #d3869b;">cal-iso</span>)
     (<span style="color: #fb4933;">let*</span> ((dayname (calendar-day-name date t))
-           (day (cadr date))
-           (day-of-week (calendar-day-of-week date))
-           (month (car date))
-           (monthname (calendar-month-name month t))
-           (year (nth 2 date))
-           (iso-week (org-days-to-iso-week
-                      (calendar-absolute-from-gregorian date)))
-           (weekyear (<span style="color: #fb4933;">cond</span> ((<span style="color: #fb4933;">and</span> (= month 1) (&gt;= iso-week 52))
-                            (1- year))
-                           ((<span style="color: #fb4933;">and</span> (= month 12) (&lt;= iso-week 1))
-                            (1+ year))
-                           (t year)))
-           (weekstring (<span style="color: #fb4933;">if</span> (= day-of-week 1)
-                           (format <span style="color: #b8bb26;">" (W%02d)"</span> iso-week)
-                         <span style="color: #b8bb26;">""</span>)))
+                   (day (cadr date))
+                   (day-of-week (calendar-day-of-week date))
+                   (month (car date))
+                   (monthname (calendar-month-name month t))
+                   (year (nth 2 date))
+                   (iso-week (org-days-to-iso-week
+                                          (calendar-absolute-from-gregorian date)))
+                   (weekyear (<span style="color: #fb4933;">cond</span> ((<span style="color: #fb4933;">and</span> (= month 1) (&gt;= iso-week 52))
+                                                        (1- year))
+                                                   ((<span style="color: #fb4933;">and</span> (= month 12) (&lt;= iso-week 1))
+                                                        (1+ year))
+                                                   (t year)))
+                   (weekstring (<span style="color: #fb4933;">if</span> (= day-of-week 1)
+                                                   (format <span style="color: #b8bb26;">" (W%02d)"</span> iso-week)
+                                                 <span style="color: #b8bb26;">""</span>)))
       (format <span style="color: #b8bb26;">"%s %2d %s %4d%s"</span>
-              dayname day monthname year weekstring)))
+                          dayname day monthname year weekstring)))
 
   (<span style="color: #fb4933;">setq</span> org-agenda-format-date #'prot/org-agenda-format-date-aligned)
 
@@ -1732,9 +1687,21 @@
   (<span style="color: #fb4933;">setq</span> org-export-dispatch-use-expert-ui nil)
 
   (<span style="color: #fb4933;">setq</span> org-html-validation-link nil)
+
+  <span style="color: #7c6f64;">;; </span><span style="color: #7c6f64;">if headline has ignore tag, dont export it. But export its contents!</span>
+  (<span style="color: #fb4933;">require</span> '<span style="color: #d3869b;">ox-extra</span>)
+  (ox-extras-activate '(ignore-headlines))
   )
 
 (<span style="color: #fb4933;">use-package</span> <span style="color: #d3869b;">ox-gfm</span>)
+
+<span style="color: #7c6f64;">;; </span><span style="color: #7c6f64;">if headline has ignore tag, dont export it. But export its contents!</span>
+(<span style="color: #fb4933;">use-package</span> <span style="color: #d3869b;">ox-extra</span>
+  <span style="color: #fe8019;">:after</span> org
+  <span style="color: #fe8019;">:ensure</span> nil
+  <span style="color: #fe8019;">:config</span>
+  (ox-extras-activate '(ignore-headlines))
+  )
 
 (<span style="color: #fb4933;">use-package</span> <span style="color: #d3869b;">popwin</span>
   <span style="color: #fe8019;">:init</span>
@@ -1742,15 +1709,14 @@
   <span style="color: #fe8019;">:config</span>
   (popwin-mode 1)
   (<span style="color: #fb4933;">setq</span> display-buffer-function 'popwin:display-buffer)
-  <span style="color: #7c6f64;">;; </span><span style="color: #7c6f64;">(push '("*anything*") popwin:special-display-config)</span>
   )
 
 (<span style="color: #fb4933;">use-package</span> <span style="color: #d3869b;">diff-hl</span>
   <span style="color: #fe8019;">:init</span>
   (custom-set-faces
    '(diff-hl-change ((t (<span style="color: #fe8019;">:background</span> <span style="color: #b8bb26;">"dark blue"</span> <span style="color: #fe8019;">:foreground</span> <span style="color: #b8bb26;">"dark blue"</span>)))
-                    '(diff-hl-insert ((t (<span style="color: #fe8019;">:background</span> <span style="color: #b8bb26;">"dark green"</span> <span style="color: #fe8019;">:foreground</span> <span style="color: #b8bb26;">"dark green"</span>))))
-                    '(diff-hl-delete ((t (<span style="color: #fe8019;">:background</span> <span style="color: #b8bb26;">"dark red"</span> <span style="color: #fe8019;">:foreground</span> <span style="color: #b8bb26;">"dark red"</span>))))))
+                                        '(diff-hl-insert ((t (<span style="color: #fe8019;">:background</span> <span style="color: #b8bb26;">"dark green"</span> <span style="color: #fe8019;">:foreground</span> <span style="color: #b8bb26;">"dark green"</span>))))
+                                        '(diff-hl-delete ((t (<span style="color: #fe8019;">:background</span> <span style="color: #b8bb26;">"dark red"</span> <span style="color: #fe8019;">:foreground</span> <span style="color: #b8bb26;">"dark red"</span>))))))
   (diff-hl-flydiff-mode)
   (diff-hl-margin-mode)
   (global-diff-hl-mode 1)
@@ -1767,15 +1733,8 @@
   (<span style="color: #fb4933;">setq</span> ivy-use-virtual-buffers t)
   (<span style="color: #fb4933;">setq</span> ivy-wrap t)
   (<span style="color: #fb4933;">setq</span> enable-recursive-minibuffers t)
-  <span style="color: #7c6f64;">;; </span><span style="color: #7c6f64;">(setq ivy-initial-inputs-alist nil)</span>
   (<span style="color: #fb4933;">setq</span> ivy-count-format <span style="color: #b8bb26;">"(%d/%d) "</span>)
 
-  <span style="color: #7c6f64;">;; </span><span style="color: #7c6f64;">;; fuzzy matching</span>
-  <span style="color: #7c6f64;">;; </span><span style="color: #7c6f64;">(setq ivy-re-builders-alist '((swiper . ivy--regex-plus)</span>
-  <span style="color: #7c6f64;">;;                               </span><span style="color: #7c6f64;">(t . ivy--regex-fuzzy)))</span>
-
-  <span style="color: #7c6f64;">;; </span><span style="color: #7c6f64;">enable this if you want `</span><span style="color: #d3869b;">swiper</span><span style="color: #7c6f64;">' to use it</span>
-  <span style="color: #7c6f64;">;; </span><span style="color: #7c6f64;">(setq search-default-mode #'char-fold-to-regexp)</span>
   (global-set-key <span style="color: #b8bb26;">"\C-s"</span> 'swiper)
   (global-set-key (kbd <span style="color: #b8bb26;">"C-c C-r"</span>) 'ivy-resume)
   (global-set-key (kbd <span style="color: #b8bb26;">"&lt;f6&gt;"</span>) 'ivy-resume)
@@ -1819,7 +1778,7 @@
   (<span style="color: #fb4933;">defun</span> <span style="color: #fabd2f;">indent-or-complete</span> ()
     (<span style="color: #fb4933;">interactive</span>)
     (<span style="color: #fb4933;">if</span> (looking-at <span style="color: #b8bb26;">"\\_&gt;"</span>)
-        (company-complete-common)
+                (company-complete-common)
       (indent-according-to-mode)))
 
   (delete 'company-dabbrev company-backends)
@@ -1839,88 +1798,6 @@
   <span style="color: #7c6f64;">;; </span><span style="color: #7c6f64;">deactivate auto complete selection</span>
   (define-key company-active-map (kbd <span style="color: #b8bb26;">"&lt;return&gt;"</span>) nil)
   (define-key company-active-map (kbd <span style="color: #b8bb26;">"RET"</span>) nil)
-  )
-
-(<span style="color: #fb4933;">use-package</span> <span style="color: #d3869b;">lsp-mode</span>
-  <span style="color: #fe8019;">:commands</span> lsp
-  <span style="color: #fe8019;">:custom</span>
-  <span style="color: #7c6f64;">;; </span><span style="color: #7c6f64;">debug</span>
-  (lsp-print-io nil)
-  (lsp-trace nil)
-  (lsp-print-performance nil)
-  (lsp-log-io nil)
-
-  <span style="color: #7c6f64;">;; </span><span style="color: #7c6f64;">workspace</span>
-  (lsp-keep-workspace-alive nil)
-
-  <span style="color: #7c6f64;">;; </span><span style="color: #7c6f64;">general</span>
-  (lsp-auto-guess-root t)
-  (lsp-prefer-flymake nil)
-  (lsp-completion-provider <span style="color: #fe8019;">:capf</span>)
-  (lsp-prefer-capf t)
-  (lsp-idle-delay 0.500)
-  (lsp-enable-imenu t)
-
-  <span style="color: #7c6f64;">;; </span><span style="color: #7c6f64;">snippet</span>
-  (lsp-enable-snippet nil)
-  (lsp-diagnostic-package <span style="color: #fe8019;">:none</span>)
-
-  <span style="color: #7c6f64;">;; </span><span style="color: #7c6f64;">other disables</span>
-  (lsp--display-inline-image nil)
-  (lsp-enable-on-type-formatting nil)
-  (lsp-enable-text-document-color nil)
-  (lsp-headerline-breadcrumb-enable nil)
-  (lsp-diagnostics-provider <span style="color: #fe8019;">:none</span>)
-  (lsp-eldoc-enable-hover t)
-  (lsp-eldoc-render-all nil)
-  (lsp-modeline-diagnostics-enable nil)
-
-  <span style="color: #7c6f64;">;; </span><span style="color: #7c6f64;">other</span>
-  (lsp-modeline-code-actions-enable nil)
-  (lsp-modeline-diagnostics-enable nil)
-  (lsp-modeline-workspace-status-enable nil)
-  (lsp-modeline-code-actions-mode nil)
-
-  (lsp-enable-file-watchers nil)
-  (lsp-enable-folding nil)
-  (lsp-enable-symbol-highlighting nil)
-  (lsp-enable-text-document-color nil)
-
-  (lsp-enable-indentation nil)
-  (lsp-enable-on-type-formatting nil)
-
-  <span style="color: #7c6f64;">;; </span><span style="color: #7c6f64;">clangd</span>
-  (lsp-clients-clangd-args `(<span style="color: #b8bb26;">"--header-insertion-decorators=0"</span>))
-
-  <span style="color: #7c6f64;">;; </span><span style="color: #7c6f64;">rust specific stuff</span>
-  (lsp-rust-analyzer-server-display-inlay-hints nil)
-  (lsp-rust-analyzer-cargo-watch-enable nil)
-  (lsp-rust-analyzer-cargo-all-targets nil)
-  (lsp-rust-analyzer-use-client-watching nil)
-  (lsp-rust-analyzer-diagnostics-enable nil)
-  (lsp-rust-analyzer-diagnostics-enable-experimental nil)
-  (lsp-rust-analyzer-completion-add-call-parenthesis nil)
-  (lsp-rust-analyzer-completion-add-call-argument-snippets nil)
-  (lsp-rust-analyzer-completion-postfix-enable nil)
-
-  <span style="color: #fe8019;">:hook</span>
-  (c-mode-hook . lsp)
-  (c++-mode-hook . lsp)
-  (typescript-mode-hook . lsp)
-  (python-mode-hook . lsp)
-  (rust-mode-hook . lsp)
-
-  <span style="color: #7c6f64;">;; </span><span style="color: #7c6f64;">:config</span>
-  <span style="color: #7c6f64;">;; </span><span style="color: #7c6f64;">(lsp-register-client</span>
-  <span style="color: #7c6f64;">;;  </span><span style="color: #7c6f64;">(make-lsp-client :new-connection (lsp-stdio-connection</span>
-  <span style="color: #7c6f64;">;;                                    </span><span style="color: #7c6f64;">'lsp-clients--clangd-command)</span>
-  <span style="color: #7c6f64;">;;                   </span><span style="color: #7c6f64;">:major-modes '(c-mode c++-mode objc-mode nothings-mode nothingspp-mode)</span>
-  <span style="color: #7c6f64;">;;                   </span><span style="color: #7c6f64;">:priority -1</span>
-  <span style="color: #7c6f64;">;;                   </span><span style="color: #7c6f64;">:server-id 'clangd))</span>
-
-  <span style="color: #7c6f64;">;; </span><span style="color: #7c6f64;">(add-to-list 'lsp-language-id-configuration '(nothings-mode . "c"))</span>
-  <span style="color: #7c6f64;">;; </span><span style="color: #7c6f64;">(add-to-list 'lsp-language-id-configuration '(nothingspp-mode . "cpp"))</span>
-
   )
 
 (<span style="color: #fb4933;">use-package</span> <span style="color: #d3869b;">eldoc</span>
@@ -1972,15 +1849,16 @@
   (auctex-latexmk-setup)
   <span style="color: #fe8019;">:config</span>
   (<span style="color: #fb4933;">setq</span> auctex-latexmk-inherit-TeX-PDF-mode t)
-  (add-hook 'LaTeX-mode-hook (<span style="color: #fb4933;">lambda</span> ()
-                               (<span style="color: #fb4933;">push</span>
-                                '(<span style="color: #b8bb26;">"LaTeXmk"</span> <span style="color: #b8bb26;">"latexmk -pdf --synctex=1 -shell-escape -interaction=nonstopmode -file-line-error -synctex=1 %s"</span> TeX-run-TeX nil t
-                                  <span style="color: #fe8019;">:help</span> <span style="color: #b8bb26;">"Run latexmk on file"</span>)
-                                TeX-command-list)
-                               (<span style="color: #fb4933;">push</span> '(<span style="color: #b8bb26;">"LuaLatex"</span> <span style="color: #b8bb26;">"lualatex -pdf --synctex=1 -shell-escape -interaction=nonstopmode -file-line-error -synctex=1 %s"</span> TeX-run-TeX nil t
-                                       <span style="color: #fe8019;">:help</span> <span style="color: #b8bb26;">"Run lualatex on file"</span>)
-                                     TeX-command-list)
-                               ))
+  (add-hook 'LaTeX-mode-hook
+            (<span style="color: #fb4933;">lambda</span> ()
+                          (<span style="color: #fb4933;">push</span>
+                           '(<span style="color: #b8bb26;">"LaTeXmk"</span> <span style="color: #b8bb26;">"latexmk -pdf --synctex=1 -shell-escape -interaction=nonstopmode -file-line-error -synctex=1 %s"</span> TeX-run-TeX nil t
+                                 <span style="color: #fe8019;">:help</span> <span style="color: #b8bb26;">"Run latexmk on file"</span>)
+                           TeX-command-list)
+              (<span style="color: #fb4933;">push</span> '(<span style="color: #b8bb26;">"LuaLatex"</span> <span style="color: #b8bb26;">"lualatex -pdf --synctex=1 -shell-escape -interaction=nonstopmode -file-line-error -synctex=1 %s"</span> TeX-run-TeX nil t
+                                          <span style="color: #fe8019;">:help</span> <span style="color: #b8bb26;">"Run lualatex on file"</span>)
+                                        TeX-command-list)
+              ))
   )
 
 (put 'upcase-region 'disabled nil)
@@ -1990,7 +1868,10 @@
 
 <hr>
 <footer>
-<p><a class="footer" href="/index.html">Back</a></p>
+<p class="footer_right">30-05-2021</p>
+<p><a class="footer" href="/index.html">Homepage</a></p>
+<p><a class="footer" href="/writeups/htb/index.html">Back</a></p>
+<div style="clear: both;"></div>
 </footer>
 </div>
 </body>

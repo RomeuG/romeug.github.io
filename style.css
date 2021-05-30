@@ -100,7 +100,11 @@ hr {
 
 footer {
 	font-size: large ;
-	max-width: 500px ;
+	/* max-width: 500px ; */
+}
+
+.footer_right {
+	float: right;
 }
 
 ::-webkit-scrollbar {
@@ -168,4 +172,3 @@ code {
 #text-table-of-contents {
     margin-left: 16px;
 }
-

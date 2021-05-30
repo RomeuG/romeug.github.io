@@ -230,10 +230,16 @@ we get a shell session with root permissions.
 Navigation to =root= home directory is required and then we have =root.txt= to
 get the root flag.
 
+* FOOTER                                                                                              :ignore:
+:PROPERTIES:
+:clearpage: t
+:END:
 #+BEGIN_EXPORT html
 <hr>
 <footer>
+<p class="footer_right">08-02-2021</p>
 <p><a class="footer" href="/index.html">Homepage</a></p>
 <p><a class="footer" href="/writeups/htb/index.html">Back</a></p>
+<div style="clear: both;"></div>
 </footer>
 #+END_EXPORT

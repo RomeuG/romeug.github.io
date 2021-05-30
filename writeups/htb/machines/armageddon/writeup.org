@@ -231,10 +231,16 @@ instructions on the website. In this case, instead of naming the snap package as
 =x=, it should have a name with more than a single character. Also, the command
 that I used to get the root flag was =cat /root/root.txt=.
 
-#+begin_export html
+* FOOTER                                                                                              :ignore:
+:PROPERTIES:
+:clearpage: t
+:END:
+#+BEGIN_EXPORT html
 <hr>
 <footer>
+<p class="footer_right">24-04-2021</p>
 <p><a class="footer" href="/index.html">Homepage</a></p>
 <p><a class="footer" href="/writeups/htb/index.html">Back</a></p>
+<div style="clear: both;"></div>
 </footer>
-#+end_export
+#+END_EXPORT

@@ -54,8 +54,10 @@ Plug 'airblade/vim-gitgutter'
 Plug 'psliwka/vim-smoothie'
 " run common unix command in Vim
 Plug 'tpope/vim-eunuch'
+" surround
+Plug 'tpope/vim-surround'
 " autopairing
-Plug 'jiangmiao/auto-pairs'
+Plug 'LukeLike/auto-pairs'
 " highlight yanked area
 Plug 'machakann/vim-highlightedyank'
 " split and join oneliners into multiline
@@ -70,7 +72,6 @@ Plug 'mg979/vim-visual-multi', {'branch': 'master'}
 Plug 't9md/vim-choosewin'
 
 call plug#end()
-
 
 " terminal 256 colors
 set t_Co=256
@@ -195,8 +196,10 @@ let g:loaded_ruby_provider = 0
 " define python3 binary
 let g:python3_host_prog = expand('/usr/bin/python3')
 
+"" autopairs
+let g:AutoPairsCenterLine = 0
 
-"" Airline
+" Airline
 " do not render empty sections
 let g:airline_skip_empty_sections = 1
 " file encoding skip expected string
@@ -226,11 +229,13 @@ let g:airline_symbols.paste = 'ρ'
 let g:airline_symbols.whitespace = 'Ξ'
 
 "" coc
+" dont start on startup
+let g:coc_start_at_startup = v:false
 " navigate snippet placeholders using tab
 let g:coc_snippet_next = '<Tab>'
 let g:coc_snippet_prev = '<S-Tab>'
 " list of the extensions to make sure are always installed
-let g:coc_global_extensions = ['coc-lists', 'coc-clangd', 'coc-highlight',]
+let g:coc_global_extensions = ['coc-lists', 'coc-clangd', 'coc-highlight', 'coc-pyright',]
 
 "" fzf
 " fzf actions
@@ -253,6 +258,10 @@ let g:highlightedyank_highlight_duration = 1000
 "
 " --- Commands --
 "
+
+" define types to syntax highlighting
+" nasm
+autocmd BufNewFile,BufRead *.S,*.s,*.asm,*.inc set filetype=asm syntax=nasm commentstring=;\%s
 
 " don't auto comment on newlines
 au BufEnter * set fo-=c fo-=r fo-=o
@@ -561,9 +570,16 @@ abclear
 }
 #+end_src
 
+* FOOTER                                                                                              :ignore:
+:PROPERTIES:
+:clearpage: t
+:END:
 #+BEGIN_EXPORT html
 <hr>
 <footer>
-<p><a class="footer" href="/index.html">Back</a></p>
+<p class="footer_right">30-05-2021</p>
+<p><a class="footer" href="/index.html">Homepage</a></p>
+<p><a class="footer" href="/writeups/htb/index.html">Back</a></p>
+<div style="clear: both;"></div>
 </footer>
 #+END_EXPORT

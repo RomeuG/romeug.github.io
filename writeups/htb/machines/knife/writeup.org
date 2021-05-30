@@ -168,10 +168,16 @@ $ sudo knife exec script.sh
 
 The output should be the root password!
 
-#+begin_export html
+* FOOTER                                                                                              :ignore:
+:PROPERTIES:
+:clearpage: t
+:END:
+#+BEGIN_EXPORT html
 <hr>
 <footer>
+<p class="footer_right">30-05-2021</p>
 <p><a class="footer" href="/index.html">Homepage</a></p>
 <p><a class="footer" href="/writeups/htb/index.html">Back</a></p>
+<div style="clear: both;"></div>
 </footer>
-#+end_export
+#+END_EXPORT

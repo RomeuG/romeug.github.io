@@ -258,10 +258,16 @@ $ ./usr/local/bin/docker-security
 
 Root permissions! :-)
 
+* FOOTER                                                                                              :ignore:
+:PROPERTIES:
+:clearpage: t
+:END:
 #+BEGIN_EXPORT html
 <hr>
 <footer>
+<p class="footer_right">06-02-2021</p>
 <p><a class="footer" href="/index.html">Homepage</a></p>
 <p><a class="footer" href="/writeups/htb/index.html">Back</a></p>
+<div style="clear: both;"></div>
 </footer>
 #+END_EXPORT

@@ -16,9 +16,9 @@
 <h2>Table of Contents</h2>
 <div id="text-table-of-contents">
 <ul>
-<li><a href="#org98cb162"><code>~/.config/nvim/init.vim</code></a></li>
-<li><a href="#orgb916a2a"><code>~/.config/nvim/after/ftplugin/rust.vim</code></a></li>
-<li><a href="#org6ba8066"><code>~/.config/nvim/coc-settings.json</code></a></li>
+<li><a href="#org6fb63d7"><code>~/.config/nvim/init.vim</code></a></li>
+<li><a href="#org67b223d"><code>~/.config/nvim/after/ftplugin/rust.vim</code></a></li>
+<li><a href="#orgbeaf3be"><code>~/.config/nvim/coc-settings.json</code></a></li>
 </ul>
 </div>
 </div>
@@ -27,9 +27,9 @@ This is my current working <code>NeoVim</code> configuration, used mainly for C,
 Rust development, with each relevant file. The configuration is meant to be self explanatory.
 </p>
 
-<div id="outline-container-org98cb162" class="outline-2">
-<h2 id="org98cb162"><code>~/.config/nvim/init.vim</code></h2>
-<div class="outline-text-2" id="text-org98cb162">
+<div id="outline-container-org6fb63d7" class="outline-2">
+<h2 id="org6fb63d7"><code>~/.config/nvim/init.vim</code></h2>
+<div class="outline-text-2" id="text-org6fb63d7">
 <div class="org-src-container">
 <pre class="src src-vimrc"><span style="color: #fb4933;">filetype</span> plugin <span style="color: #fb4933;">on</span>
 
@@ -65,8 +65,10 @@ Plug <span style="color: #b8bb26;">'airblade/vim-gitgutter'</span>
 Plug <span style="color: #b8bb26;">'psliwka/vim-smoothie'</span>
 <span style="color: #7c6f64;">" run common unix command in Vim</span>
 Plug <span style="color: #b8bb26;">'tpope/vim-eunuch'</span>
+<span style="color: #7c6f64;">" surround</span>
+Plug <span style="color: #b8bb26;">'tpope/vim-surround'</span>
 <span style="color: #7c6f64;">" autopairing</span>
-Plug <span style="color: #b8bb26;">'jiangmiao/auto-pairs'</span>
+Plug <span style="color: #b8bb26;">'LukeLike/auto-pairs'</span>
 <span style="color: #7c6f64;">" highlight yanked area</span>
 Plug <span style="color: #b8bb26;">'machakann/vim-highlightedyank'</span>
 <span style="color: #7c6f64;">" split and join oneliners into multiline</span>
@@ -81,7 +83,6 @@ Plug <span style="color: #b8bb26;">'mg979/vim-visual-multi'</span>, {<span style
 Plug <span style="color: #b8bb26;">'t9md/vim-choosewin'</span>
 
 <span style="color: #fb4933;">call</span> plug#<span style="color: #fabd2f;">end</span>()
-
 
 <span style="color: #7c6f64;">" terminal 256 colors</span>
 <span style="color: #fb4933;">set</span> t_Co<span style="color: #d3869b;">=</span><span style="color: #87ceeb;">256</span>
@@ -206,8 +207,10 @@ Plug <span style="color: #b8bb26;">'t9md/vim-choosewin'</span>
 <span style="color: #7c6f64;">" define python3 binary</span>
 <span style="color: #fb4933;">let</span> <span style="color: #83a598;">g:python3_host_prog</span> <span style="color: #d3869b;">=</span> <span style="color: #fabd2f;">expand</span>(<span style="color: #b8bb26;">'/usr/bin/python3'</span>)
 
+<span style="color: #7c6f64;">"" autopairs</span>
+<span style="color: #fb4933;">let</span> <span style="color: #83a598;">g:AutoPairsCenterLine</span> <span style="color: #d3869b;">=</span> <span style="color: #87ceeb;">0</span>
 
-<span style="color: #7c6f64;">"" Airline</span>
+<span style="color: #7c6f64;">" Airline</span>
 <span style="color: #7c6f64;">" do not render empty sections</span>
 <span style="color: #fb4933;">let</span> <span style="color: #83a598;">g:airline_skip_empty_sections</span> <span style="color: #d3869b;">=</span> <span style="color: #87ceeb;">1</span>
 <span style="color: #7c6f64;">" file encoding skip expected string</span>
@@ -237,11 +240,13 @@ Plug <span style="color: #b8bb26;">'t9md/vim-choosewin'</span>
 <span style="color: #fb4933;">let</span> <span style="color: #83a598;">g:airline_symbols</span><span style="color: #d3869b;">.</span>whitespace <span style="color: #d3869b;">=</span> <span style="color: #b8bb26;">'&#926;'</span>
 
 <span style="color: #7c6f64;">"" coc</span>
+<span style="color: #7c6f64;">" dont start on startup</span>
+<span style="color: #fb4933;">let</span> <span style="color: #83a598;">g:coc_start_at_startup</span> <span style="color: #d3869b;">=</span> <span style="color: #83a598;">v:false</span>
 <span style="color: #7c6f64;">" navigate snippet placeholders using tab</span>
 <span style="color: #fb4933;">let</span> <span style="color: #83a598;">g:coc_snippet_next</span> <span style="color: #d3869b;">=</span> <span style="color: #b8bb26;">'&lt;Tab&gt;'</span>
 <span style="color: #fb4933;">let</span> <span style="color: #83a598;">g:coc_snippet_prev</span> <span style="color: #d3869b;">=</span> <span style="color: #b8bb26;">'&lt;S-Tab&gt;'</span>
 <span style="color: #7c6f64;">" list of the extensions to make sure are always installed</span>
-<span style="color: #fb4933;">let</span> <span style="color: #83a598;">g:coc_global_extensions</span> <span style="color: #d3869b;">=</span> [<span style="color: #b8bb26;">'coc-lists'</span>, <span style="color: #b8bb26;">'coc-clangd'</span>, <span style="color: #b8bb26;">'coc-highlight'</span>,]
+<span style="color: #fb4933;">let</span> <span style="color: #83a598;">g:coc_global_extensions</span> <span style="color: #d3869b;">=</span> [<span style="color: #b8bb26;">'coc-lists'</span>, <span style="color: #b8bb26;">'coc-clangd'</span>, <span style="color: #b8bb26;">'coc-highlight'</span>, <span style="color: #b8bb26;">'coc-pyright'</span>,]
 
 <span style="color: #7c6f64;">"" fzf</span>
 <span style="color: #7c6f64;">" fzf actions</span>
@@ -264,6 +269,10 @@ Plug <span style="color: #b8bb26;">'t9md/vim-choosewin'</span>
 <span style="color: #7c6f64;">"</span>
 <span style="color: #7c6f64;">" --- Commands --</span>
 <span style="color: #7c6f64;">"</span>
+
+<span style="color: #7c6f64;">" define types to syntax highlighting</span>
+<span style="color: #7c6f64;">" nasm</span>
+<span style="color: #fb4933;">autocmd</span> BufNewFile,BufRead *<span style="color: #d3869b;">.</span>S,*<span style="color: #d3869b;">.</span>s,*<span style="color: #d3869b;">.</span>asm,*<span style="color: #d3869b;">.</span><span style="color: #83a598;">inc</span> <span style="color: #fb4933;">set</span> <span style="color: #83a598;">filetype</span><span style="color: #d3869b;">=</span>asm <span style="color: #83a598;">syntax</span><span style="color: #d3869b;">=</span>nasm <span style="color: #83a598;">commentstring</span><span style="color: #d3869b;">=</span>;\%s
 
 <span style="color: #7c6f64;">" don't auto comment on newlines</span>
 <span style="color: #fb4933;">au</span> BufEnter * <span style="color: #fb4933;">set</span> <span style="color: #83a598;">fo</span><span style="color: #d3869b;">-=</span><span style="color: #fb4933;">c</span> <span style="color: #83a598;">fo</span><span style="color: #d3869b;">-=</span><span style="color: #fb4933;">r</span> <span style="color: #83a598;">fo</span><span style="color: #d3869b;">-=</span><span style="color: #fb4933;">o</span>
@@ -494,9 +503,9 @@ Plug <span style="color: #b8bb26;">'t9md/vim-choosewin'</span>
 </div>
 </div>
 
-<div id="outline-container-orgb916a2a" class="outline-2">
-<h2 id="orgb916a2a"><code>~/.config/nvim/after/ftplugin/rust.vim</code></h2>
-<div class="outline-text-2" id="text-orgb916a2a">
+<div id="outline-container-org67b223d" class="outline-2">
+<h2 id="org67b223d"><code>~/.config/nvim/after/ftplugin/rust.vim</code></h2>
+<div class="outline-text-2" id="text-org67b223d">
 <div class="org-src-container">
 <pre class="src src-vimrc"><span style="color: #7c6f64;">" general</span>
 <span style="color: #fb4933;">set</span> <span style="color: #83a598;">makeprg</span><span style="color: #d3869b;">=</span>cargo
@@ -530,9 +539,9 @@ Plug <span style="color: #b8bb26;">'t9md/vim-choosewin'</span>
 </div>
 </div>
 
-<div id="outline-container-org6ba8066" class="outline-2">
-<h2 id="org6ba8066"><code>~/.config/nvim/coc-settings.json</code></h2>
-<div class="outline-text-2" id="text-org6ba8066">
+<div id="outline-container-orgbeaf3be" class="outline-2">
+<h2 id="orgbeaf3be"><code>~/.config/nvim/coc-settings.json</code></h2>
+<div class="outline-text-2" id="text-orgbeaf3be">
 <div class="org-src-container">
 <pre class="src src-js">{
     <span style="color: #7c6f64;">// </span><span style="color: #7c6f64;">normal settings</span>
@@ -580,13 +589,16 @@ Plug <span style="color: #b8bb26;">'t9md/vim-choosewin'</span>
 }
 </pre>
 </div>
+</div>
+</div>
 
 <hr>
 <footer>
-<p><a class="footer" href="/index.html">Back</a></p>
+<p class="footer_right">30-05-2021</p>
+<p><a class="footer" href="/index.html">Homepage</a></p>
+<p><a class="footer" href="/writeups/htb/index.html">Back</a></p>
+<div style="clear: both;"></div>
 </footer>
-</div>
-</div>
 </div>
 </body>
 </html>
