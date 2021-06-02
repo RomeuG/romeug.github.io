@@ -6,7 +6,7 @@
 
 #+OPTIONS: author:nil
 #+OPTIONS: email:nil
-#+OPTIONS: date:t
+#+OPTIONS: date:
 
 #+PROPERTY: header-args :eval no
 
@@ -14,29 +14,53 @@
 
 #+EXPORT_FILE_NAME: emacs
 
-#+begin_src elisp
-(setq gc-cons-threshold 60000000) ; 100mb
+#+INCLUDE: "~/.config/emacs/orgmacros.org"
 
-;; file-name-handler-list optimization
+* Garbage Collector
+
+Set a ridiculously big number to the garbage collector threshold to speedup initialization.
+
+#+BEGIN_SRC emacs-lisp
+(setq gc-cons-threshold 60000000)
+#+END_SRC
+
+* Unknown Optimization
+
+#+BEGIN_SRC emacs-lisp
+;; file-name-handler-alist optimization
 (defvar my--file-name-handler-alist file-name-handler-alist)
 (setq file-name-handler-alist nil)
 
 (add-hook 'emacs-startup-hook
-		  (lambda ()
-			(setq file-name-handler-alist my--file-name-handler-alist)))
+	  (lambda ()
+	    (setq file-name-handler-alist my--file-name-handler-alist)))
+#+END_SRC
 
-;; Window System
-;; (unless (display-graphic-p)
+* Window Settings
+
+#+BEGIN_SRC emacs-lisp
 (tool-bar-mode -1)
 (menu-bar-mode -1)
 (scroll-bar-mode -1)
 (toggle-scroll-bar -1)
 (blink-cursor-mode 1)
-;; )
+#+END_SRC
 
+* GNUTLS Changes
+
+These changes were made because of the connection to MELPA and other package
+archives. Still need to test the configuration without it.
+
+#+BEGIN_SRC emacs-lisp
 (setq gnutls-min-prime-bits 1024)
 (setq gnutls-algorithm-priority "SECURE128:-VERS-SSL3.0:-VERS-TLS1.3")
+#+END_SRC
 
+* Package Services Initialization
+
+Initialization of GNU Elpa, MELPA and Org package archives.
+
+#+BEGIN_SRC emacs-lisp
 (require 'package)
 
 (add-to-list 'package-archives '("gnu" . "https://elpa.gnu.org/packages/") t)
@@ -47,17 +71,21 @@
 (unless (bound-and-true-p package--initialized)
   (setq package-enable-at-startup nil)
   (package-initialize))
+#+END_SRC
 
-;; Make sure `use-package' is available.
+* Use-package
+
+Make sure it is installed first.
+
+#+BEGIN_SRC emacs-lisp
 (unless (package-installed-p 'use-package)
   (package-refresh-contents)
   (package-install 'use-package))
+#+END_SRC
 
-;; load theme earlier because of off-emacs org-mode conversion
-(load-theme 'gruvbox-dark-hard t)
-(set-face-attribute 'mode-line nil :background "#1d2021" :foreground "#fbf1c7" :box "#fe8019")
+Configure it and then load it.
 
-;; Configure `use-package' prior to loading it.
+#+BEGIN_SRC emacs-lisp
 (eval-and-compile
   (setq use-package-always-ensure t)
   (setq use-package-always-defer t)
@@ -66,14 +94,27 @@
 
 (eval-when-compile
   (require 'use-package))
+#+END_SRC
 
+Then packages should be made available
+
+#+BEGIN_SRC emacs-lisp
 (setq package-enable-at-startup nil)
+#+END_SRC
 
-(setq load-prefer-newer t)
+* Theme
 
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;; FUNCTIONS
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+Theme should be loaded early in the configuration because of scripts that use
+org-mode and also need the colors from the specific theme in use.
+
+#+BEGIN_SRC emacs-lisp
+(load-theme 'gruvbox-dark-hard t)
+(set-face-attribute 'mode-line nil :background "#1d2021" :foreground "#fbf1c7" :box "#fe8019")
+#+END_SRC
+
+* Functions
+
+#+BEGIN_SRC emacs-lisp
 (defun kill-other-buffers ()
   "Kill all other buffers except scratch."
   (interactive)
@@ -101,35 +142,35 @@
       (beginning-of-line)
       ;; get rid of tabs at beginning of line
       (when (looking-at "^\\s-+")
-		(untabify (match-beginning 0) (match-end 0)))
+	(untabify (match-beginning 0) (match-end 0)))
       (when (looking-at "^	  ")
-		(replace-match "")))))
+	(replace-match "")))))
 
 (defun duplicate-line (arg)
   "Duplicate current line, leaving point in lower line."
   (interactive "*p")
   (setq buffer-undo-list (cons (point) buffer-undo-list))
   (let ((bol (save-excursion (beginning-of-line) (point)))
-		eol)
+	eol)
     (save-excursion
       (end-of-line)
       (setq eol (point))
       (let ((line (buffer-substring bol eol))
-			(buffer-undo-list t)
-			(count arg))
-		(while (> count 0)
-		  (newline)			;; because there is no newline in 'line'
-		  (insert line)
-		  (setq count (1- count)))
-		)
+	    (buffer-undo-list t)
+	    (count arg))
+	(while (> count 0)
+	  (newline)			;; because there is no newline in 'line'
+	  (insert line)
+	  (setq count (1- count)))
+	)
       (setq buffer-undo-list (cons (cons eol (point)) buffer-undo-list)))
     )
   (next-line arg))
 
 (defun my/disable-scroll-bars (frame)
   (modify-frame-parameters frame
-						   '((vertical-scroll-bars . nil)
-							 (horizontal-scroll-bars . nil))))
+			   '((vertical-scroll-bars . nil)
+			     (horizontal-scroll-bars . nil))))
 
 (defun endless/flycheck-dir (dir)
   "Run flycheck for each file in current directory.
@@ -138,67 +179,67 @@ Results are reported in a compilation buffer."
   (displaying-byte-compile-warnings
    (let ((p nil))
      (with-current-buffer (get-buffer-create
-						   byte-compile-log-buffer)
+			   byte-compile-log-buffer)
        (setq default-directory dir)
        (unless (eq major-mode 'compilation-mode)
-		 (compilation-mode))
+	 (compilation-mode))
        (goto-char (point-max))
        (let ((inhibit-read-only t))
-		 (insert "\n\xc\n\n"))
+	 (insert "\n\xc\n\n"))
        (setq p (point)))
      (dolist (file (directory-files "./" nil
-									"\\`[^\\.].*\\'"))
+				    "\\`[^\\.].*\\'"))
        (endless/-flycheck-file file))
      (with-selected-window (display-buffer
-							byte-compile-log-buffer)
+			    byte-compile-log-buffer)
        (goto-char p)
        (recenter 1)))))
 
 (defun endless/-report-error (fmt &rest args)
   "Print an error on `byte-compile-log-buffer'."
   (let ((inhibit-read-only t)
-		(fill-prefix "	  "))
+	(fill-prefix "	  "))
     (with-current-buffer byte-compile-log-buffer
       (let ((l (point)))
-		(insert "\n" (apply #'format fmt args))
-		(fill-region (1+ l) (point))))))
+	(insert "\n" (apply #'format fmt args))
+	(fill-region (1+ l) (point))))))
 
 (defun endless/-flycheck-file (file)
   "Check FILE and report to `byte-compile-log-buffer'."
   (let ((was-visited (find-buffer-visiting file)))
     (with-current-buffer (or was-visited
-							 (progn (find-file file)
-									(current-buffer)))
+			     (progn (find-file file)
+				    (current-buffer)))
       (when (ignore-errors (flycheck-buffer))
-		(while (flycheck-running-p)
-		  (accept-process-output nil 0.1))
-		(pcase flycheck-last-status-change
-		  ((or `errored `suspicious)
-		   (endless/-report-error
-			"%s: Something wrong here!"
-			(file-name-nondirectory (buffer-file-name))))
-		  (`finished
-		   (dolist (e flycheck-current-errors)
-			 (endless/-report-error
-			  "%s:%s:%s:%s: %s"
-			  (file-name-nondirectory (buffer-file-name))
-			  (flycheck-error-line e)
-			  (flycheck-error-column e)
-			  (flycheck-error-level e)
-			  (flycheck-error-message e))))))
+	(while (flycheck-running-p)
+	  (accept-process-output nil 0.1))
+	(pcase flycheck-last-status-change
+	  ((or `errored `suspicious)
+	   (endless/-report-error
+	    "%s: Something wrong here!"
+	    (file-name-nondirectory (buffer-file-name))))
+	  (`finished
+	   (dolist (e flycheck-current-errors)
+	     (endless/-report-error
+	      "%s:%s:%s:%s: %s"
+	      (file-name-nondirectory (buffer-file-name))
+	      (flycheck-error-line e)
+	      (flycheck-error-column e)
+	      (flycheck-error-level e)
+	      (flycheck-error-message e))))))
       (if was-visited
-		  (bury-buffer was-visited)
-		(kill-buffer (current-buffer))))))
+	  (bury-buffer was-visited)
+	(kill-buffer (current-buffer))))))
 
 (defun insert-date (prefix)
   "Insert the current date. With prefix-argument, use ISO format. With
    two prefix arguments, write out the day and month name."
   (interactive "P")
   (let ((format (cond
-				 ((not prefix) "%d.%m.%Y")
-				 ((equal prefix '(4)) "%Y-%m-%d")
-				 ((equal prefix '(16)) "%A, %d. %B %Y")))
-		(system-time-locale "de_DE"))
+		 ((not prefix) "%d.%m.%Y")
+		 ((equal prefix '(4)) "%Y-%m-%d")
+		 ((equal prefix '(16)) "%A, %d. %B %Y")))
+	(system-time-locale "de_DE"))
     (insert (format-time-string format))))
 
 (defadvice move-beginning-of-line (around smarter-bol activate)
@@ -251,7 +292,7 @@ Results are reported in a compilation buffer."
    (format "https://pypi.python.org/pypi?%%3Aaction=search&term=%s&submit=search"
            (read-string "Pip: ")
            (message "Searching pip.")
-		   )))
+	   )))
 
 (defun python/doc-search ()
   "Search Python3 official documentation. at: https://docs.python.org"
@@ -322,13 +363,13 @@ Results are reported in a compilation buffer."
   (interactive)
   (message "Deleting old backup files...")
   (let ((week (* 60 60 24 7))
-		(current (float-time (current-time))))
+	(current (float-time (current-time))))
     (dolist (file (directory-files temporary-file-directory t))
       (when (and (backup-file-name-p file)
-				 (> (- current (float-time (fifth (file-attributes file))))
-					week))
-		(message "%s" file)
-		(delete-file file)))))
+		 (> (- current (float-time (fifth (file-attributes file))))
+		    week))
+	(message "%s" file)
+	(delete-file file)))))
 
 (defun my-delete-word (arg)
   "Delete characters forward until encountering the end of a word.
@@ -406,12 +447,41 @@ managers such as DWM, BSPWM refer to this state as 'monocle'."
     (with-temp-buffer
       (cd (locate-dominating-file default-directory "Makefile"))
       (compile "make -k"))))
+#+END_SRC
 
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;; CONFIGS
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+* Configuration
 
-;; terminal bindings
+** Early Loads
+
+Load =tramp= and =bind-key= earlier.
+
+#+BEGIN_SRC emacs-lisp
+(require 'tramp)
+(require 'bind-key)
+#+END_SRC
+
+** Early Modes
+
+#+BEGIN_SRC emacs-lisp
+(global-subword-mode 1)
+(size-indication-mode t)
+(xterm-mouse-mode t)
+(delete-selection-mode t)
+(transient-mark-mode t)
+(column-number-mode 1)
+(global-font-lock-mode t)
+(savehist-mode 1)
+
+(fringe-mode '(nil . 0))
+
+                                        ; disable recentf mode
+(recentf-mode -1)
+(setq recentf-mode nil)
+
+#+END_SRC
+
+** Terminal Bindings
+#+BEGIN_SRC emacs-lisp
 (unless (display-graphic-p)
   (progn
     (define-key input-decode-map "\e[1;2A" [(shift up)])
@@ -426,363 +496,201 @@ managers such as DWM, BSPWM refer to this state as 'monocle'."
     (define-key input-decode-map "\e[1;5B" [(control down)])
     (define-key input-decode-map "\e[1;5C" [(control right)])
     (define-key input-decode-map "\e[1;5D" [(control left)])
-    ))
+    )
+  )
+#+END_SRC
 
-;; load early
-(require 'tramp)
+** Better Defaults
 
-;; bind-key for use-package
-(require 'bind-key)
-
-;; disable abbrev-mode
-(abbrev-mode -1)
-
-(remove-hook 'text-mode-hook #'abbrev-mode)
-(remove-hook 'c-mode-hook #'abbrev-mode)
-(remove-hook 'c++-mode-hook #'abbrev-mode)
-
-;; don’t warn for large file
-(setq large-file-warning-threshold nil)
-
-;; don’t warn for symlink
-(setq vc-follow-symlinks t)
-
-;; Don’t warn when advice is added for functions
-(setq ad-redefinition-action 'accept)
-
-(add-hook 'text-mode-hook (lambda () (abbrev-mode -1)))
-(add-hook 'c-mode-hook (lambda () (abbrev-mode -1)))
-(add-hook 'c++-mode-hook (lambda () (abbrev-mode -1)))
-
-(add-hook 'text-mode-hook (lambda () (TeX-PDF-mode -1)))
-(add-hook 'c-mode-hook (lambda () (TeX-PDF-mode -1)))
-(add-hook 'c++-mode-hook (lambda () (TeX-PDF-mode -1)))
-
-(setq-default confirm-kill-emacs 'yes-or-no-p)
-(setq-default cursor-in-non-selected-windows t)
-(setq-default help-window-select t)
-(setq-default x-stretch-cursor t)
-
-(setq x-underline-at-descent-line t)
-(setq underline-minimum-offset 1)
-
-(global-subword-mode 1)
-
-(add-hook 'focus-out-hook #'garbage-collect)
-
-(setq use-file-dialog nil)
-
-;; set fill columns
-(setq-default fill-column 80)
-
-;; always left-to-right text
-(setq-default bidi-paragraph-direction 'left-to-right)
-
-;; (setq garbage-collection-messages t)
-(setq jit-lock-defer-time 0)
-(setq fast-but-imprecise-scrolling t)
-(setq redisplay-dont-pause t)
-(setq read-process-output-max (* 1024 1024))
-
-(use-package exec-path-from-shell
-  :ensure t
-  :demand t
-  :config (exec-path-from-shell-initialize))
-
-(size-indication-mode t)
-(setq auto-window-vscroll nil)
-
-;; mouse settings
-(xterm-mouse-mode t)
-(global-unset-key [mouse-2])
-(global-set-key   [mouse-4] '(lambda () (interactive) (scroll-down 3)))
-(global-set-key   [mouse-5] '(lambda () (interactive) (scroll-up   3)))
-
-;; new home key action
-(global-set-key (kbd "<home>") 'move-beginning-of-line)
-
-;; comments
-(global-set-key (kbd "C-x C-;") #'*-comment-or-uncomment-region-or-line)
-
-;; my custom C-backspace
-(global-set-key [C-backspace] 'my-backward-delete-word)
-
-;; set new keyboard-quit
-(global-set-key (kbd "C-q") 'keyboard-quit)
-
-;; set new goto line
-(global-set-key (kbd "C-g") 'goto-line)
-
-;; disable suspend frame
-(global-unset-key (kbd "C-z"))
-(global-unset-key (kbd "C-x C-z"))
-(global-unset-key (kbd "C-h h"))
-
-;; compile
-(global-set-key [f5] 'desperately-compile)
-
-;; text marking
-(delete-selection-mode t)
-(transient-mark-mode t)
-(setq-default select-enable-clipboard t)
-(setq-default x-select-enable-clipboard t)
-
-;; cursor type
-(setq-default cursor-type 'box)
-
-;; quiet startup
-(setq inhibit-startup-screen t)
-(setq inhibit-startup-message t)
-(setq inhibit-startup-echo-area-message t)
-(setq initial-scratch-message nil)
-(defun display-startup-echo-area-message ()
-  (message ""))
-(setq-default frame-title-format nil)
-(setq-default ring-bell-function 'ignore)
-(setq-default adaptive-fill-regexp "[ t]+|[ t]*([0-9]+.|*+)[ t]*")
-(setq-default adaptive-fill-first-line-regexp "^* *$")
-(setq-default sentence-end "\\([。、！？]\\|……\\|[,.?!][]\"')}]*\\($\\|[ \t]\\)\\)[ \t\n]*")
-(setq-default sentence-end-double-space nil)
-(setq-default set-mark-command-repeat-pop t)  ; Repeating set-mark after popping mark pops it again
-(setq-default track-eol t)			; Keep cursor at end of lines.
-(setq-default line-move-visual nil)		; To be required by track-eol
-(setq-default kill-whole-line t)	; Kill line including '\n'
-(setq-default indent-tabs-mode nil)   ; use space
-
-(defalias 'yes-or-no-p #'y-or-n-p)
-
-;; column number
-(column-number-mode 1)
-
-;; highlighting
-(global-font-lock-mode t)
-(setq font-lock-maximum-decoration t)
-
-;; Paste with middle mouse button doesn't move the cursor
-(setq mouse-yank-at-point t)
-
-;; Silence ad-handle-definition about advised functions getting redefined
-(setq ad-redefinition-action 'accept)
+#+BEGIN_SRC emacs-lisp
+(setq-default
+ ad-redefinition-action 'accept            ; silence ad-handle-definition about advised functions getting redefined
+ auto-window-vscroll nil                   ; don’t automatically adjust window-vscroll to view tall lines
+ bidi-paragraph-direction 'left-to-right   ; always left-to-right text
+ confirm-kill-emacs 'yes-or-no-p           ; how exit confirmation is done
+ cursor-type 'box                          ; cursor type
+ cursor-in-non-selected-windows t          ; show cursor in non selected windows
+ fast-but-imprecise-scrolling t            ; faster scrolling
+ fill-column 80                            ; width for line breaks
+ frame-title-format nil                    ; don’t display title
+ help-window-select t                      ; always select help window
+ indent-tabs-mode nil                      ; use spaces instead of tabs
+ kill-whole-line t                         ; delete line including “\n”
+ large-file-warning-threshold nil          ; no warning for large files
+ line-move-visual nil                      ; required by track-eol
+ load-prefer-newer t                       ; prefer newer version of files
+ mouse-yank-at-point t                     ; paste with middle mouse button doesnt move cursor
+ read-process-output-max (* 1024 1024)     ; maximum number of bytes to read from subprocess in a single chunk
+ redisplay-dont-pause t                    ; don’t pause on redisplay
+ require-final-newline t                   ; trailing newline in file
+ select-enable-clipboard t                 ; cut/paste uses clipboard
+ sentence-end-double-space nil             ; single space ends sentence
+ set-mark-command-repeat-pop t             ; repeating set-mark after popping mark pops it again
+ track-eol t                               ; keep cursor at end of lines
+ underline-minimum-offset 1                ; minimum distance between baseline and underline
+ use-file-dialog nil                       ; disable use of file dialog
+ vc-follow-symlinks t                      ; no warning for symlinks
+ x-select-enable-clipboard t               ; cut/paste uses clipboard
+ x-stretch-cursor t                        ; draw cursor as wide as glyph underneath
+ x-underline-at-descent-line t             ; draw the underline at the same place as the descent line
+ )
 
 ;; Use 'fancy' ellipses for truncated strings
 (setq truncate-string-ellipsis "…")
 
-;; scroll bar new-frame
-(add-hook 'after-make-frame-functions 'my/disable-scroll-bars)
+(setq-default adaptive-fill-regexp "[ t]+|[ t]*([0-9]+.|*+)[ t]*") ; regexp to match text at start of line that constitutes indentation
+(setq-default adaptive-fill-first-line-regexp "^* *$")             ; regexp specifying whether to set fill prefix from a one-line paragraph
 
-;; require trailing newline
-(setq-default require-final-newline t)
-;; delete trailing whitespace on write
-(add-hook 'write-file-hooks 'delete-trailing-whitespace)
+(setq-default sentence-end "\\([。、！？]\\|……\\|[,.?!][]\"')}]*\\($\\|[ \t]\\)\\)[ \t\n]*") ; regexp describing the end of a sentence
+#+END_SRC
 
-;; Defer fontification a little bit, so we could gain a bit in scroll speed
-(setq jit-lock-defer-time 0.02)
+*** Backups
 
-;; redefining sentences in emacs
-(setq-default sentence-end-double-space nil)
-
-;; font settings
-(setq-default use-default-font-for-symbols nil)
-(setq-default inhibit-compacting-font-caches t)
-
-(cond ((string-equal system-type "gnu/linux")
-       (setq-default default-font-family "Sarasa Term K")
-       (set-frame-font "Sarasa Term K-12")
-       (setq-default default-frame-alist '((font . "Sarasa Term K-12")
-										   (height . 75)))
-       )
-      )
-
-(set-fontset-font "fontset-default" nil (font-spec :size 11 :name "Symbola"))
-(set-fontset-font "fontset-default" 'unicode "DejaVu Sans")
-
-(global-set-key (kbd "C-.") 'other-window)
-(global-set-key (kbd "C-,") 'prev-window)
-
-;; visual bell and less keystrokes
-(setq-default echo-keystrokes 0.1)
-(setq-default use-dialog-box nil)
-(setq-default visible-bell t)
-
-;; (add-hook 'minibuffer-setup-hook #'my-minibuffer-setup-hook)
-;; (add-hook 'minibuffer-exit-hook #'my-minibuffer-exit-hook)
-
-;; backups
+#+BEGIN_SRC emacs-lisp
 (setq-default backup-directory-alist '(("." . "~/.config/emacs/backups")))
 (setq-default backup-by-copying t)
 (setq-default delete-old-versions t)
 (setq-default kept-new-versions 6)
 (setq-default kept-old-version 2)
 (setq-default version-control t)
+(setq-default vc-make-backup-files t)
+(setq-default auto-save-file-name-transforms '((".*" "~/.config/emacs/auto-save-list/" t)))
+#+END_SRC
 
-;; disable warning when killing buffers
-(setq-default kill-buffer-query-functions
-			  (remq 'process-kill-buffer-query-function
-					kill-buffer-query-functions))
+*** History
 
-;; custom file
-(setq-default custom-file "~/.config/emacs/custom.el")
-
-;; history
+#+BEGIN_SRC emacs-lisp
 (setq-default savehist-file "~/.config/emacs/savehist")
-(savehist-mode 1)
 (setq-default history-length t)
 (setq-default history-delete-duplicates t)
 (setq-default savehist-save-minibuffer-history 1)
-(setq-default savehist-additional-variables
-			  '(kill-ring
-				search-ring
-				regexp-search-ring))
+(setq-default savehist-additional-variables '(kill-ring search-ring regexp-search-ring))
+#+END_SRC
 
-;; save disk space
-(setq-default delete-old-versions t)
-(setq-default version-control t)
-(setq-default vc-make-backup-files t)
-(setq-default auto-save-file-name-transforms '((".*" "~/.config/emacs/auto-save-list/" t)))
+*** Quiet Startup
 
-;; utf8 stuff
+#+BEGIN_SRC emacs-lisp
+(setq inhibit-startup-screen t)
+(setq inhibit-startup-message t)
+(setq inhibit-startup-echo-area-message t)
+(setq initial-scratch-message nil)
+(defun display-startup-echo-area-message () (message ""))
+#+END_SRC
+
+*** Visual Bells
+
+#+BEGIN_SRC emacs-lisp
+(setq-default echo-keystrokes 0.1)
+(setq-default use-dialog-box nil)
+(setq-default visible-bell t)
+(setq-default ring-bell-function 'ignore)
+#+END_SRC
+
+*** Font
+
+#+BEGIN_SRC emacs-lisp
+(setq-default use-default-font-for-symbols nil)
+(setq-default inhibit-compacting-font-caches t)
+(setq-default font-lock-maximum-decoration t)            ; use maximum decoration available
+(setq-default jit-lock-defer-time 0.02)                  ; fontification is only deferred while there is input pending
+
+(setq-default default-font-family "Sarasa Term K")
+(set-frame-font "Sarasa Term K-12")
+(setq-default default-frame-alist '((font . "Sarasa Term K-12") (height . 75)))
+
+(set-fontset-font "fontset-default" nil (font-spec :size 11 :name "Symbola"))
+(set-fontset-font "fontset-default" 'unicode "DejaVu Sans")
+
 (set-locale-environment "en_US.UTF-8")
 (set-default-coding-systems 'utf-8)
 (prefer-coding-system 'utf-8)
-
-;; backtab delete spaces
-(global-set-key (kbd "<backtab>") 'un-indent-by-removing-4-spaces)
-
-;; set font size
-(global-set-key (kbd "C-+") 'text-scale-increase)
-(global-set-key (kbd "C--") 'text-scale-decrease)
-
-(define-globalized-minor-mode
-  global-text-scale-mode
-  text-scale-mode
-  (lambda () (text-scale-mode 1)))
-
-(defun global-text-scale-adjust (inc) (interactive)
-       (text-scale-set 1)
-       (kill-local-variable 'text-scale-mode-amount)
-       (setq-default text-scale-mode-amount (+ text-scale-mode-amount inc))
-       (global-text-scale-mode 1)
-       )
-
-(global-set-key (kbd "M-0")
-				'(lambda () (interactive)
-				   (global-text-scale-adjust (- text-scale-mode-amount))
-				   (global-text-scale-mode -1)))
-(global-set-key (kbd "M-+")
-				'(lambda () (interactive) (global-text-scale-adjust 1)))
-(global-set-key (kbd "M--")
-				'(lambda () (interactive) (global-text-scale-adjust -1)))
 
 ;; highlight NOTE and TODO
 (setq-default fixme-modes '(c++-mode c-mode emacs-lisp-mode))
 (make-face 'font-lock-fixme-face)
 (make-face 'font-lock-note-face)
 (mapc (lambda (mode)
-		(font-lock-add-keywords
-		 mode
-		 '(("\\<\\(TODO\\)" 1 'font-lock-fixme-face t)
-		   ("\\<\\(NOTE\\)" 1 'font-lock-note-face t))))
+	(font-lock-add-keywords
+	 mode
+	 '(("\\<\\(TODO\\)" 1 'font-lock-fixme-face t)
+	   ("\\<\\(NOTE\\)" 1 'font-lock-note-face t))))
       fixme-modes)
 (modify-face 'font-lock-fixme-face "Red" nil nil t nil t nil nil)
 (modify-face 'font-lock-note-face "Dark Green" nil nil t nil t nil nil)
+#+END_SRC
 
-(global-set-key (kbd "<f5>") (lambda ()
-							   (interactive)
-							   (call-interactively 'recompile)))
+*** Disable Commands
 
-;; disable recentf
-(recentf-mode -1)
-(setq recentf-mode nil)
+#+BEGIN_SRC emacs-lisp
+(put 'upcase-region 'disabled nil)
+(put 'downcase-region 'disabled nil)
+#+END_SRC
+** Better Keybinds
 
-;; GDB
-(setq-default gdb-many-windows t)
-(setq-default gdb-show-main	   t)
+#+BEGIN_SRC emacs-lisp
+(global-set-key (kbd "<home>") 'move-beginning-of-line)                  ; new home key action
+(global-set-key (kbd "C-x C-;") #'*-comment-or-uncomment-region-or-line) ; comments
+(global-set-key [C-backspace] 'my-backward-delete-word)                  ; C-Backspace deletes by word
+(global-set-key (kbd "C-q") 'keyboard-quit)                              ; keyboard quit key
+(global-set-key (kbd "C-g") 'goto-line)                                  ; go to line
+(global-set-key [f5] 'desperately-compile)                               ; compile
+(global-set-key (kbd "C-d") 'duplicate-line)                             ; duplicate current line
+
+(global-set-key (kbd "<backtab>") 'un-indent-by-removing-4-spaces)       ; delete 4 spaces
+
+(global-set-key (kbd "C-+") 'text-scale-increase)                        ; increase font size
+(global-set-key (kbd "C--") 'text-scale-decrease)                        ; decrease font size
+
+(global-set-key (kbd "C-.") 'other-window)                               ; move to other window
+(global-set-key (kbd "C-,") 'prev-window)                                ; move to previous window
+
+(global-unset-key (kbd "C-z"))                                           ; disable suspend frame
+(global-unset-key (kbd "C-x C-z"))
+(global-unset-key (kbd "C-h h"))
+#+END_SRC
+
+*** Mouse
+
+Scroll up and down by 3 lines.
+
+#+BEGIN_SRC emacs-lisp
+(global-unset-key [mouse-2])
+(global-set-key   [mouse-4] '(lambda () (interactive) (scroll-down 3)))
+(global-set-key   [mouse-5] '(lambda () (interactive) (scroll-up   3)))
+#+END_SRC
+
+** Hooks
+
+#+BEGIN_SRC emacs-lisp
+                                        ; scroll bar new-frame
+(add-hook 'after-make-frame-functions 'my/disable-scroll-bars)
+
+                                        ; delete trailing whitespace on write
+(add-hook 'write-file-hooks 'delete-trailing-whitespace)
 
 (add-hook 'c-mode-hook (lambda () (local-unset-key (kbd "C-d"))))
 (add-hook 'c++-mode-hook (lambda () (local-unset-key (kbd "C-d"))))
-
-(global-set-key (kbd "C-d") 'duplicate-line)
-
-;; bison & lex
-(add-to-list 'auto-mode-alist '("\\.y\\'" ignore t))
-(add-to-list 'auto-mode-alist '("\\.l\\'" ignore t))
-
-;; Use more convenient bindings for previous-error and next-error.
-(dolist (key (append (where-is-internal #'previous-error)
-                     (where-is-internal #'next-error)))
-  (global-unset-key key))
-(global-set-key (kbd "M-N") #'next-error)
-(global-set-key (kbd "M-P") #'previous-error)
-
-;; (fringe-mode '(nil . 0))
-;; (set-fringe-mode 0)
-(fringe-mode '(nil . 0))
-(set-fringe-mode fringe-mode)
-
-;; modeline
-(setq-default mode-line-buffer-identification
-              (let ((orig  (car mode-line-buffer-identification)))
-                `(:eval (cons (concat ,orig (abbreviate-file-name default-directory))
-                              (cdr mode-line-buffer-identification)))))
-
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;; PACKAGES
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-
-(use-package multiple-cursors
-  :bind (("C-c m"   . mc/edit-lines)
-         ("C->"     . mc/mark-next-like-this)
-         ("C-<"     . mc/mark-previous-like-this)
-         ("C-c C-<" . mc/mark-all-like-this)))
+#+END_SRC
 
 
-(use-package hungry-delete
-  :diminish
+* Package Configuration
+
+** All The Icons
+
+#+BEGIN_SRC emacs-lisp
+(use-package all-the-icons
   :config
-  (setq hungry-delete-chars-to-skip " \t\r\f\v")
-
-  (defun rvg/hungry-delete-off ()
-    (hungry-delete-mode -1))
-
-  ;; hungry delete mode doesnt play well with multiple cursors...
-  (add-hook 'multiple-cursors-mode-enabled-hook #'rvg/hungry-delete-off)
-  (add-hook 'multiple-cursors-mode-disabled-hook #'rvg/hungry-delete-off)
-
-  (global-hungry-delete-mode)
+  (set-fontset-font t 'unicode (font-spec :family "all-the-icons") nil 'append)
+  (set-fontset-font t 'unicode (font-spec :family "file-icons") nil 'append)
+  (set-fontset-font t 'unicode (font-spec :family "Material Icons") nil 'append)
+  (set-fontset-font t 'unicode (font-spec :family "github-octicons") nil 'append)
+  (set-fontset-font t 'unicode (font-spec :family "FontAwesome") nil 'append)
+  (set-fontset-font t 'unicode (font-spec :family "Weather Icons") nil 'append)
   )
+#+END_SRC
+** Ansi Color
 
-(use-package paren
-  :config
-  (setq show-paren-style 'parenthesis)
-  (setq show-paren-when-point-in-periphery t)
-  (setq show-paren-when-point-inside-paren nil)
-  :hook (after-init-hook . show-paren-mode)
-  )
-
-(use-package electric
-  :config
-  (setq electric-pair-inhibit-predicate'electric-pair-conservative-inhibit)
-  (setq electric-pair-preserve-balance t)
-  (setq electric-pair-pairs
-        '((8216 . 8217)
-          (8220 . 8221)
-          (171 . 187)))
-  (setq electric-pair-skip-self 'electric-pair-default-skip-self)
-  (setq electric-pair-skip-whitespace nil)
-  (setq electric-pair-skip-whitespace-chars
-        '(9
-          10
-          32))
-  (setq electric-quote-context-sensitive t)
-  (setq electric-quote-paragraph t)
-  (setq electric-quote-string nil)
-  (setq electric-quote-replace-double t)
-  :hook (after-init-hook . (lambda ()
-                             (electric-indent-mode 1)
-                             (electric-pair-mode 1)
-                             (electric-quote-mode 1)))
-  )
-
+#+BEGIN_SRC emacs-lisp
 (use-package ansi-color
   :commands ansi-color-display
   :hook (compilation-filter-hook . colorize-compilation-buffer)
@@ -799,135 +707,72 @@ managers such as DWM, BSPWM refer to this state as 'monocle'."
   ;; http://stackoverflow.com/a/3072831/355252
   (defun colorize-compilation-buffer ()
     (let ((inhibit-read-only t))
-      (ansi-color-apply-on-region (point-min) (point-max)))))
+      (ansi-color-apply-on-region (point-min) (point-max))))
+  )
+#+END_SRC
 
-(use-package compile
+** Async
+
+#+BEGIN_SRC emacs-lisp
+(use-package async :ensure)
+#+END_SRC
+
+** Auctex
+
+#+BEGIN_SRC emacs-lisp
+(use-package auctex
+  :mode (".tex" . latex-mode)
   :config
-  (setq compile-command "make -C .. all")
-  (setq compile-read-command nil)
+  (setq TeX-auto-save t)
+  (setq TeX-engine 'xelatex)
+  (setq TeX-PDF-mode t)
 
-  ;; Always save before compiling
-  (setq compilation-ask-about-save nil)
-  ;; Just kill old compile processes before starting the new one
-  (setq compilation-always-kill t)
-  ;; Scroll with the compilation output
-  ;; Set to 'first-error to stop scrolling on first error
-  (setq compilation-scroll-output t))
+  (setq TeX-command-default "Latexmk")
+  )
+#+END_SRC
 
-(use-package epa
-  :defer t
+*** Latexmk
+
+#+BEGIN_SRC emacs-lisp
+(use-package auctex-latexmk
+  :defer 0
+  :init
+  (auctex-latexmk-setup)
   :config
-  ;; Always replace encrypted text with plain text version
-  (setq epa-replace-original-text t))
+  (setq auctex-latexmk-inherit-TeX-PDF-mode t)
+  (add-hook 'LaTeX-mode-hook
+            (lambda ()
+	      (push
+	       '("LaTeXmk" "latexmk -pdf --synctex=1 -shell-escape -interaction=nonstopmode -file-line-error -synctex=1 %s" TeX-run-TeX nil t
+		 :help "Run latexmk on file")
+	       TeX-command-list)
+              (push '("LuaLatex" "lualatex -pdf --synctex=1 -shell-escape -interaction=nonstopmode -file-line-error -synctex=1 %s" TeX-run-TeX nil t
+		      :help "Run lualatex on file")
+		    TeX-command-list)
+              ))
+  )
+#+END_SRC
 
-(use-package epg
-  :defer t
-  :config
-  ;; Let Emacs query the passphrase through the minibuffer
-  (setq epg-pinentry-mode 'loopback))
+** Auto Revert
 
-(use-package isearch
-  :defer
+#+BEGIN_SRC emacs-lisp
+(use-package autorevert
   :ensure nil
   :diminish
-  :config
-  (setq search-highlight t)
-  (setq search-whitespace-regexp ".*?")
-  (setq isearch-lax-whitespace t)
-  (setq isearch-regexp-lax-whitespace nil)
-  (setq isearch-lazy-highlight t)
+  :hook (after-init-hook . global-auto-revert-mode))
+#+END_SRC
 
-  (setq isearch-lazy-count t)
-  (setq lazy-count-prefix-format nil)
-  (setq lazy-count-suffix-format " (%s/%s)")
-  (setq isearch-yank-on-move 'shift)
-  (setq isearch-allow-scroll 'unlimited)
+** Avy
 
-  (setq search-default-mode 'char-fold-to-regexp)
+#+BEGIN_SRC emacs-lisp
+(use-package avy
+  :bind
+  ("M-s" . avy-goto-char)
   )
+#+END_SRC
+** Calendar
 
-(use-package dired
-  :defer
-  :ensure nil
-  :config
-  (setq dired-recursive-copies 'always)
-  (setq dired-recursive-deletes 'always)
-  (setq delete-by-moving-to-trash t)
-  (setq dired-listing-switches
-        "-AGFhlv --group-directories-first --time-style=long-iso")
-  (setq dired-dwim-target t)
-  :hook ((dired-mode-hook . dired-hide-details-mode)
-         (dired-mode-hook . hl-line-mode)))
-
-(use-package dired-aux
-  :defer
-  :ensure nil
-  :config
-  (setq dired-isearch-filenames 'dwim)
-  (setq dired-create-destination-dirs 'ask)
-  (setq dired-vc-rename-file t)
-  )
-
-(use-package find-dired
-  :defer
-  :ensure nil
-  :after dired
-  :config
-  (setq find-ls-option
-        '("-ls" . "-AGFhlv --group-directories-first --time-style=long-iso"))
-  (setq find-name-arg "-iname"))
-
-(use-package async :ensure)
-
-(use-package dired-async
-  :defer
-  :ensure nil
-  :after (dired async)
-  :hook (dired-mode-hook . dired-async-mode))
-
-(use-package dired-subtree
-  :defer
-  :after dired
-  :config
-  (setq dired-subtree-use-backgrounds nil)
-  :bind (:map dired-mode-map
-              ("<tab>" . dired-subtree-toggle)
-              ("<C-tab>" . dired-subtree-cycle)
-              ("<S-iso-lefttab>" . dired-subtree-remove)))
-
-(use-package window
-  :ensure nil
-  :init
-  (setq window-combination-resize t)
-  (setq even-window-sizes 'height-only)
-  (setq window-sides-vertical nil)
-  (setq switch-to-buffer-in-dedicated-window 'pop)
-  :hook ((help-mode-hook . visual-line-mode)
-         (custom-mode-hook . visual-line-mode))
-  )
-
-(use-package diary-lib
-  :ensure nil
-  :defer
-  :config
-  (setq diary-file "~/.config/emacs/diary")
-  (setq diary-entry-marker "diary")
-  (setq diary-show-holidays-flag t)
-  (setq diary-header-line-flag nil)
-  (setq diary-mail-addr "romeu.bizz@gmail.com")
-  (setq diary-mail-days 3)
-  (setq diary-number-of-entries 3)
-  (setq diary-comment-start ";")
-  (setq diary-comment-end "")
-  (setq diary-date-forms
-        '((day "/" month "[^/0-9]")
-          (day "/" month "/" year "[^0-9]")
-          (day " *" monthname " *" year "[^0-9]")
-          (monthname " *" day "[^,0-9]")
-          (monthname " *" day ", *" year "[^0-9]")
-          (year "[-/]" month "[-/]" day "[^0-9]")
-          (dayname "\\W"))))
-
+#+BEGIN_SRC emacs-lisp
 (use-package calendar
   :ensure nil
   :defer
@@ -963,48 +808,17 @@ managers such as DWM, BSPWM refer to this state as 'monocle'."
             "Last Quarter Moon")))
 
   :hook (calendar-today-visible-hook . calendar-mark-today))
+#+END_SRC
 
-(use-package which-func
-  :defer 5
-  :config (which-function-mode 1))
+** CC-Mode
 
-(use-package server
-  :ensure nil
-  :hook (after-init-hook . server-mode))
-
-;; Automatically reload files was modified by external program
-(use-package autorevert
-  :ensure nil
-  :diminish
-  :hook (after-init-hook . global-auto-revert-mode))
-
-;; Remember location in file
-(use-package saveplace
-  :ensure nil
-  :hook (after-init-hook . save-place-mode))
-
-(use-package projectile
-  :diminish
-  :config
-  (projectile-mode +1))
-
-(use-package gruvbox-theme
-  :defer 0
-  :config
-  (load-theme 'gruvbox-dark-hard)
-  (set-face-attribute 'mode-line nil :background "#1d2021" :foreground "#fbf1c7" :box "#fe8019")
-  )
-
-(use-package so-long
-  :config
-  (global-so-long-mode))
-
+#+BEGIN_SRC emacs-lisp
 (use-package cc-mode
   :config
   (setq-default c-default-style "bsd")
   (setq-default c-basic-offset 4)
 
-										; automatically indent when press RET
+  ;; automatically indent when press RET
   (global-set-key (kbd "RET") 'newline-and-indent)
 
   (global-set-key (kbd "C-c w") 'whitespace-mode)
@@ -1017,36 +831,372 @@ managers such as DWM, BSPWM refer to this state as 'monocle'."
   (fset 'c-indent-region 'clang-format-region)
 
   (add-hook 'before-save-hook
-			(lambda ()
-			  (when (member major-mode '(c-mode c++-mode))
-				(progn
-				  (if (string= (file-name-extension (buffer-name)) "h")
-					  (message "Clang-format won’t work with this file format.")
-					(when (locate-dominating-file "." ".clang-format")
-					  (clang-format-buffer))
-					)
-				  ;; Return nil, to continue saving.
-				  nil))))
+	    (lambda ()
+	      (when (member major-mode '(c-mode c++-mode))
+		(progn
+		  (if (string= (file-name-extension (buffer-name)) "h")
+		      (message "Clang-format won’t work with this file format.")
+		    (when (locate-dominating-file "." ".clang-format")
+		      (clang-format-buffer))
+		    )
+		  ;; Return nil, to continue saving.
+		  nil))))
   )
+#+END_SRC
 
-(use-package uniquify
+** Clean Aindent Mode
+
+#+BEGIN_SRC emacs-lisp
+(use-package clean-aindent-mode
+  :init
+  (add-hook 'prog-mode-hook 'clean-aindent-mode))
+#+END_SRC
+
+** Company
+
+#+BEGIN_SRC emacs-lisp
+(use-package company
+  :diminish company-mode
+  :defines
+  (company-dabbrev-ignore-case company-dabbrev-downcase)
+  :init (global-company-mode)
+  :custom
+  (company-idle-delay 0)
+  (company-echo-delay 0)
+  (company-minimum-prefix-length 1)
+  (company-tooltip-align-annotations t)
+  :config
+  (defun indent-or-complete ()
+    (interactive)
+    (if (looking-at "\\_>")
+	(company-complete-common)
+      (indent-according-to-mode)))
+
+  (delete 'company-dabbrev company-backends)
+  (delete 'company-oddmuse company-backends)
+  (delete 'company-clang company-backends)
+  (delete 'company-bbdb company-backends)
+  (delete 'company-files company-backends)
+  (delete '(company-dabbrev-code company-gtags company-etags company-keywords) company-backends)
+
+  (setq company-require-match nil)
+  (setq company-tooltip-idle-delay .25)
+
+  (global-unset-key (kbd "C-SPC"))
+  (global-set-key (kbd "C-SPC") 'company-complete)
+  (global-set-key (kbd "<f9>") 'company-complete)
+
+  ;; deactivate auto complete selection
+  (define-key company-active-map (kbd "<return>") nil)
+  (define-key company-active-map (kbd "RET") nil)
+  )
+#+END_SRC
+** Compile
+
+#+BEGIN_SRC emacs-lisp
+(use-package compile
+  :config
+  (setq compile-command "make -C .. all")
+  (setq compile-read-command nil)
+
+  ;; Always save before compiling
+  (setq compilation-ask-about-save nil)
+  ;; Just kill old compile processes before starting the new one
+  (setq compilation-always-kill t)
+  ;; Scroll with the compilation output
+  ;; Set to 'first-error to stop scrolling on first error
+  (setq compilation-scroll-output t))
+#+END_SRC
+** Counsel
+
+#+BEGIN_SRC emacs-lisp
+(use-package counsel)
+#+END_SRC
+** Crux
+
+#+BEGIN_SRC emacs-lisp
+(use-package crux)
+#+END_SRC
+** CSV Mode
+
+#+BEGIN_SRC emacs-lisp
+(use-package csv-mode)
+#+END_SRC
+** Diary Lib
+
+#+BEGIN_SRC emacs-lisp
+(use-package diary-lib
+  :ensure nil
+  :defer
+  :config
+  (setq diary-file "~/.config/emacs/diary")
+  (setq diary-entry-marker "diary")
+  (setq diary-show-holidays-flag t)
+  (setq diary-header-line-flag nil)
+  (setq diary-mail-addr "romeu.bizz@gmail.com")
+  (setq diary-mail-days 3)
+  (setq diary-number-of-entries 3)
+  (setq diary-comment-start ";")
+  (setq diary-comment-end "")
+  (setq diary-date-forms
+        '((day "/" month "[^/0-9]")
+          (day "/" month "/" year "[^0-9]")
+          (day " *" monthname " *" year "[^0-9]")
+          (monthname " *" day "[^,0-9]")
+          (monthname " *" day ", *" year "[^0-9]")
+          (year "[-/]" month "[-/]" day "[^0-9]")
+          (dayname "\\W"))))
+#+END_SRC
+** Diff Hl
+
+#+BEGIN_SRC emacs-lisp
+(use-package diff-hl
+  :init
+  (custom-set-faces
+   '(diff-hl-change ((t (:background "dark blue" :foreground "dark blue")))
+		    '(diff-hl-insert ((t (:background "dark green" :foreground "dark green"))))
+		    '(diff-hl-delete ((t (:background "dark red" :foreground "dark red"))))))
+  (diff-hl-flydiff-mode)
+  (diff-hl-margin-mode)
+  (global-diff-hl-mode 1)
+
+  (add-hook 'magit-post-refresh-hook 'diff-hl-magit-post-refresh)
+  )
+#+END_SRC
+** Dired
+
+#+BEGIN_SRC emacs-lisp
+(use-package dired
+  :defer
   :ensure nil
   :config
-  (setq uniquify-buffer-name-style 'forward)
-  (setq uniquify-strip-common-suffix t)
-  (setq uniquify-after-kill-buffer-p t)
-  (setq uniquify-separator "/")
+  (setq dired-recursive-copies 'always)
+  (setq dired-recursive-deletes 'always)
+  (setq delete-by-moving-to-trash t)
+  (setq dired-listing-switches
+        "-AGFhlv --group-directories-first --time-style=long-iso")
+  (setq dired-dwim-target t)
+  :hook ((dired-mode-hook . dired-hide-details-mode)
+         (dired-mode-hook . hl-line-mode)))
+#+END_SRC
+
+*** Dired Async
+
+#+BEGIN_SRC emacs-lisp
+(use-package dired-async
+  :defer
+  :ensure nil
+  :after (dired async)
+  :hook (dired-mode-hook . dired-async-mode))
+#+END_SRC
+
+*** Dired Aux
+
+#+BEGIN_SRC emacs-lisp
+(use-package dired-aux
+  :defer
+  :ensure nil
+  :config
+  (setq dired-isearch-filenames 'dwim)
+  (setq dired-create-destination-dirs 'ask)
+  (setq dired-vc-rename-file t)
   )
+#+END_SRC
 
-(use-package markdown-mode
-  :commands (markdown-mode gfm-mode)
-  :mode (("README\\.md\\'" . gfm-mode)
-         ("\\.md\\'" . markdown-mode)
-         ("\\.markdown\\'" . markdown-mode))
-  :init (setq markdown-command "multimarkdown"))
+*** Dired Subtree
 
-;; (use-package cmake-mode)
+#+BEGIN_SRC emacs-lisp
+(use-package dired-subtree
+  :defer
+  :after dired
+  :config
+  (setq dired-subtree-use-backgrounds nil)
+  :bind (:map dired-mode-map
+              ("<tab>" . dired-subtree-toggle)
+              ("<C-tab>" . dired-subtree-cycle)
+              ("<S-iso-lefttab>" . dired-subtree-remove)))
+#+END_SRC
 
+*** Find Dired
+
+#+BEGIN_SRC emacs-lisp
+(use-package find-dired
+  :defer
+  :ensure nil
+  :after dired
+  :config
+  (setq find-ls-option
+        '("-ls" . "-AGFhlv --group-directories-first --time-style=long-iso"))
+  (setq find-name-arg "-iname"))
+#+END_SRC
+
+** Eldoc
+
+#+BEGIN_SRC emacs-lisp
+(use-package eldoc
+  :ensure nil
+  :config (global-eldoc-mode -1))
+#+END_SRC
+** Electric
+
+#+BEGIN_SRC emacs-lisp
+(use-package electric
+  :config
+  (setq electric-pair-inhibit-predicate'electric-pair-conservative-inhibit)
+  (setq electric-pair-preserve-balance t)
+  (setq electric-pair-pairs
+        '((8216 . 8217)
+          (8220 . 8221)
+          (171 . 187)))
+  (setq electric-pair-skip-self 'electric-pair-default-skip-self)
+  (setq electric-pair-skip-whitespace nil)
+  (setq electric-pair-skip-whitespace-chars '(9 10 32))
+  (setq electric-quote-context-sensitive t)
+  (setq electric-quote-paragraph t)
+  (setq electric-quote-string nil)
+  (setq electric-quote-replace-double t)
+  :hook (after-init-hook . (lambda ()
+                             (electric-indent-mode 1)
+                             (electric-pair-mode 1)
+                             (electric-quote-mode 1)))
+  )
+#+END_SRC
+
+** Epa
+
+#+BEGIN_SRC emacs-lisp
+(use-package epa
+  :defer t
+  :config
+  ;; Always replace encrypted text with plain text version
+  (setq epa-replace-original-text t)
+  )
+#+END_SRC
+
+** Epg
+
+#+BEGIN_SRC emacs-lisp
+(use-package epg
+  :defer t
+  :config
+  ;; Let Emacs query the passphrase through the minibuffer
+  (setq epg-pinentry-mode 'loopback)
+  )
+#+END_SRC
+
+** Exec Path from Shell
+
+#+BEGIN_SRC emacs-lisp
+(use-package exec-path-from-shell
+  :ensure t
+  :demand t
+  :config (exec-path-from-shell-initialize))
+#+END_SRC
+** Git Time Machine
+
+#+BEGIN_SRC emacs-lisp
+(use-package git-timemachine
+  :bind ("M-g t" . git-timemachine-toggle))
+#+END_SRC
+
+** Gruvbox Theme
+
+#+BEGIN_SRC emacs-lisp
+(use-package gruvbox-theme
+  :defer 0
+  :config
+  (load-theme 'gruvbox-dark-hard)
+  (set-face-attribute 'mode-line nil :background "#1d2021" :foreground "#fbf1c7" :box "#fe8019")
+  )
+#+END_SRC
+
+** Hungry Delete
+
+#+BEGIN_SRC emacs-lisp
+(use-package hungry-delete
+  :diminish
+  :config
+  (setq hungry-delete-chars-to-skip " \t\r\f\v")
+
+  (defun rvg/hungry-delete-off ()
+    (hungry-delete-mode -1))
+
+  ;; hungry delete mode doesnt play well with multiple cursors...
+  (add-hook 'multiple-cursors-mode-enabled-hook #'rvg/hungry-delete-off)
+  (add-hook 'multiple-cursors-mode-disabled-hook #'rvg/hungry-delete-off)
+
+  (global-hungry-delete-mode)
+  )
+#+END_SRC
+
+** Isearch
+
+#+BEGIN_SRC emacs-lisp
+(use-package isearch
+  :defer
+  :ensure nil
+  :diminish
+  :config
+  (setq search-highlight t)
+  (setq search-whitespace-regexp ".*?")
+  (setq isearch-lax-whitespace t)
+  (setq isearch-regexp-lax-whitespace nil)
+  (setq isearch-lazy-highlight t)
+
+  (setq isearch-lazy-count t)
+  (setq lazy-count-prefix-format nil)
+  (setq lazy-count-suffix-format " (%s/%s)")
+  (setq isearch-yank-on-move 'shift)
+  (setq isearch-allow-scroll 'unlimited)
+
+  (setq search-default-mode 'char-fold-to-regexp)
+  )
+#+END_SRC
+
+** Ivy
+
+#+BEGIN_SRC emacs-lisp
+(use-package ivy
+  :defer 0
+  :config
+  (ivy-mode 1)
+  (setq ivy-use-virtual-buffers t)
+  (setq ivy-wrap t)
+  (setq enable-recursive-minibuffers t)
+  (setq ivy-count-format "(%d/%d) ")
+
+  (global-set-key "\C-s" 'swiper)
+  (global-set-key (kbd "C-c C-r") 'ivy-resume)
+  (global-set-key (kbd "<f6>") 'ivy-resume)
+
+  (global-set-key (kbd "M-x") 'counsel-M-x)
+  (global-set-key (kbd "C-x b") 'counsel-ibuffer)
+  (global-set-key (kbd "C-x C-f") 'counsel-find-file)
+  (global-set-key (kbd "C-M-l") 'counsel-imenu)
+
+  (global-set-key (kbd "<f1> f") 'counsel-describe-function)
+  (global-set-key (kbd "<f1> v") 'counsel-describe-variable)
+  (global-set-key (kbd "<f1> o") 'counsel-describe-symbol)
+  (global-set-key (kbd "<f1> l") 'counsel-find-library)
+  (global-set-key (kbd "<f2> i") 'counsel-info-lookup-symbol)
+  (global-set-key (kbd "<f2> u") 'counsel-unicode-char)
+
+  (global-set-key (kbd "C-c F") 'counsel-org-file)
+  (global-set-key (kbd "C-c k") 'counsel-rg)
+  (global-set-key (kbd "C-x l") 'counsel-locate)
+  (global-set-key (kbd "C-c L") 'counsel-git-log)
+  (global-set-key (kbd "C-c g") 'counsel-git)
+  (global-set-key (kbd "C-c m") 'counsel-linux-app)
+  (global-set-key (kbd "C-c n") 'counsel-fzf)
+  (global-set-key (kbd "C-c J") 'counsel-file-jump)
+  (global-set-key (kbd "C-c t") 'counsel-load-theme)
+
+  (define-key minibuffer-local-map (kbd "C-r") 'counsel-minibuffer-history)
+  )
+#+END_SRC
+** Magit
+
+#+BEGIN_SRC emacs-lisp
 (use-package magit
   :diminish magit-auto-revert-mode
   :init
@@ -1060,7 +1210,11 @@ managers such as DWM, BSPWM refer to this state as 'monocle'."
     (magit-stage-modified)
     (magit-commit))
   )
+#+END_SRC
 
+*** Git Commit
+
+#+BEGIN_SRC emacs-lisp
 (use-package git-commit
   :after magit
   :ensure nil
@@ -1079,7 +1233,11 @@ managers such as DWM, BSPWM refer to this state as 'monocle'."
   (setq git-commit-style-convention-checks
         '(non-empty-second-line
           overlong-summary-line)))
+#+END_SRC
 
+*** Magit Repos
+
+#+BEGIN_SRC emacs-lisp
 (use-package magit-repos
   :after magit
   :ensure nil
@@ -1088,18 +1246,32 @@ managers such as DWM, BSPWM refer to this state as 'monocle'."
   :config
   (setq magit-repository-directories
         '(("~/Documents/Projects/" . 1))))
+#+END_SRC
 
-(use-package git-timemachine
-  :bind ("M-g t" . git-timemachine-toggle))
+** Markdown Mode
 
-(use-package px)
+#+BEGIN_SRC emacs-lisp
+(use-package markdown-mode
+  :commands (markdown-mode gfm-mode)
+  :mode (("README\\.md\\'" . gfm-mode)
+         ("\\.md\\'" . markdown-mode)
+         ("\\.markdown\\'" . markdown-mode))
+  :init (setq markdown-command "multimarkdown"))
+#+END_SRC
 
-(use-package crux)
+** Multiple Cursors
 
-(use-package clean-aindent-mode
-  :init
-  (add-hook 'prog-mode-hook 'clean-aindent-mode))
+#+BEGIN_SRC emacs-lisp
+(use-package multiple-cursors
+  :bind (("C-c m"   . mc/edit-lines)
+         ("C->"     . mc/mark-next-like-this)
+         ("C-<"     . mc/mark-previous-like-this)
+         ("C-c C-<" . mc/mark-all-like-this)))
+#+END_SRC
 
+** Org Mode
+
+#+BEGIN_SRC emacs-lisp
 (use-package org
   :commands org-indent-mode
   :config
@@ -1125,7 +1297,7 @@ managers such as DWM, BSPWM refer to this state as 'monocle'."
   (defun my-git-publish (ppl)
     (let ((publish-script (format "%s/publish.sh" my-org-publish-dir)))
       (when (file-executable-p publish-script)
-		(start-process-shell-command "pub" nil publish-script))))
+	(start-process-shell-command "pub" nil publish-script))))
 
   (defun my-publish (a b c)
     (setq org-export-with-toc t)
@@ -1152,18 +1324,18 @@ managers such as DWM, BSPWM refer to this state as 'monocle'."
     "Insert custom inline css"
     (when (eq exporter 'html)
       (let* ((dir (ignore-errors (file-name-directory (buffer-file-name))))
-			 (path (concat dir "style.css"))
-			 (homestyle (or (null dir) (null (file-exists-p path))))
-			 (final (if homestyle "~/.config/emacs/org-style.css" path)))
-		(setq org-html-head-include-default-style nil)
-		(setq org-html-head (concat
-							 "<style type=\"text/css\">\n"
-							 "<!--/*--><![CDATA[/*><!--*/\n"
-							 (with-temp-buffer
+	     (path (concat dir "style.css"))
+	     (homestyle (or (null dir) (null (file-exists-p path))))
+	     (final (if homestyle "~/.config/emacs/org-style.css" path)))
+	(setq org-html-head-include-default-style nil)
+	(setq org-html-head (concat
+			     "<style type=\"text/css\">\n"
+			     "<!--/*--><![CDATA[/*><!--*/\n"
+			     (with-temp-buffer
                                (insert-file-contents final)
                                (buffer-string))
-							 "/*]]>*/-->\n"
-							 "</style>\n")))))
+			     "/*]]>*/-->\n"
+			     "</style>\n")))))
 
   (add-hook 'org-export-before-processing-hook 'my-org-inline-css-hook)
 
@@ -1180,9 +1352,9 @@ managers such as DWM, BSPWM refer to this state as 'monocle'."
   (setq org-metadir my-org-meta-dir)
   (setq org-archive-location my-org-archive-dir)
   (setq org-agenda-files (list
-						  "/home/romeu/Documents/Org/Agenda/todo.org"
-						  "/home/romeu/Documents/Org/Agenda/work.org"
-						  "/home/romeu/Documents/Org/Agenda/birthdays.org"
+			  "/home/romeu/Documents/Org/Agenda/todo.org"
+			  "/home/romeu/Documents/Org/Agenda/work.org"
+			  "/home/romeu/Documents/Org/Agenda/birthdays.org"
                           ))
   (setq diary-file my-org-diary-file)
 
@@ -1360,22 +1532,22 @@ managers such as DWM, BSPWM refer to this state as 'monocle'."
   ;; TODO: improve and add more templates
   (setq org-capture-templates
         '(
-		  ("c" "Code")
+	  ("c" "Code")
 
-		  ("cc" "Cpp")
-		  ("ccs" "Cpp Snippets" entry (file+olp "Code/Cpp.org" "Cpp" "Snippets")
-		   "* %? %t" :empty-lines 1)
+	  ("cc" "Cpp")
+	  ("ccs" "Cpp Snippets" entry (file+olp "Code/Cpp.org" "Cpp" "Snippets")
+	   "* %? %t" :empty-lines 1)
 
-		  ("ck" "Kotlin")
-		  ("cks" "Kotlin Snippets" entry (file+olp "Code/Kotlin.org" "Kotlin" "Snippets")
-		   "* %? %t" :empty-lines 1)
-		  ("ckl" "Kotlin Libs")
-		  ("ckln" "Kotlin Native" entry (file+headline "Code/Kotlin.org" "Kotlin Native")
+	  ("ck" "Kotlin")
+	  ("cks" "Kotlin Snippets" entry (file+olp "Code/Kotlin.org" "Kotlin" "Snippets")
+	   "* %? %t" :empty-lines 1)
+	  ("ckl" "Kotlin Libs")
+	  ("ckln" "Kotlin Native" entry (file+headline "Code/Kotlin.org" "Kotlin Native")
            "* %? %t" :empty-lines 1)
 
-		  ("cr" "Rust")
-		  ("crs" "Rust Snippets" entry (file+olp "Code/Rust.org" "Rust" "Snippets")
-		   "* %? %t" :empty-lines 1)
+	  ("cr" "Rust")
+	  ("crs" "Rust Snippets" entry (file+olp "Code/Rust.org" "Rust" "Snippets")
+	   "* %? %t" :empty-lines 1)
 
           ("j" "Personal Journal" entry (file+datetree rg/get-journal-file-year)
            "* Entry %(rg/date-sha256) %T %^G\n\n%?\n" :kill-buffer t :empty-lines 1)
@@ -1404,11 +1576,10 @@ managers such as DWM, BSPWM refer to this state as 'monocle'."
      (dot . t)))
 
   (setq org-latex-listings 'minted
-		org-latex-packages-alist '(("newfloat" "minted"))
-		org-latex-pdf-process
-		'("pdflatex -shell-escape -interaction nonstopmode -output-directory %o %f"
-		  "pdflatex -shell-escape -interaction nonstopmode -output-directory %o %f"))
-
+	org-latex-packages-alist '(("newfloat" "minted"))
+	org-latex-pdf-process
+	'("pdflatex -shell-escape -interaction nonstopmode -output-directory %o %f"
+	  "pdflatex -shell-escape -interaction nonstopmode -output-directory %o %f"))
 
   ;; org crypt
   (require 'org-crypt)
@@ -1476,23 +1647,23 @@ Slightly tweaked version of `org-agenda-format-date-aligned' that
 produces dates with a fixed length."
     (require 'cal-iso)
     (let* ((dayname (calendar-day-name date t))
-		   (day (cadr date))
-		   (day-of-week (calendar-day-of-week date))
-		   (month (car date))
-		   (monthname (calendar-month-name month t))
-		   (year (nth 2 date))
-		   (iso-week (org-days-to-iso-week
-					  (calendar-absolute-from-gregorian date)))
-		   (weekyear (cond ((and (= month 1) (>= iso-week 52))
-							(1- year))
-						   ((and (= month 12) (<= iso-week 1))
-							(1+ year))
-						   (t year)))
-		   (weekstring (if (= day-of-week 1)
-						   (format " (W%02d)" iso-week)
-						 "")))
+	   (day (cadr date))
+	   (day-of-week (calendar-day-of-week date))
+	   (month (car date))
+	   (monthname (calendar-month-name month t))
+	   (year (nth 2 date))
+	   (iso-week (org-days-to-iso-week
+		      (calendar-absolute-from-gregorian date)))
+	   (weekyear (cond ((and (= month 1) (>= iso-week 52))
+			    (1- year))
+			   ((and (= month 12) (<= iso-week 1))
+			    (1+ year))
+			   (t year)))
+	   (weekstring (if (= day-of-week 1)
+			   (format " (W%02d)" iso-week)
+			 "")))
       (format "%s %2d %s %4d%s"
-			  dayname day monthname year weekstring)))
+	      dayname day monthname year weekstring)))
 
   (setq org-agenda-format-date #'prot/org-agenda-format-date-aligned)
 
@@ -1704,7 +1875,23 @@ file which do not already have one."
   :config
   (ox-extras-activate '(ignore-headlines))
   )
+#+END_SRC
 
+** Paren
+
+#+BEGIN_SRC emacs-lisp
+(use-package paren
+  :config
+  (setq show-paren-style 'parenthesis)
+  (setq show-paren-when-point-in-periphery t)
+  (setq show-paren-when-point-inside-paren nil)
+  :hook (after-init-hook . show-paren-mode)
+  )
+#+END_SRC
+
+** Popwin
+
+#+BEGIN_SRC emacs-lisp
 (use-package popwin
   :init
   (customize-set-variable 'popwin:popup-window-height 0.5)
@@ -1712,107 +1899,24 @@ file which do not already have one."
   (popwin-mode 1)
   (setq display-buffer-function 'popwin:display-buffer)
   )
+#+END_SRC
+** Projectile
 
-(use-package diff-hl
-  :init
-  (custom-set-faces
-   '(diff-hl-change ((t (:background "dark blue" :foreground "dark blue")))
-					'(diff-hl-insert ((t (:background "dark green" :foreground "dark green"))))
-					'(diff-hl-delete ((t (:background "dark red" :foreground "dark red"))))))
-  (diff-hl-flydiff-mode)
-  (diff-hl-margin-mode)
-  (global-diff-hl-mode 1)
-
-  (add-hook 'magit-post-refresh-hook 'diff-hl-magit-post-refresh)
-  )
-
-(use-package counsel)
-
-(use-package ivy
-  :defer 0
+#+BEGIN_SRC emacs-lisp
+(use-package projectile
+  :diminish
   :config
-  (ivy-mode 1)
-  (setq ivy-use-virtual-buffers t)
-  (setq ivy-wrap t)
-  (setq enable-recursive-minibuffers t)
-  (setq ivy-count-format "(%d/%d) ")
+  (projectile-mode +1))
+#+END_SRC
 
-  (global-set-key "\C-s" 'swiper)
-  (global-set-key (kbd "C-c C-r") 'ivy-resume)
-  (global-set-key (kbd "<f6>") 'ivy-resume)
+** Px
 
-  (global-set-key (kbd "M-x") 'counsel-M-x)
-  (global-set-key (kbd "C-x b") 'counsel-ibuffer)
-  (global-set-key (kbd "C-x C-f") 'counsel-find-file)
-  (global-set-key (kbd "C-M-l") 'counsel-imenu)
+#+BEGIN_SCR emacs-lisp
+(use-package px)
+#+END_SRC
+** Rg
 
-  (global-set-key (kbd "<f1> f") 'counsel-describe-function)
-  (global-set-key (kbd "<f1> v") 'counsel-describe-variable)
-  (global-set-key (kbd "<f1> o") 'counsel-describe-symbol)
-  (global-set-key (kbd "<f1> l") 'counsel-find-library)
-  (global-set-key (kbd "<f2> i") 'counsel-info-lookup-symbol)
-  (global-set-key (kbd "<f2> u") 'counsel-unicode-char)
-
-  (global-set-key (kbd "C-c F") 'counsel-org-file)
-  (global-set-key (kbd "C-c k") 'counsel-rg)
-  (global-set-key (kbd "C-x l") 'counsel-locate)
-  (global-set-key (kbd "C-c L") 'counsel-git-log)
-  (global-set-key (kbd "C-c g") 'counsel-git)
-  (global-set-key (kbd "C-c m") 'counsel-linux-app)
-  (global-set-key (kbd "C-c n") 'counsel-fzf)
-  (global-set-key (kbd "C-c J") 'counsel-file-jump)
-  (global-set-key (kbd "C-c t") 'counsel-load-theme)
-
-  (define-key minibuffer-local-map (kbd "C-r") 'counsel-minibuffer-history)
-  )
-
-(use-package company
-  :diminish company-mode
-  :defines
-  (company-dabbrev-ignore-case company-dabbrev-downcase)
-  :init (global-company-mode)
-  :custom
-  (company-idle-delay 0)
-  (company-echo-delay 0)
-  (company-minimum-prefix-length 1)
-  (company-tooltip-align-annotations t)
-  :config
-  (defun indent-or-complete ()
-    (interactive)
-    (if (looking-at "\\_>")
-		(company-complete-common)
-      (indent-according-to-mode)))
-
-  (delete 'company-dabbrev company-backends)
-  (delete 'company-oddmuse company-backends)
-  (delete 'company-clang company-backends)
-  (delete 'company-bbdb company-backends)
-  (delete 'company-files company-backends)
-  (delete '(company-dabbrev-code company-gtags company-etags company-keywords) company-backends)
-
-  (setq company-require-match nil)
-  (setq company-tooltip-idle-delay .25)
-
-  (global-unset-key (kbd "C-SPC"))
-  (global-set-key (kbd "C-SPC") 'company-complete)
-  (global-set-key (kbd "<f9>") 'company-complete)
-
-  ;; deactivate auto complete selection
-  (define-key company-active-map (kbd "<return>") nil)
-  (define-key company-active-map (kbd "RET") nil)
-  )
-
-(use-package eldoc
-  :ensure nil
-  :config (global-eldoc-mode -1))
-
-(use-package csv-mode)
-
-(use-package avy
-  :bind
-  ("M-s" . avy-goto-char)
-  )
-
+#+BEGIN_SRC emacs-lisp
 (use-package rg
   :ensure
   :defer
@@ -1824,48 +1928,131 @@ file which do not already have one."
   (setq rg-custom-type-aliases nil)
   (setq rg-default-alias-fallback "all")
   )
+#+END_SRC
+** Save Place
 
-(use-package all-the-icons
+#+BEGIN_SRC emacs-lisp
+(use-package saveplace
+  :ensure nil
+  :hook (after-init-hook . save-place-mode))
+#+END_SRC
+** Server
+
+#+BEGIN_SRC emacs-lisp
+(use-package server
+  :ensure nil
+  :hook (after-init-hook . server-mode))
+#+END_SRC
+
+** So Long
+
+#+BEGIN_SRC emacs-lisp
+(use-package so-long
   :config
-  (set-fontset-font t 'unicode (font-spec :family "all-the-icons") nil 'append)
-  (set-fontset-font t 'unicode (font-spec :family "file-icons") nil 'append)
-  (set-fontset-font t 'unicode (font-spec :family "Material Icons") nil 'append)
-  (set-fontset-font t 'unicode (font-spec :family "github-octicons") nil 'append)
-  (set-fontset-font t 'unicode (font-spec :family "FontAwesome") nil 'append)
-  (set-fontset-font t 'unicode (font-spec :family "Weather Icons") nil 'append)
-  )
+  (global-so-long-mode))
+#+END_SRC
 
-(use-package auctex
-  :mode (".tex" . latex-mode)
+** Uniquify
+
+#+BEGIN_SRC emacs-lisp
+(use-package uniquify
+  :ensure nil
   :config
-  (setq TeX-auto-save t)
-  (setq TeX-engine 'xelatex)
-  (setq TeX-PDF-mode t)
-
-  (setq TeX-command-default "Latexmk")
+  (setq uniquify-buffer-name-style 'forward)
+  (setq uniquify-strip-common-suffix t)
+  (setq uniquify-after-kill-buffer-p t)
+  (setq uniquify-separator "/")
   )
+#+END_SRC
 
-(use-package auctex-latexmk
-  :defer 0
+** Window
+
+#+BEGIN_SRC emacs-lisp
+(use-package window
+  :ensure nil
   :init
-  (auctex-latexmk-setup)
-  :config
-  (setq auctex-latexmk-inherit-TeX-PDF-mode t)
-  (add-hook 'LaTeX-mode-hook
-            (lambda ()
-			  (push
-			   '("LaTeXmk" "latexmk -pdf --synctex=1 -shell-escape -interaction=nonstopmode -file-line-error -synctex=1 %s" TeX-run-TeX nil t
-				 :help "Run latexmk on file")
-			   TeX-command-list)
-              (push '("LuaLatex" "lualatex -pdf --synctex=1 -shell-escape -interaction=nonstopmode -file-line-error -synctex=1 %s" TeX-run-TeX nil t
-					  :help "Run lualatex on file")
-					TeX-command-list)
-              ))
+  (setq window-combination-resize t)
+  (setq even-window-sizes 'height-only)
+  (setq window-sides-vertical nil)
+  (setq switch-to-buffer-in-dedicated-window 'pop)
+  :hook ((help-mode-hook . visual-line-mode)
+         (custom-mode-hook . visual-line-mode))
   )
+#+END_SRC
 
-(put 'upcase-region 'disabled nil)
+** Which-Func
+
+#+BEGIN_SRC emacs-lisp
+(use-package which-func
+  :defer 5
+  :config (which-function-mode 1))
+#+END_SRC
+
+
+* Last Steps
+
+#+BEGIN_SRC emacs-lisp
+(setq-default custom-file "~/.config/emacs/custom.el")
 (load custom-file)
-#+end_src
+#+END_SRC
+
+* Rest of configuration
+
+#+BEGIN_SRC emacs-lisp
+;; Configure `use-package' prior to loading it.
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; FUNCTIONS
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; CONFIGS
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+
+;; (add-hook 'text-mode-hook (lambda () (abbrev-mode -1)))
+;; (add-hook 'c-mode-hook (lambda () (abbrev-mode -1)))
+;; (add-hook 'c++-mode-hook (lambda () (abbrev-mode -1)))
+
+;; (add-hook 'text-mode-hook (lambda () (TeX-PDF-mode -1)))
+;; (add-hook 'c-mode-hook (lambda () (TeX-PDF-mode -1)))
+;; (add-hook 'c++-mode-hook (lambda () (TeX-PDF-mode -1)))
+
+;; (add-hook 'focus-out-hook #'garbage-collect)
+
+(defalias 'yes-or-no-p #'y-or-n-p)
+
+;; (add-hook 'minibuffer-setup-hook #'my-minibuffer-setup-hook)
+;; (add-hook 'minibuffer-exit-hook #'my-minibuffer-exit-hook)
+
+;; backups
+
+
+;; disable warning when killing buffers
+(setq-default kill-buffer-query-functions
+	      (remq 'process-kill-buffer-query-function
+		    kill-buffer-query-functions))
+
+;; custom file
+
+;; (fringe-mode '(nil . 0))
+;; (set-fringe-mode 0)
+;; (set-fringe-mode fringe-mode)
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; PACKAGES
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+
+
+;; Automatically reload files was modified by external progra
+
+;; Remember location in file
+
+
+;; (use-package cmake-mode)
+#+END_SRC
 
 * FOOTER                                                                                              :ignore:
 :PROPERTIES:
