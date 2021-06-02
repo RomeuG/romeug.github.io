@@ -2,6 +2,7 @@
     --h1Color: #cc241d;
     --h2Color: #b8bb26;
     --h3Color: #fabd2f;
+    --h4Color: #689d6a;
     --blueh: #458588;
     --bluel: #83a598;
     --orangel: #fe8019;
@@ -38,17 +39,33 @@ body {
 h1 {
     color: var(--h1Color);
     text-align: center;
-    margin-bottom: 64px;
+    /* margin-bottom: 64px; */
+    word-break: break-all;
 }
 
 h2 {
     color: var(--h2Color);
     text-align: center;
-    margin-top: 64px;
+    /* margin-top: 64px; */
+    word-break: break-all;
 }
 
 h3 {
     color: var(--h3Color);
+    text-align: center;
+    word-break: break-all;
+}
+
+h4 {
+    color: var(--h4Color);
+    text-align: center;
+    word-break: break-all;
+}
+
+.subdivision {
+    display: inline-flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
 }
 
 a {
@@ -63,28 +80,50 @@ li {
     padding: 0 0 0 0px;
 }
 
+ul li::marker {
+    color: var(--h2Color);
+}
+
+li ul li {
+    margin-left: 16px
+}
+
+li ul li::marker {
+    color: var(--h3Color);
+}
+
+li ul li ul li::marker {
+    color: var(--h4Color);
+}
+
 .column {
-    float: left;
-    margin: 0 128px 0 0;
+    /* float: left; */
+    margin: 0 64px 0 0;
 }
 
 .resright {
-	display: block ;
-	margin: auto ;
-	max-width: 90% ;
+    display: block ;
+    margin: auto ;
+    max-width: 90% ;
 }
 
 @media (min-width: 55em) {
-	.lol { display: inline-block; vertical-align: top ; }
+    .lol { display: inline-block; vertical-align: top ; }
 
-	.resright {
-		float: right;
-		padding: 20px ;
-		clear: both ;
-		max-width: 300px ;
-	}
+    .resright {
+	float: right;
+	padding: 20px ;
+	clear: both ;
+	max-width: 300px ;
+    }
 
-	body { max-width: 850px ; }
+    body { max-width: 850px ; }
+}
+
+@media screen and (max-width: 500px) {
+    .column {
+        width: 100%;
+    }
 }
 
 p {
@@ -99,12 +138,12 @@ hr {
 }
 
 footer {
-	font-size: large ;
-	/* max-width: 500px ; */
+    font-size: large ;
+    /* max-width: 500px ; */
 }
 
 .footer_right {
-	float: right;
+    float: right;
 }
 
 ::-webkit-scrollbar {
@@ -134,10 +173,10 @@ pre {
     position: relative;
     overflow: auto;
     background: var(--bg0);
-	border: 4px solid var(--purplel);
-	border-radius: 4px;
-	padding: 20px;
-	margin: 32px;
+    border: 4px solid var(--purplel);
+    border-radius: 4px;
+    padding: 20px;
+    margin: 32px;
 }
 
 .figure {
@@ -156,6 +195,24 @@ pre {
     border-radius: 4px;
 }
 
+
+.latexfig {
+    margin: 32px 40px 34px 32px;
+    text-align: center;
+}
+
+.latexfig img {
+    display: block;
+    margin: auto;
+    max-width: 100%;
+    height: auto;
+    object-fit: contain;
+}
+
+.MathJax_Display {
+    padding-bottom: 20px;
+}
+
 code {
     border-radius: 4px;
     background-color: var(--bg2);
@@ -171,4 +228,27 @@ code {
 
 #text-table-of-contents {
     margin-left: 16px;
+}
+
+.warning {
+    text-align: center;
+    animation: warning-animation 2s infinite;
+}
+
+@keyframes warning-animation {
+    0% {
+	color: red;
+    }
+
+    33% {
+	color: yellow;
+    }
+
+    66% {
+	color: yellowgreen;
+    }
+
+    99% {
+	color: red;
+    }
 }
