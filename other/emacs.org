@@ -6,7 +6,8 @@
 
 #+OPTIONS: author:nil
 #+OPTIONS: email:nil
-#+OPTIONS: date:
+#+OPTIONS: date:t
+#+OPTIONS: toc:nil
 
 #+PROPERTY: header-args :eval no
 
@@ -15,6 +16,16 @@
 #+EXPORT_FILE_NAME: emacs
 
 #+INCLUDE: "~/.config/emacs/orgmacros.org"
+
+#+BEGIN_EXPORT html
+<p class="spacing-64" \>
+#+END_EXPORT
+
+#+TOC: headlines 3
+
+#+BEGIN_EXPORT html
+<p class="spacing-64" \>
+#+END_EXPORT
 
 * Garbage Collector
 

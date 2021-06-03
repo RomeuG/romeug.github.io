@@ -12,6 +12,10 @@
 <body>
 <div id="content">
 <h1 class="title">Templated</h1>
+<p class="spacing-64" \>
+
+<p class="spacing-64" \>
+
 <p>
 When you enter the given URL, you are directly presented with this text:
 </p>
@@ -24,21 +28,12 @@ Proudly powered by Flask/Jinja2
 <p>
 This information is here for a reason. You have two different technologies that
 go hand-in-hand when doing simple Python web development: Flask and Jinja2.
-</p>
-
-<p>
 First thing you can think of is that maybe Flask has some vulnerabilities that
 can be exploited. And altough that could be true, the title of the challenge is
 an hint.
-</p>
-
-<p>
 <code>Templated</code>&#x2026; and Jinja2 is a template engine. Therefore, this could be a
 challenge where you have to know how to exploit a Server Side Template Injection
 (SSTI).
-</p>
-
-<p>
 First thing we can try, to verify this is doing something like this on the
 Address Bar: <code>http://209.97.138.240:30840/{{1+1}}</code>. We are trying to check if
 <code>1+1</code> is evaluated.
@@ -56,16 +51,10 @@ The page '2' could not be found
 <p>
 It seems <code>{{1+1}}</code> was evaluated to <code>2</code>! So it is confirmed that we are able to
 do an SSTI.
-</p>
-
-<p>
 An object we can access on a GET request is called <code>request</code>.
 If we execute <code>http://209.97.138.240:30840/{{request}}</code> we get this string
 <code>&lt;Request 'http://209.97.138.240:30840/%7B%7Brequest%7D%7D' [GET]&gt;</code> which
 represents an object in Python.
-</p>
-
-<p>
 From this object, we can see its methods and attributes. We may try doing a
 request to <code>http://209.97.138.240:30840/{{dir(request)}}</code> but we will encounter
 a 500 Internal Server Error without any relevant information.

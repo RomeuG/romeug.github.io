@@ -108,6 +108,7 @@ li ul li ul li::marker {
 .menu-list-item {
 	list-style: none;
 	text-align: center;
+    margin-bottom: 16px;
 }
 
 .menu-list-item li {
@@ -117,7 +118,7 @@ li ul li ul li::marker {
 	margin-bottom: 4px;
 }
 
-@media only screen and (min-width: 700px) {
+@media only screen and (min-width: 795px) {
 	.menu-list {
 		flex-wrap: nowrap;
 	}
@@ -222,6 +223,11 @@ footer {
     border-radius: 2px;
 }
 
+.spacing-16 { margin-bottom: 15px; }
+.spacing-32 { margin-bottom: 32px; }
+.spacing-64 { margin-bottom: 64px; }
+.spacing-128 { margin-bottom: 128px; }
+
 /*
 org-mode specific stuff
 */
@@ -233,11 +239,11 @@ pre {
     border: 4px solid var(--purplel);
     border-radius: 4px;
     padding: 20px;
-    margin: 32px;
+    margin: 32px 0px 32px 0px;
 }
 
 .figure {
-    margin: 32px 40px 34px 32px;
+    margin: 32px 0px 32px 0px;
     text-align: center;
 }
 
@@ -285,6 +291,10 @@ code {
 
 #text-table-of-contents {
     margin-left: 16px;
+}
+
+*[id^='outline-container-org'] {
+    margin-top: 64px;
 }
 
 .warning {

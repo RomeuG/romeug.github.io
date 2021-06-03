@@ -12,20 +12,24 @@
 <body>
 <div id="content">
 <h1 class="title">Script Kiddie</h1>
+<p class="spacing-64" \>
+
 <div id="table-of-contents">
 <h2>Table of Contents</h2>
 <div id="text-table-of-contents">
 <ul>
-<li><a href="#org360b17f">Enumeration</a></li>
-<li><a href="#orgb0c3713">User</a></li>
-<li><a href="#orgea2d502">Root</a></li>
+<li><a href="#org3df634d">Enumeration</a></li>
+<li><a href="#org563a00d">User</a></li>
+<li><a href="#orga1a4185">Root</a></li>
 </ul>
 </div>
 </div>
 
-<div id="outline-container-org360b17f" class="outline-2">
-<h2 id="org360b17f">Enumeration</h2>
-<div class="outline-text-2" id="text-org360b17f">
+<p class="spacing-64" \>
+
+<div id="outline-container-org3df634d" class="outline-2">
+<h2 id="org3df634d">Enumeration</h2>
+<div class="outline-text-2" id="text-org3df634d">
 <p>
 As usual, we start with an Nmap scan:
 </p>
@@ -57,7 +61,7 @@ Going to the website (<code>10.129.75.138:5000</code>), we see this page:
 </p>
 
 
-<div id="org7a5bb51" class="figure">
+<div id="org42faa6d" class="figure">
 <p><img src="./images/img1.jpg" alt="img1.jpg" />
 </p>
 </div>
@@ -80,9 +84,9 @@ From the website, we know that the server is running <code>nmap</code>, <code>ms
 </div>
 </div>
 
-<div id="outline-container-orgb0c3713" class="outline-2">
-<h2 id="orgb0c3713">User</h2>
-<div class="outline-text-2" id="text-orgb0c3713">
+<div id="outline-container-org563a00d" class="outline-2">
+<h2 id="org563a00d">User</h2>
+<div class="outline-text-2" id="text-org563a00d">
 <p>
 Using the <code>searchsploit</code> utility from the website, we can search <code>nmap</code> or
 <code>msfvenom</code> exploits. <code>Nmap</code> has a couple exploits, but <code>msfvenom</code> has one that
@@ -173,7 +177,7 @@ website:
 </p>
 
 
-<div id="orgf66a1bb" class="figure">
+<div id="org6f8771d" class="figure">
 <p><img src="./images/img2.jpg" alt="img2.jpg" />
 </p>
 </div>
@@ -185,7 +189,7 @@ user <code>kid</code>:
 </p>
 
 
-<div id="orgf8e4a7e" class="figure">
+<div id="orge884363" class="figure">
 <p><img src="./images/img3.jpg" alt="img3.jpg" />
 </p>
 </div>
@@ -196,9 +200,9 @@ In <code>kid</code> home directory, we can get the <code>user.txt</code> flag.
 </div>
 </div>
 
-<div id="outline-container-orgea2d502" class="outline-2">
-<h2 id="orgea2d502">Root</h2>
-<div class="outline-text-2" id="text-orgea2d502">
+<div id="outline-container-orga1a4185" class="outline-2">
+<h2 id="orga1a4185">Root</h2>
+<div class="outline-text-2" id="text-orga1a4185">
 <p>
 There are some rabbit holes we can get into. We can rapidly see that there is an
 odd file (<code>/home/kid/logs/hackers</code>).
@@ -226,7 +230,7 @@ can clearly see what commands are executed on the server:
 </p>
 
 
-<div id="org9cd6320" class="figure">
+<div id="org67c9b82" class="figure">
 <p><img src="./images/img4.jpg" alt="img4.jpg" />
 </p>
 </div>
@@ -271,7 +275,7 @@ and then redirect everything to <code>/home/kid/logs/hackers</code>).
 </p>
 
 
-<div id="orgc60eb15" class="figure">
+<div id="org928e541" class="figure">
 <p><img src="./images/img5.jpg" alt="img5.jpg" />
 </p>
 </div>
@@ -281,7 +285,7 @@ We get the result and save a new <code>id_rsa</code> in our computer and <code>s
 </p>
 
 
-<div id="org64a89ec" class="figure">
+<div id="orgb808d33" class="figure">
 <p><img src="./images/img6.jpg" alt="img6.jpg" />
 </p>
 </div>
@@ -309,7 +313,7 @@ we get a shell session with root permissions.
 </p>
 
 
-<div id="orgd84c4e5" class="figure">
+<div id="org7888a41" class="figure">
 <p><img src="./images/img7.jpg" alt="img7.jpg" />
 </p>
 </div>

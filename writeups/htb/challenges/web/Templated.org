@@ -7,12 +7,23 @@
 #+OPTIONS: author:nil
 #+OPTIONS: email:nil
 #+OPTIONS: date:t
+#+OPTIONS: toc:nil
 
 #+PROPERTY: header-args :eval no
 
 #+HTML_HEAD: <link rel="stylesheet" type="text/css" href="/style.css"/>
 
 #+EXPORT_FILE_NAME: templated
+
+#+BEGIN_EXPORT html
+<p class="spacing-64" \>
+#+END_EXPORT
+
+#+TOC: headlines 2
+
+#+BEGIN_EXPORT html
+<p class="spacing-64" \>
+#+END_EXPORT
 
 When you enter the given URL, you are directly presented with this text:
 
@@ -23,15 +34,12 @@ Proudly powered by Flask/Jinja2
 
 This information is here for a reason. You have two different technologies that
 go hand-in-hand when doing simple Python web development: Flask and Jinja2.
-
 First thing you can think of is that maybe Flask has some vulnerabilities that
 can be exploited. And altough that could be true, the title of the challenge is
 an hint.
-
 =Templated=... and Jinja2 is a template engine. Therefore, this could be a
 challenge where you have to know how to exploit a Server Side Template Injection
 (SSTI).
-
 First thing we can try, to verify this is doing something like this on the
 Address Bar: =http://209.97.138.240:30840/{{1+1}}=. We are trying to check if
 =1+1= is evaluated.
@@ -45,12 +53,10 @@ The page '2' could not be found
 
 It seems ={{1+1}}= was evaluated to =2=! So it is confirmed that we are able to
 do an SSTI.
-
 An object we can access on a GET request is called =request=.
 If we execute =http://209.97.138.240:30840/{{request}}= we get this string
 =<Request 'http://209.97.138.240:30840/%7B%7Brequest%7D%7D' [GET]>= which
 represents an object in Python.
-
 From this object, we can see its methods and attributes. We may try doing a
 request to =http://209.97.138.240:30840/{{dir(request)}}= but we will encounter
 a 500 Internal Server Error without any relevant information.

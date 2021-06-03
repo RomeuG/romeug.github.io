@@ -7,6 +7,7 @@
 #+OPTIONS: author:nil
 #+OPTIONS: email:nil
 #+OPTIONS: date:t
+#+OPTIONS: toc:nil
 
 #+PROPERTY: header-args :eval no
 
@@ -14,12 +15,20 @@
 
 #+EXPORT_FILE_NAME: emdee-five-for-life
 
+#+BEGIN_EXPORT html
+<p class="spacing-64" \>
+#+END_EXPORT
+
+#+TOC: headlines 2
+
+#+BEGIN_EXPORT html
+<p class="spacing-64" \>
+#+END_EXPORT
+
 In this challenge we are presented with a webpage that has a string that should
 be hashed using MD5 and then submitted.
-
 When we test manually, and submit the MD5 hash, we are presented with the same
 screen with an extra string saying =Too slow!=.
-
 I guess we can always write a script to submit the hash as fast as we can.
 So we can write a Bash Script like this:
 

@@ -7,12 +7,23 @@
 #+OPTIONS: author:nil
 #+OPTIONS: email:nil
 #+OPTIONS: date:t
+#+OPTIONS: toc:nil
 
 #+PROPERTY: header-args :eval no
 
 #+HTML_HEAD: <link rel="stylesheet" type="text/css" href="/style.css"/>
 
 #+EXPORT_FILE_NAME: neovim
+
+#+BEGIN_EXPORT html
+<p class="spacing-64" \>
+#+END_EXPORT
+
+#+TOC: headlines 2
+
+#+BEGIN_EXPORT html
+<p class="spacing-64" \>
+#+END_EXPORT
 
 This is my current working =NeoVim= configuration, used mainly for C, C++ and
 Rust development, with each relevant file. The configuration is meant to be self explanatory.

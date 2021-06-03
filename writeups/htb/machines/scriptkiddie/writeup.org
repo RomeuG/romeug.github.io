@@ -7,12 +7,23 @@
 #+OPTIONS: author:nil
 #+OPTIONS: email:nil
 #+OPTIONS: date:t
+#+OPTIONS: toc:nil
 
 #+PROPERTY: header-args :eval no
 
 #+HTML_HEAD: <link rel="stylesheet" type="text/css" href="/style.css"/>
 
 #+EXPORT_FILE_NAME: scriptkiddie
+
+#+BEGIN_EXPORT html
+<p class="spacing-64" \>
+#+END_EXPORT
+
+#+TOC: headlines 2
+
+#+BEGIN_EXPORT html
+<p class="spacing-64" \>
+#+END_EXPORT
 
 * Enumeration
 
