@@ -276,9 +276,21 @@ Root permissions! :-)
 #+BEGIN_EXPORT html
 <hr>
 <footer>
-<p class="footer_right">06-02-2021</p>
-<p><a class="footer" href="/index.html">Homepage</a></p>
-<p><a class="footer" href="/writeups/htb/index.html">Back</a></p>
-<div style="clear: both;"></div>
+  <div class="container">
+    <ul class="menu-list">
+      <li class="menu-list-item flex-basis-100-margin fit-content">
+        <a href="/index.html">Home</a>
+      </li>
+      <li class="menu-list-item flex-basis-100-margin fit-content">
+        <a href="/articles/articles.html">Articles</a>
+      </li>
+      <li class="menu-list-item flex-basis-100-margin fit-content">
+        <a href="/writeups/htb/index.html">Write-Ups</a>
+      </li>
+      <li class="menu-list-item flex-basis-100-margin fit-content">
+        <a class="inactive-link">06-02-2021</a>
+      </li>
+    </ul>
+  </div>
 </footer>
 #+END_EXPORT

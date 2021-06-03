@@ -28,7 +28,7 @@
 This is my current working =NeoVim= configuration, used mainly for C, C++ and
 Rust development, with each relevant file. The configuration is meant to be self explanatory.
 
-* =~/.config/nvim/init.vim=
+* ~/.config/nvim/init.vim
 
 #+begin_src vimrc
 filetype plugin on
@@ -500,7 +500,7 @@ nnoremap <silent><nowait> <space>cs  :<C-u>CocList -I symbols<cr>
 nnoremap <silent><nowait> <space>cp  :<C-u>CocListResume<CR>
 #+end_src
 
-* =~/.config/nvim/after/ftplugin/rust.vim=
+* ~/.config/nvim/after/ftplugin/rust.vim
 
 #+begin_src vimrc
 " general
@@ -532,7 +532,7 @@ abclear
 "ia dd #[derive(Debug)]
 #+end_src
 
-* =~/.config/nvim/coc-settings.json=
+* ~/.config/nvim/coc-settings.json
 
 #+begin_src js
 {
@@ -588,9 +588,21 @@ abclear
 #+BEGIN_EXPORT html
 <hr>
 <footer>
-<p class="footer_right">30-05-2021</p>
-<p><a class="footer" href="/index.html">Homepage</a></p>
-<p><a class="footer" href="/writeups/htb/index.html">Back</a></p>
-<div style="clear: both;"></div>
+        <div class="container">
+            <ul class="menu-list">
+                <li class="menu-list-item flex-basis-100-margin fit-content">
+                    <a href="/index.html">Home</a>
+                </li>
+                <li class="menu-list-item flex-basis-100-margin fit-content">
+                    <a href="/articles/articles.html">Articles</a>
+                </li>
+                <li class="menu-list-item flex-basis-100-margin fit-content">
+                    <a href="/writeups/htb/index.html">Write-Ups</a>
+                </li>
+                <li class="menu-list-item flex-basis-100-margin fit-content">
+                    <a class="inactive-link">30-05-2021</a>
+                </li>
+            </ul>
+        </div>
 </footer>
 #+END_EXPORT

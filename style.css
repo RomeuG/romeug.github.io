@@ -78,6 +78,12 @@ a {
 a:hover { color: var(--blueh) ;}
 .new a:hover { color: var(--blueh) ; }
 
+.inactive-link {
+    color: var(--fg1);
+    pointer-events: none;
+    cursor: default;
+}
+
 ul,
 li {
     margin: 0;

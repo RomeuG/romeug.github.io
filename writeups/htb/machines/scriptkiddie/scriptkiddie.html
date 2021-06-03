@@ -18,18 +18,18 @@
 <h2>Table of Contents</h2>
 <div id="text-table-of-contents">
 <ul>
-<li><a href="#org3df634d">Enumeration</a></li>
-<li><a href="#org563a00d">User</a></li>
-<li><a href="#orga1a4185">Root</a></li>
+<li><a href="#orgd603dd3">Enumeration</a></li>
+<li><a href="#orgb260335">User</a></li>
+<li><a href="#orge396958">Root</a></li>
 </ul>
 </div>
 </div>
 
 <p class="spacing-64" \>
 
-<div id="outline-container-org3df634d" class="outline-2">
-<h2 id="org3df634d">Enumeration</h2>
-<div class="outline-text-2" id="text-org3df634d">
+<div id="outline-container-orgd603dd3" class="outline-2">
+<h2 id="orgd603dd3">Enumeration</h2>
+<div class="outline-text-2" id="text-orgd603dd3">
 <p>
 As usual, we start with an Nmap scan:
 </p>
@@ -61,7 +61,7 @@ Going to the website (<code>10.129.75.138:5000</code>), we see this page:
 </p>
 
 
-<div id="org42faa6d" class="figure">
+<div id="org2153a51" class="figure">
 <p><img src="./images/img1.jpg" alt="img1.jpg" />
 </p>
 </div>
@@ -84,9 +84,9 @@ From the website, we know that the server is running <code>nmap</code>, <code>ms
 </div>
 </div>
 
-<div id="outline-container-org563a00d" class="outline-2">
-<h2 id="org563a00d">User</h2>
-<div class="outline-text-2" id="text-org563a00d">
+<div id="outline-container-orgb260335" class="outline-2">
+<h2 id="orgb260335">User</h2>
+<div class="outline-text-2" id="text-orgb260335">
 <p>
 Using the <code>searchsploit</code> utility from the website, we can search <code>nmap</code> or
 <code>msfvenom</code> exploits. <code>Nmap</code> has a couple exploits, but <code>msfvenom</code> has one that
@@ -177,7 +177,7 @@ website:
 </p>
 
 
-<div id="org6f8771d" class="figure">
+<div id="org7760e02" class="figure">
 <p><img src="./images/img2.jpg" alt="img2.jpg" />
 </p>
 </div>
@@ -189,7 +189,7 @@ user <code>kid</code>:
 </p>
 
 
-<div id="orge884363" class="figure">
+<div id="org703189e" class="figure">
 <p><img src="./images/img3.jpg" alt="img3.jpg" />
 </p>
 </div>
@@ -200,9 +200,9 @@ In <code>kid</code> home directory, we can get the <code>user.txt</code> flag.
 </div>
 </div>
 
-<div id="outline-container-orga1a4185" class="outline-2">
-<h2 id="orga1a4185">Root</h2>
-<div class="outline-text-2" id="text-orga1a4185">
+<div id="outline-container-orge396958" class="outline-2">
+<h2 id="orge396958">Root</h2>
+<div class="outline-text-2" id="text-orge396958">
 <p>
 There are some rabbit holes we can get into. We can rapidly see that there is an
 odd file (<code>/home/kid/logs/hackers</code>).
@@ -230,7 +230,7 @@ can clearly see what commands are executed on the server:
 </p>
 
 
-<div id="org67c9b82" class="figure">
+<div id="org5229c16" class="figure">
 <p><img src="./images/img4.jpg" alt="img4.jpg" />
 </p>
 </div>
@@ -275,7 +275,7 @@ and then redirect everything to <code>/home/kid/logs/hackers</code>).
 </p>
 
 
-<div id="org928e541" class="figure">
+<div id="org557c07e" class="figure">
 <p><img src="./images/img5.jpg" alt="img5.jpg" />
 </p>
 </div>
@@ -285,7 +285,7 @@ We get the result and save a new <code>id_rsa</code> in our computer and <code>s
 </p>
 
 
-<div id="orgb808d33" class="figure">
+<div id="org07fb805" class="figure">
 <p><img src="./images/img6.jpg" alt="img6.jpg" />
 </p>
 </div>
@@ -313,7 +313,7 @@ we get a shell session with root permissions.
 </p>
 
 
-<div id="org7888a41" class="figure">
+<div id="org4366a78" class="figure">
 <p><img src="./images/img7.jpg" alt="img7.jpg" />
 </p>
 </div>
@@ -327,10 +327,22 @@ get the root flag.
 
 <hr>
 <footer>
-<p class="footer_right">08-02-2021</p>
-<p><a class="footer" href="/index.html">Homepage</a></p>
-<p><a class="footer" href="/writeups/htb/index.html">Back</a></p>
-<div style="clear: both;"></div>
+  <div class="container">
+    <ul class="menu-list">
+      <li class="menu-list-item flex-basis-100-margin fit-content">
+        <a href="/index.html">Home</a>
+      </li>
+      <li class="menu-list-item flex-basis-100-margin fit-content">
+        <a href="/articles/articles.html">Articles</a>
+      </li>
+      <li class="menu-list-item flex-basis-100-margin fit-content">
+        <a href="/writeups/htb/index.html">Write-Ups</a>
+      </li>
+      <li class="menu-list-item flex-basis-100-margin fit-content">
+        <a class="inactive-link">08-02-2021</a>
+      </li>
+    </ul>
+  </div>
 </footer>
 </div>
 </body>
