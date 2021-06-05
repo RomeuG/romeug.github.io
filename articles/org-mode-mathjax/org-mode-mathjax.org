@@ -1,4 +1,4 @@
-#+TITLE: Org-Mode, LaTeX, MathJax and HTML
+#+TITLE: Org-Mode & MathJax
 #+AUTHOR: Romeu Vieira
 
 #+OPTIONS: html-style:nil
@@ -36,11 +36,9 @@
 
 Documentation to use and export LaTeX math formulas (and formulas from
 extensions) from Org-Mode to HTML is sparse.
-
 The most modern way of including formulas in HTML is by the use of MathJax.
 Org-Mode has support for MathJax 2.7:
 https://orgmode.org/manual/LaTeX-fragments.html.
-
 It is a simple as including =#+OPTIONS: tex: t= in an org file.
 Then, we can freely use LaTeX math formulas.
 
@@ -74,7 +72,6 @@ importing any of the extensions. One way of doing this would be [[https://emacs.
 =org-html-mathjax-template= with the same value but with the extension key added.
 But this solution is sub-optimal. Changing this configuration shouldn’t ever be
 needed.
-
 Fortunately, through the Org-Mode mailing list, an alternative was found:
 https://lists.gnu.org/archive/html/emacs-orgmode/2017-11/msg00030.html.
 All that is needed is the following line on the top of the org file:
@@ -165,6 +162,7 @@ output file in =ImageMagick=.
 #+latex_header: \usepackage{xcolor}
 #+latex_header: \definecolor{myForeground}{rgb}{0.9843, 0.9451, 0.7804}
 #+latex_header: \definecolor{myBackground}{rgb}{0.1137,0.1255,0.1294}
+
 $$\pagecolor{myBackground}\colorbox{myBackground}{\color{myForeground}\chemfig{CH_3CH_2-[:-60,,3]C(-[:-120]H_3C)=C(-[:-60]H)-[:60]C|{(CH_3)_3}}}$$
 #+end_src
 
@@ -185,6 +183,23 @@ as the website: =convert -density %D -trim -border 10 -bordercolor \"#1d2021\"
 +repage -antialias %f -quality 100 %O=.
 
 [[./images/img3.png]]
+
+There is a second method if the previous one didn’t work. This may be the case
+for normal math equations or other libraries.
+
+#+begin_src
+#+latex_header: \usepackage{pagecolor}
+#+latex_header: \usepackage{xcolor}
+#+latex_header: \definecolor{myForeground}{rgb}{0.9843, 0.9451, 0.7804}
+#+latex_header: \definecolor{myBackground}{rgb}{0.1137,0.1255,0.1294}
+#+latex_header: \newcommand{\highlight}[1]{\colorbox{myBackground}{$\displaystyle #1$}}
+
+$$\pagecolor{myBackground}\highlight{\color{myForeground}S0(x)=(x >>> 2)\oplus(x >>> 13)\oplus(x >>> 22)}$$
+#+end_src
+
+[[./images/img4.png]]
+
+This second method was provided by a user in StackOverflow: https://tex.stackexchange.com/a/33402.
 
 * FOOTER                                                                                              :ignore:
 :PROPERTIES:

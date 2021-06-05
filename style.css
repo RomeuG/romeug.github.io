@@ -44,26 +44,26 @@ h1 {
     color: var(--h1Color);
     text-align: center;
     /* margin-bottom: 64px; */
-    word-break: break-all;
+    word-break: break-word;
 }
 
 h2 {
     color: var(--h2Color);
     text-align: center;
     /* margin-top: 64px; */
-    word-break: break-all;
+    word-break: break-word;
 }
 
 h3 {
     color: var(--h3Color);
     text-align: center;
-    word-break: break-all;
+    word-break: break-word;
 }
 
 h4 {
     color: var(--h4Color);
     text-align: center;
-    word-break: break-all;
+    word-break: break-word;
 }
 
 .subdivision {
@@ -74,6 +74,7 @@ h4 {
 
 a {
     color: var(--bluel);
+    word-break: break-word;
 }
 a:hover { color: var(--blueh) ;}
 .new a:hover { color: var(--blueh) ; }
@@ -264,9 +265,8 @@ pre {
     border-radius: 4px;
 }
 
-
 .latexfig {
-    margin: 32px 40px 34px 32px;
+    margin: 0px 0px 0px 0px;
     text-align: center;
 }
 
@@ -289,6 +289,7 @@ code {
     font-family: monospace;
     margin: 0px 2px;
     padding: 0px 4px;
+    word-break: break-word;
 }
 
 .org-ul {

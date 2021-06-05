@@ -5,7 +5,7 @@
 <head>
 <meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
-<title>Org-Mode, LaTeX, MathJax and HTML</title>
+<title>Org-Mode &amp; MathJax</title>
 <meta name="generator" content="Org mode" />
 <link rel="stylesheet" type="text/css" href="/style.css"/>
 <script type="text/x-mathjax-config">
@@ -33,7 +33,7 @@
 </head>
 <body>
 <div id="content">
-<h1 class="title">Org-Mode, LaTeX, MathJax and HTML</h1>
+<h1 class="title">Org-Mode &amp; MathJax</h1>
 \(\require{mhchem}\)
 <p class="warning">
 <code>~~~~</code> WARNING: THIS PAGE USES JAVASCRIPT! <code>~~~~</code>
@@ -45,32 +45,26 @@
 <h2>Table of Contents</h2>
 <div id="text-table-of-contents">
 <ul>
-<li><a href="#orgbf4fd47">Org-Mode and MathJax</a></li>
-<li><a href="#org93d0280">MathJax Extensions</a></li>
-<li><a href="#orgda624e7">Export Settings</a></li>
-<li><a href="#org21d46f1">MathJax &amp; Unsupported Extensions</a></li>
-<li><a href="#orgf926765">A Javascript-less Method</a></li>
+<li><a href="#org874bdb4">Org-Mode and MathJax</a></li>
+<li><a href="#orgbd3691e">MathJax Extensions</a></li>
+<li><a href="#org86ef553">Export Settings</a></li>
+<li><a href="#orgfb168e8">MathJax &amp; Unsupported Extensions</a></li>
+<li><a href="#org4e87f35">A Javascript-less Method</a></li>
 </ul>
 </div>
 </div>
 
 <p class="spacing-64" \>
 
-<div id="outline-container-orgbf4fd47" class="outline-2">
-<h2 id="orgbf4fd47">Org-Mode and MathJax</h2>
-<div class="outline-text-2" id="text-orgbf4fd47">
+<div id="outline-container-org874bdb4" class="outline-2">
+<h2 id="org874bdb4">Org-Mode and MathJax</h2>
+<div class="outline-text-2" id="text-org874bdb4">
 <p>
 Documentation to use and export LaTeX math formulas (and formulas from
 extensions) from Org-Mode to HTML is sparse.
-</p>
-
-<p>
 The most modern way of including formulas in HTML is by the use of MathJax.
 Org-Mode has support for MathJax 2.7:
 <a href="https://orgmode.org/manual/LaTeX-fragments.html">https://orgmode.org/manual/LaTeX-fragments.html</a>.
-</p>
-
-<p>
 It is a simple as including <code>#+OPTIONS: tex: t</code> in an org file.
 Then, we can freely use LaTeX math formulas.
 </p>
@@ -90,9 +84,9 @@ And this is the result:
 </div>
 </div>
 
-<div id="outline-container-org93d0280" class="outline-2">
-<h2 id="org93d0280">MathJax Extensions</h2>
-<div class="outline-text-2" id="text-org93d0280">
+<div id="outline-container-orgbd3691e" class="outline-2">
+<h2 id="orgbd3691e">MathJax Extensions</h2>
+<div class="outline-text-2" id="text-orgbd3691e">
 <p>
 Things get more complicated when trying to use formulas from LaTeX extensions.
 One good extension when doing chemistry equations is <code>mhchem</code>. This can also be
@@ -115,9 +109,6 @@ importing any of the extensions. One way of doing this would be <a href="https:/
 <code>org-html-mathjax-template</code> with the same value but with the extension key added.
 But this solution is sub-optimal. Changing this configuration shouldn’t ever be
 needed.
-</p>
-
-<p>
 Fortunately, through the Org-Mode mailing list, an alternative was found:
 <a href="https://lists.gnu.org/archive/html/emacs-orgmode/2017-11/msg00030.html">https://lists.gnu.org/archive/html/emacs-orgmode/2017-11/msg00030.html</a>.
 All that is needed is the following line on the top of the org file:
@@ -173,16 +164,16 @@ This is the result:
 </p>
 
 
-<div id="org566c4e8" class="figure">
+<div id="orge379530" class="figure">
 <p><img src="./images/img1.png" alt="img1.png" />
 </p>
 </div>
 </div>
 </div>
 
-<div id="outline-container-orgda624e7" class="outline-2">
-<h2 id="orgda624e7">Export Settings</h2>
-<div class="outline-text-2" id="text-orgda624e7">
+<div id="outline-container-org86ef553" class="outline-2">
+<h2 id="org86ef553">Export Settings</h2>
+<div class="outline-text-2" id="text-org86ef553">
 <p>
 The result is far from good because the background may not match the websites
 background, foreground the same and the image is trimmed without any padding.
@@ -200,16 +191,16 @@ changed into: <code>convert -density %D -trim -border 10 -bordercolor white
 </p>
 
 
-<div id="org4560de3" class="figure">
+<div id="orgb181b53" class="figure">
 <p><img src="./images/img2.png" alt="img2.png" />
 </p>
 </div>
 </div>
 </div>
 
-<div id="outline-container-org21d46f1" class="outline-2">
-<h2 id="org21d46f1">MathJax &amp; Unsupported Extensions</h2>
-<div class="outline-text-2" id="text-org21d46f1">
+<div id="outline-container-orgfb168e8" class="outline-2">
+<h2 id="orgfb168e8">MathJax &amp; Unsupported Extensions</h2>
+<div class="outline-text-2" id="text-orgfb168e8">
 <p>
 Because of available and unavailable extensions for MathJax, there may be the
 need to use both MathJax compatible formulas and images. Users may try to set
@@ -224,9 +215,9 @@ compatible.
 </div>
 </div>
 
-<div id="outline-container-orgf926765" class="outline-2">
-<h2 id="orgf926765">A Javascript-less Method</h2>
-<div class="outline-text-2" id="text-orgf926765">
+<div id="outline-container-org4e87f35" class="outline-2">
+<h2 id="org4e87f35">A Javascript-less Method</h2>
+<div class="outline-text-2" id="text-org4e87f35">
 <p>
 If you are like me and you don’t want JavaScript polluting your website, there
 is a method to generate images with <code>ImageMagick</code> that respect the website
@@ -248,6 +239,7 @@ output file in <code>ImageMagick</code>.
 #+latex_header: \usepackage{xcolor}
 #+latex_header: \definecolor{myForeground}{rgb}{0.9843, 0.9451, 0.7804}
 #+latex_header: \definecolor{myBackground}{rgb}{0.1137,0.1255,0.1294}
+
 $$\pagecolor{myBackground}\colorbox{myBackground}{\color{myForeground}\chemfig{CH_3CH_2-[:-60,,3]C(-[:-120]H_3C)=C(-[:-60]H)-[:60]C|{(CH_3)_3}}}$$
 </pre>
 
@@ -274,10 +266,35 @@ as the website: <code>convert -density %D -trim -border 10 -bordercolor \"#1d202
 </p>
 
 
-<div id="orgb53e233" class="figure">
+<div id="orgda74fa9" class="figure">
 <p><img src="./images/img3.png" alt="img3.png" />
 </p>
 </div>
+
+<p>
+There is a second method if the previous one didn’t work. This may be the case
+for normal math equations or other libraries.
+</p>
+
+<pre class="example">
+#+latex_header: \usepackage{pagecolor}
+#+latex_header: \usepackage{xcolor}
+#+latex_header: \definecolor{myForeground}{rgb}{0.9843, 0.9451, 0.7804}
+#+latex_header: \definecolor{myBackground}{rgb}{0.1137,0.1255,0.1294}
+#+latex_header: \newcommand{\highlight}[1]{\colorbox{myBackground}{$\displaystyle #1$}}
+
+$$\pagecolor{myBackground}\highlight{\color{myForeground}S0(x)=(x &gt;&gt;&gt; 2)\oplus(x &gt;&gt;&gt; 13)\oplus(x &gt;&gt;&gt; 22)}$$
+</pre>
+
+
+<div id="org2addb7f" class="figure">
+<p><img src="./images/img4.png" alt="img4.png" />
+</p>
+</div>
+
+<p>
+This second method was provided by a user in StackOverflow: <a href="https://tex.stackexchange.com/a/33402">https://tex.stackexchange.com/a/33402</a>.
+</p>
 </div>
 </div>
 
