@@ -36,7 +36,7 @@
 <h1 class="title">Org-Mode &amp; MathJax</h1>
 \(\require{mhchem}\)
 <p class="warning">
-<code>~~~~</code> WARNING: THIS PAGE USES JAVASCRIPT! <code>~~~~</code>
+WARNING: THIS PAGE USES JAVASCRIPT!
 </p>
 
 <p class="spacing-64" \>
@@ -45,20 +45,20 @@
 <h2>Table of Contents</h2>
 <div id="text-table-of-contents">
 <ul>
-<li><a href="#orgb6e3a1a">Org-Mode and MathJax</a></li>
-<li><a href="#org5bc8418">MathJax Extensions</a></li>
-<li><a href="#orge6a7269">Export Settings</a></li>
-<li><a href="#org1644605">MathJax &amp; Unsupported Extensions</a></li>
-<li><a href="#org795a8ed">A Javascript-less Method</a></li>
+<li><a href="#org103b492">Org-Mode and MathJax</a></li>
+<li><a href="#org9f4af4d">MathJax Extensions</a></li>
+<li><a href="#org61cc830">Export Settings</a></li>
+<li><a href="#org13163b1">MathJax &amp; Unsupported Extensions</a></li>
+<li><a href="#org51ccfd8">A Javascript-less Method</a></li>
 </ul>
 </div>
 </div>
 
 <p class="spacing-64" \>
 
-<div id="outline-container-orgb6e3a1a" class="outline-2">
-<h2 id="orgb6e3a1a">Org-Mode and MathJax</h2>
-<div class="outline-text-2" id="text-orgb6e3a1a">
+<div id="outline-container-org103b492" class="outline-2">
+<h2 id="org103b492">Org-Mode and MathJax</h2>
+<div class="outline-text-2" id="text-org103b492">
 <p>
 Documentation to use and export LaTeX math formulas (and formulas from
 extensions) from Org-Mode to HTML is sparse.
@@ -84,9 +84,9 @@ And this is the result:
 </div>
 </div>
 
-<div id="outline-container-org5bc8418" class="outline-2">
-<h2 id="org5bc8418">MathJax Extensions</h2>
-<div class="outline-text-2" id="text-org5bc8418">
+<div id="outline-container-org9f4af4d" class="outline-2">
+<h2 id="org9f4af4d">MathJax Extensions</h2>
+<div class="outline-text-2" id="text-org9f4af4d">
 <p>
 Things get more complicated when trying to use formulas from LaTeX extensions.
 One good extension when doing chemistry equations is <code>mhchem</code>. This can also be
@@ -164,16 +164,16 @@ This is the result:
 </p>
 
 
-<div id="org35adbee" class="figure">
+<div id="orgf0d2820" class="figure">
 <p><img src="./images/img1.png" alt="img1.png" />
 </p>
 </div>
 </div>
 </div>
 
-<div id="outline-container-orge6a7269" class="outline-2">
-<h2 id="orge6a7269">Export Settings</h2>
-<div class="outline-text-2" id="text-orge6a7269">
+<div id="outline-container-org61cc830" class="outline-2">
+<h2 id="org61cc830">Export Settings</h2>
+<div class="outline-text-2" id="text-org61cc830">
 <p>
 The result is far from good because the background may not match the websites
 background, foreground the same and the image is trimmed without any padding.
@@ -191,16 +191,16 @@ changed into: <code>convert -density %D -trim -border 10 -bordercolor white
 </p>
 
 
-<div id="orgcf26771" class="figure">
+<div id="orgde81490" class="figure">
 <p><img src="./images/img2.png" alt="img2.png" />
 </p>
 </div>
 </div>
 </div>
 
-<div id="outline-container-org1644605" class="outline-2">
-<h2 id="org1644605">MathJax &amp; Unsupported Extensions</h2>
-<div class="outline-text-2" id="text-org1644605">
+<div id="outline-container-org13163b1" class="outline-2">
+<h2 id="org13163b1">MathJax &amp; Unsupported Extensions</h2>
+<div class="outline-text-2" id="text-org13163b1">
 <p>
 Because of available and unavailable extensions for MathJax, there may be the
 need to use both MathJax compatible formulas and images. Users may try to set
@@ -215,9 +215,9 @@ compatible.
 </div>
 </div>
 
-<div id="outline-container-org795a8ed" class="outline-2">
-<h2 id="org795a8ed">A Javascript-less Method</h2>
-<div class="outline-text-2" id="text-org795a8ed">
+<div id="outline-container-org51ccfd8" class="outline-2">
+<h2 id="org51ccfd8">A Javascript-less Method</h2>
+<div class="outline-text-2" id="text-org51ccfd8">
 <p>
 If you are like me and you don’t want JavaScript polluting your website, there
 is a method to generate images with <code>ImageMagick</code> that respect the website
@@ -266,7 +266,7 @@ as the website: <code>convert -density %D -trim -border 10 -bordercolor \"#1d202
 </p>
 
 
-<div id="org08796c3" class="figure">
+<div id="org39b9d05" class="figure">
 <p><img src="./images/img3.png" alt="img3.png" />
 </p>
 </div>
@@ -287,7 +287,7 @@ $$\pagecolor{myBackground}\highlight{\color{myForeground}S0(x)=(x &gt;&gt;&gt; 2
 </pre>
 
 
-<div id="org2bbf8e6" class="figure">
+<div id="org4e11b4d" class="figure">
 <p><img src="./images/img4.png" alt="img4.png" />
 </p>
 </div>

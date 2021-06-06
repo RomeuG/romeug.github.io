@@ -20,7 +20,7 @@
 #+HTML: \(\require{mhchem}\)
 #+OPTIONS: tex:t
 
-{{{website_warning(~~~~~~ WARNING: THIS PAGE USES JAVASCRIPT! ~~~~~~)}}}
+{{{website_warning(WARNING: THIS PAGE USES JAVASCRIPT!)}}}
 
 #+BEGIN_EXPORT html
 <p class="spacing-64" \>
