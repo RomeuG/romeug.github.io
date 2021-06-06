@@ -254,6 +254,12 @@ pre {
     text-align: center;
 }
 
+.figure p {
+    display: flex;
+    justify-content: center;
+    margin: 0px 2px;
+}
+
 .figure img {
     display: block;
     margin: auto;
@@ -268,6 +274,12 @@ pre {
 .latexfig {
     margin: 0px 0px 0px 0px;
     text-align: center;
+}
+
+.latexfig p {
+    display: flex;
+    justify-content: center;
+    margin: 0px 2px;
 }
 
 .latexfig img {
