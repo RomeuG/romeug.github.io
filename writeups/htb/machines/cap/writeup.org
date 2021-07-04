@@ -1,4 +1,4 @@
-#+TITLE: Armageddon
+#+TITLE: Cap
 #+AUTHOR: Romeu Vieira
 
 #+OPTIONS: html-style:nil
@@ -13,7 +13,7 @@
 
 #+HTML_HEAD: <link rel="stylesheet" type="text/css" href="/style.css"/>
 
-#+EXPORT_FILE_NAME: armageddon
+#+EXPORT_FILE_NAME: cap
 
 #+BEGIN_EXPORT html
 <p class="spacing-64" \>
