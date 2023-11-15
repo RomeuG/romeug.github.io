@@ -1,0 +1,228 @@
+#+TITLE: Org-Mode & MathJax
+#+AUTHOR: Romeu Vieira
+
+#+OPTIONS: html-style:nil
+#+OPTIONS: html-scripts:nil
+
+#+OPTIONS: author:nil
+#+OPTIONS: email:nil
+#+OPTIONS: date:t
+#+OPTIONS: toc:nil
+
+#+PROPERTY: header-args :eval no
+
+#+HTML_HEAD: <link rel="stylesheet" type="text/css" href="/style.css"/>
+
+#+EXPORT_FILE_NAME: org-mode-mathjax
+
+#+INCLUDE: "~/.config/emacs/orgmacros.org"
+
+#+HTML: \(\require{mhchem}\)
+#+OPTIONS: tex:t
+
+{{{website_warning(WARNING: THIS PAGE USES JAVASCRIPT!)}}}
+
+#+BEGIN_EXPORT html
+<p class="spacing-64" \>
+#+END_EXPORT
+
+#+TOC: headlines 2
+
+#+BEGIN_EXPORT html
+<p class="spacing-64" \>
+#+END_EXPORT
+
+* Org-Mode and MathJax
+
+Documentation to use and export LaTeX math formulas (and formulas from
+extensions) from Org-Mode to HTML is sparse.
+The most modern way of including formulas in HTML is by the use of MathJax.
+Org-Mode has support for MathJax 2.7:
+https://orgmode.org/manual/LaTeX-fragments.html.
+It is a simple as including =#+OPTIONS: tex: t= in an org file.
+Then, we can freely use LaTeX math formulas.
+
+#+begin_src
+#+OPTIONS: tex:t
+$$x=\frac{-b\pm\sqrt{b^2-4ac}}{2a}$$
+#+end_src
+
+And this is the result:
+
+$$x=\frac{-b\pm\sqrt{b^2-4ac}}{2a}$$
+
+* MathJax Extensions
+
+Things get more complicated when trying to use formulas from LaTeX extensions.
+One good extension when doing chemistry equations is =mhchem=. This can also be
+used alongside MathJax, but we have to signal it that we want to use the
+extension.
+
+#+ATTR_HTML: :target _blank
+Org-mode documentation [[https://orgmode.org/manual/Math-formatting-in-HTML-export.html][shows]] a way of “importing” an extension:, through the
+following snippet:
+
+#+begin_src
+#+HTML_MATHJAX: cancel.js noErrors.js
+#+end_src
+
+#+ATTR_HTML: :target _blank
+This is supposed to import “cancel” and “noErrors”. For some reason, it wasn’t
+importing any of the extensions. One way of doing this would be [[https://emacs.stackexchange.com/questions/31271/siunitx-mathjax-org-mode-and-html-export][overriding]]
+=org-html-mathjax-template= with the same value but with the extension key added.
+But this solution is sub-optimal. Changing this configuration shouldn’t ever be
+needed.
+Fortunately, through the Org-Mode mailing list, an alternative was found:
+https://lists.gnu.org/archive/html/emacs-orgmode/2017-11/msg00030.html.
+All that is needed is the following line on the top of the org file:
+
+#+begin_src
+#+HTML: \(\require{mhchem}\)
+#+end_src
+
+This is an indication to MathJax to import the required extension and is
+converted to a =<script>= when the page is loading. The string might appear in
+the page for a fraction of a second. This is the best solution that could be
+found at this time, even though I have been having mixed results with it.
+
+Here is an example:
+
+#+begin_src
+,#+HTML: \(\require{mhchem}\)
+$$\ce{Hg^2+ ->[I-] HgI2->[I-] [Hg^{II}I4]^2-}$$
+#+end_src
+
+And this is the result:
+
+$$\ce{Hg^2+ ->[I-] HgI2->[I-] [Hg^{II}I4]^2-}$$
+
+There are other extensions that are not supported by MathJax and need an
+alternative.
+For instance, another chemistry related LaTeX library that can be used is =chemfig=,
+which uses =tikz= internally. Since both of these libraries do not have
+extensions to MathJax, a way of displaying it in HTML is generating a PNG
+(=dvipng= or =imagemagick=) or an SVG (=dvisvgm=). I prefer =ImageMagick=
+because of its easier to use.
+
+#+begin_src
+#+latex_header: \usepackage{chemfig}
+#+OPTIONS: tex:imagemagick
+
+$$\chemfig{H-C(-[2]H)(-[6]H)-C(-[7]H)=[1]O}$$
+#+end_src
+
+This is the result:
+
+[[./images/img1.png]]
+
+* Export Settings
+
+The result is far from good because the background may not match the websites
+background, foreground the same and the image is trimmed without any padding.
+To change how the image is generated, the =ImageMagick= command executed by
+Org-Mode should be changed. The variable with configurations for =ImageMagick=,
+=dvipng= and =dvisvgm= is =org-preview-latex-process-alist=.
+
+The default command for =ImageMagick= is =convert -density %D -trim -antialias
+%f -quality 100 %O=.
+It is trimming the image completely, without adding any border. This can be
+changed into: =convert -density %D -trim -border 10 -bordercolor white
+-antialias %f -quality 100 %O=. The result is as follows:
+
+[[./images/img2.png]]
+
+* MathJax & Unsupported Extensions
+
+Because of available and unavailable extensions for MathJax, there may be the
+need to use both MathJax compatible formulas and images. Users may try to set
+=#+OPTIONS: tex:t=, insert formulas and then set =#+OPTIONS: tex:imagemagick=
+for images. But Org-Mode will only interpret the last option that has been set
+when exporting (=imagemagick=). Because of this, all formulas will be images,
+instead of having a mix of both. This seems to be a limitation of Org-Mode and
+the workaround that is being used in this HTML page is setting =OPTIONS= to use
+=t= (MathJax) and import manually the images for the other formulas that are not
+compatible.
+
+* A Javascript-less Method
+
+If you are like me and you don’t want JavaScript polluting your website, there
+is a method to generate images with =ImageMagick= that respect the website
+background and you can use any background and foreground colors you want.
+
+The LaTeX package =xcolor= is used to set the foreground color of the
+equations/formulas, etc. It can also set the background color! As mentioned
+before, a custom color can be set using =\definecolor= with an RGB input. Then, we
+set the equation foreground color by putting =\color= before anything else. To
+define the image background as transparent, we define =-transparent white= to the
+output file in =ImageMagick=.
+
+#+begin_src
+#+latex_header: \usepackage{pagecolor}
+#+latex_header: \usepackage{chemfig}
+#+latex_header: \usepackage{xcolor}
+#+latex_header: \definecolor{myForeground}{rgb}{0.9843, 0.9451, 0.7804}
+#+latex_header: \definecolor{myBackground}{rgb}{0.1137,0.1255,0.1294}
+
+$$\pagecolor{myBackground}\colorbox{myBackground}{\color{myForeground}\chemfig{CH_3CH_2-[:-60,,3]C(-[:-120]H_3C)=C(-[:-60]H)-[:60]C|{(CH_3)_3}}}$$
+#+end_src
+
+The LaTeX package =xcolor= can be used to set the background and foreground colors
+of an equation, formula, etc. We can define new colors through the =\definecolor=
+function, which takes an RGB input with values from =0.0= to =1.0=. To set the
+background color, =\colorbox= is used and we set the background color as the first
+argument, and we insert the formula as the second argument. To set the
+foreground color, we prefix the formula field with the =\color= function.
+
+The result is great, although there are two small thin grey lines on the top and
+bottom of the generated image. To remove those lines, =\pagecolor= should be set
+with the same color as the background of the image.
+
+Additionally, I recommend adding a border to the result image. As mentioned
+previously, this is the =ImageMagick= command, but with the same background color
+as the website: =convert -density %D -trim -border 10 -bordercolor \"#1d2021\"
++repage -antialias %f -quality 100 %O=.
+
+[[./images/img3.png]]
+
+There is a second method if the previous one didn’t work. This may be the case
+for normal math equations or other libraries.
+
+#+begin_src
+#+latex_header: \usepackage{pagecolor}
+#+latex_header: \usepackage{xcolor}
+#+latex_header: \definecolor{myForeground}{rgb}{0.9843, 0.9451, 0.7804}
+#+latex_header: \definecolor{myBackground}{rgb}{0.1137,0.1255,0.1294}
+#+latex_header: \newcommand{\highlight}[1]{\colorbox{myBackground}{$\displaystyle #1$}}
+
+$$\pagecolor{myBackground}\highlight{\color{myForeground}S0(x)=(x >>> 2)\oplus(x >>> 13)\oplus(x >>> 22)}$$
+#+end_src
+
+[[./images/img4.png]]
+
+This second method was provided by a user in StackOverflow: https://tex.stackexchange.com/a/33402.
+
+* FOOTER                                                                                              :ignore:
+:PROPERTIES:
+:clearpage: t
+:END:
+#+BEGIN_EXPORT html
+<hr>
+<footer>
+        <div class="container">
+            <ul class="menu-list">
+                <li class="menu-list-item flex-basis-100-margin fit-content">
+                    <a href="/index.html">Home</a>
+                </li>
+                <li class="menu-list-item flex-basis-100-margin fit-content">
+                    <a href="/articles/articles.html">Articles</a>
+                </li>
+                <li class="menu-list-item flex-basis-100-margin fit-content">
+                    <a href="/writeups/htb/index.html">Write-Ups</a>
+                </li>
+                <li class="menu-list-item flex-basis-100-margin fit-content">
+                    <a class="inactive-link">30-05-2021</a>
+                </li>
+            </ul>
+        </div>
+</footer>
+#+END_EXPORT
