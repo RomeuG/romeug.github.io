@@ -22,6 +22,8 @@
   --gapSize: 8px;
   --flexMarginSize: 16px;
   --flexTotalMargin: calc(var(--flexMarginSize) * 2);
+
+  --pageMinWidth: 350px;
 }
 
 html {
@@ -38,6 +40,8 @@ body {
   border-radius: 16px;
   padding: 32px;
   margin: auto;
+  /* minimum width overall */
+  min-width: var(--pageMinWidth);
 }
 
 h1 {
@@ -89,6 +93,14 @@ a:hover {
   cursor: default;
 }
 
+/* main page stuff */
+.main-menu {
+}
+.main-menu img {
+  max-height: 300px;
+}
+/* end main page stuff */
+
 ul,
 li {
   margin: 0;
@@ -132,6 +144,17 @@ li ul li ul li::marker {
 @media only screen and (min-width: 1000px) {
   .menu-list {
     flex-wrap: nowrap;
+  }
+
+  .main-menu {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .main-menu img {
+    min-width: 200px;
+    float: right;
   }
 }
 
@@ -226,23 +249,10 @@ li ul li ul li::marker {
   margin: 0 64px 0 0;
 }
 
-.resright {
-  display: block;
-  margin: auto;
-  max-width: 90%;
-}
-
 @media (min-width: 925px) {
   .lol {
     display: inline-block;
     vertical-align: top;
-  }
-
-  .resright {
-    float: right;
-    padding: 20px;
-    clear: both;
-    max-width: 300px;
   }
 
   body {
@@ -306,6 +316,10 @@ footer {
 }
 .spacing-128 {
   margin-bottom: 128px;
+}
+
+.spacing-v-64 {
+  margin-right: 64px;
 }
 
 /*
