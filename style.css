@@ -30,6 +30,9 @@ html {
   padding-top: 64px;
   margin-bottom: 64px;
 
+  padding-left: 16px;
+  padding-right: 16px;
+
   background: radial-gradient(#1d2021, #7c6f64) no-repeat fixed;
 }
 
