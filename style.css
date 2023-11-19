@@ -3,9 +3,6 @@
   --h2Color: #b8bb26;
   --h3Color: #fabd2f;
   --h4Color: #689d6a;
-  --blueh: #458588;
-  --bluel: #83a598;
-  --orangel: #fe8019;
   --preColor: #8ec07c;
   --bg0: #282828;
   --bg1: #3c3836;
@@ -17,7 +14,29 @@
   --fg2: #d5c4a1;
   --fg3: #bdae93;
   --fg4: #a89984;
+
+  --gray8: #928374;
+
+  --redh: #cc241d;
+  --redl: #fb4934;
+
+  --greenh: #98971a;
+  --greenl: #b8bb26;
+
+  --yellowh: #d79921;
+  --yellowl: #fabd2f;
+
+  --blueh: #458588;
+  --bluel: #83a598;
+
+  --purpleh: #b16286;
   --purplel: #d3869b;
+
+  --aquah: #689d6a;
+  --aqual: #8ec07c;
+
+  --orangeh: #d64d0e;
+  --orangel: #fe8019;
 
   --gapSize: 8px;
   --flexMarginSize: 16px;
@@ -440,4 +459,44 @@ table {
   99% {
     color: red;
   }
+}
+
+/* org-mode code */
+.org-comment-delimiter {
+  color: var(--gray8);
+}
+
+.org-comment {
+  color: var(--gray8);
+}
+
+.org-keyword,
+.org-vimrc-command {
+  color: var(--redl);
+}
+
+.org-variable-name,
+.org-vimrc-option {
+  color: var(--bluel);
+}
+
+.org-string {
+  color: var(--greenl);
+}
+
+.org-builtin,
+.org-vimrc-number {
+  color: var(--orangel);
+}
+
+.org-function-name {
+  color: var(--yellowl);
+}
+
+.org-doc {
+  color: var(--greenl);
+}
+
+.org-constant {
+  color: var(--purplel);
 }
