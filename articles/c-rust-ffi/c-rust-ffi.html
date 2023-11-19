@@ -1,0 +1,463 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+"http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
+<head>
+<meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>C to Rust FFI</title>
+<meta name="generator" content="Org Mode" />
+<link rel="stylesheet" type="text/css" href="/style.css"/>
+<meta name="theme-color" content="#7c6f64" />
+</head>
+<body>
+<div id="content" class="content">
+<h1 class="title">C to Rust FFI</h1>
+<p class="spacing-64" \>
+
+<div id="table-of-contents" role="doc-toc">
+<h2>Table of Contents</h2>
+<div id="text-table-of-contents" role="doc-toc">
+<ul>
+<li><a href="#orgb6971b5">Motivation</a></li>
+<li><a href="#orgbc1ca38">How To</a></li>
+<li><a href="#org8cffab6">Usage</a></li>
+<li><a href="#org082953f">Bonus</a></li>
+</ul>
+</div>
+</div>
+
+<p class="spacing-64" \>
+
+<div id="outline-container-orgb6971b5" class="outline-2">
+<h2 id="orgb6971b5">Motivation</h2>
+<div class="outline-text-2" id="text-orgb6971b5">
+<p>
+Recently I wanted to develop a small program to write raw bytes directly do a USB device
+file, like <code>/dev/sdg</code>, by providing its <code>vendorid</code> and <code>productid</code> and then ask for
+write confirmation. The reason for this is that it is very risky to just use <code>dd</code> by
+checking the device file through <code>lsblk</code> or a similar program. Plugging the USB device
+in and out might change the device it points to.
+</p>
+
+<p>
+I wanted to use my programming language of choice: Rust. At the same time, I had to use
+<code>udev</code> library to access the information regarding the connected USB devices. I did find
+a <a href="https://crates.io/crates/udev">Rust crate</a> that works as a wrapper and had
+everything I needed, but I thought that this could be an opportunity to actually learn
+something about FFI (Foreign Function Interface).
+</p>
+</div>
+</div>
+
+<div id="outline-container-orgbc1ca38" class="outline-2">
+<h2 id="orgbc1ca38">How To</h2>
+<div class="outline-text-2" id="text-orgbc1ca38">
+<p>
+I found a great <a href="https://rust-lang.github.io/rust-bindgen/introduction.html">Rust book</a>
+called <code>The `bindgen` User Guide</code> and it had a great tutorial on how to start with FFI in
+Rust.
+So, after starting a new project, I immediately added <code>bindgen</code> library to <code>Cargo.toml</code>:
+</p>
+
+<div class="org-src-container">
+<pre class="src src-yaml">[build-dependencies]
+bindgen = "0.59.2"
+cc = { version = "1.0", features = ["parallel"] }
+</pre>
+</div>
+
+<p>
+I created a C header file named <code>wrapper.h</code> in the <code>src</code> folder:
+</p>
+
+<div class="org-src-container">
+<pre class="src src-c"><span class="org-preprocessor">#include</span> <span class="org-string">&lt;libudev.h&gt;</span>
+</pre>
+</div>
+
+<p>
+Alongside, I also created a <code>build.rs</code> build file in the root directory of the project:
+</p>
+
+<div class="org-src-container">
+<pre class="src src-rust"><span class="org-keyword">use</span> <span class="org-constant">std</span>::env;
+<span class="org-keyword">use</span> <span class="org-constant">std</span>::<span class="org-constant">path</span>::<span class="org-type">PathBuf</span>;
+
+<span class="org-keyword">fn</span> <span class="org-function-name">main</span>() {
+
+    <span class="org-comment-delimiter">// </span><span class="org-comment">udev lib linkage</span>
+    <span class="org-rust-builtin-formatting-macro">println!</span>(<span class="org-string">"cargo:rustc-link-lib=udev"</span>);
+
+    <span class="org-rust-builtin-formatting-macro">println!</span>(<span class="org-string">"cargo:rustc-link-search=."</span>);
+
+    <span class="org-comment-delimiter">// </span><span class="org-comment">compile again if changes made to header</span>
+    <span class="org-rust-builtin-formatting-macro">println!</span>(<span class="org-string">"cargo:rerun-if-changed=src/wrapper.h"</span>);
+
+    <span class="org-keyword">let</span> <span class="org-variable-name">bindings</span> = <span class="org-constant">bindgen</span>::<span class="org-type">Builder</span>::default()
+        .header(<span class="org-string">"src/wrapper.h"</span>)
+        .parse_callbacks(<span class="org-type">Box</span>::new(<span class="org-constant">bindgen</span>::<span class="org-type">CargoCallbacks</span>))
+        .generate()
+        .expect(<span class="org-string">"Unable to generate bindings"</span>);
+
+    <span class="org-keyword">let</span> <span class="org-variable-name">out_path</span> = <span class="org-type">PathBuf</span>::from(<span class="org-constant">env</span>::var(<span class="org-string">"OUT_DIR"</span>).unwrap());
+    bindings
+        .write_to_file(out_path.join(<span class="org-string">"bindings.rs"</span>))
+        .expect(<span class="org-string">"Couldn't write to bindings!"</span>);
+}
+</pre>
+</div>
+
+<p>
+The code above run when using the <code>cargo build</code> command, and it will re-run if the
+<code>wrapper.h</code> suffers any changes. It will generate a <code>bindings.rs</code> file in the build path
+(e.g.: <code>./target/debug/build/write-to-device-89d0f8bcd824fd52/out/bindings.rs</code>). This file
+contains everything related to whatever is included in the header file. In this case, it
+will convert every relevant <code>udev</code> code to Rust. The generated code respects the arguments
+and their type, so pointers and the use of <code>unsafe</code> scope are inevitable. Structures
+respect the C contract and implement the <code>Debug</code>, <code>Copy</code> and <code>Clone</code> traits. Here is a
+sample:
+</p>
+
+<div class="org-src-container">
+<pre class="src src-rust"><span class="org-preprocessor">#[repr(C)]</span>
+<span class="org-preprocessor">#[derive(Debug, Copy, Clone)]</span>
+<span class="org-keyword">pub</span> <span class="org-keyword">struct</span> <span class="org-type">udev_device</span> {
+    <span class="org-variable-name">_unused</span>: [<span class="org-type">u8</span>; 0],
+}
+
+<span class="org-keyword">extern</span> <span class="org-string">"C"</span> {
+    <span class="org-keyword">pub</span> <span class="org-keyword">fn</span> <span class="org-function-name">udev_device_ref</span>(<span class="org-variable-name">udev_device</span>: *<span class="org-keyword">mut</span> udev_device) -&gt; *<span class="org-keyword">mut</span> udev_device;
+    <span class="org-keyword">pub</span> <span class="org-keyword">fn</span> <span class="org-function-name">udev_device_unref</span>(<span class="org-variable-name">udev_device</span>: *<span class="org-keyword">mut</span> udev_device) -&gt; *<span class="org-keyword">mut</span> udev_device;
+    <span class="org-keyword">pub</span> <span class="org-keyword">fn</span> <span class="org-function-name">udev_device_get_udev</span>(<span class="org-variable-name">udev_device</span>: *<span class="org-keyword">mut</span> udev_device) -&gt; *<span class="org-keyword">mut</span> udev;
+
+    <span class="org-keyword">pub</span> <span class="org-keyword">fn</span> <span class="org-function-name">udev_device_new_from_syspath</span>(
+        <span class="org-variable-name">udev</span>: *<span class="org-keyword">mut</span> udev,
+        <span class="org-variable-name">syspath</span>: *<span class="org-keyword">const</span> ::<span class="org-constant">std</span>::<span class="org-constant">os</span>::<span class="org-constant">raw</span>::c_char,
+    ) -&gt; *<span class="org-keyword">mut</span> udev_device;
+
+    <span class="org-keyword">pub</span> <span class="org-keyword">fn</span> <span class="org-function-name">udev_device_new_from_devnum</span>(
+        <span class="org-variable-name">udev</span>: *<span class="org-keyword">mut</span> udev,
+        <span class="org-variable-name">type_</span>: ::<span class="org-constant">std</span>::<span class="org-constant">os</span>::<span class="org-constant">raw</span>::c_char,
+        <span class="org-variable-name">devnum</span>: dev_t,
+    ) -&gt; *<span class="org-keyword">mut</span> udev_device;
+}
+</pre>
+</div>
+
+<p>
+Lastly, I just included the bindings file at the top of the main project file so I can
+use everything declared in it:
+</p>
+
+<div class="org-src-container">
+<pre class="src src-rust"><span class="org-preprocessor">#![allow(non_upper_case_globals)]</span>
+<span class="org-preprocessor">#![allow(non_camel_case_types)]</span>
+<span class="org-preprocessor">#![allow(non_snake_case)]</span>
+<span class="org-preprocessor">#![allow(dead_code)]</span>
+<span class="org-preprocessor">#![allow(improper_ctypes)]</span>
+
+<span class="org-comment-delimiter">// </span><span class="org-comment">include the bindings</span>
+<span class="org-preprocessor">include!</span>(<span class="org-preprocessor">concat!</span>(<span class="org-preprocessor">env!</span>(<span class="org-string">"OUT_DIR"</span>), <span class="org-string">"/bindings.rs"</span>));
+</pre>
+</div>
+
+<p>
+The project is now ready and now I can use every function and structure from the <code>udev</code>
+library! But there is still something that hasn't been covered: you can have your own C
+source file with your own functions and use it. For instance, you can declare new structs
+in your header file. In the following code from <code>wrapper.h</code>, I added a struct called
+<code>DeviceInfo</code>, which now can be used directly through the Rust code:
+</p>
+
+<div class="org-src-container">
+<pre class="src src-c"><span class="org-preprocessor">#include</span> <span class="org-string">&lt;libudev.h&gt;</span>
+
+<span class="org-keyword">struct</span> <span class="org-type">DeviceInfo</span> {
+    <span class="org-keyword">struct</span> <span class="org-type">udev</span>* <span class="org-variable-name">udev</span>;
+    <span class="org-keyword">struct</span> <span class="org-type">udev_device</span>* <span class="org-variable-name">block</span>;
+    <span class="org-keyword">struct</span> <span class="org-type">udev_device</span>* <span class="org-variable-name">scsi</span>;
+    <span class="org-keyword">struct</span> <span class="org-type">udev_device</span>* <span class="org-variable-name">usb</span>;
+};
+</pre>
+</div>
+
+<p>
+New functions can also be added to the header file and the process is similar. In case a
+user wants to have the functions implemented in a C file, lets say <code>src/libdevice.c</code>, the
+<code>build.rs</code> needs to be changed so a static library can be generated through the C file and
+then integrated into the final binary:
+</p>
+
+<div class="org-src-container">
+<pre class="src src-rust"><span class="org-keyword">use</span> <span class="org-constant">std</span>::env;
+<span class="org-keyword">use</span> <span class="org-constant">std</span>::<span class="org-constant">path</span>::<span class="org-type">PathBuf</span>;
+
+<span class="org-keyword">fn</span> <span class="org-function-name">main</span>() {
+
+    <span class="org-constant">cc</span>::<span class="org-type">Build</span>::new().file(<span class="org-string">"src/libdevice.c"</span>).compile(<span class="org-string">"libdevice.a"</span>);
+
+    <span class="org-comment-delimiter">// </span><span class="org-comment">udev lib linkage</span>
+    <span class="org-rust-builtin-formatting-macro">println!</span>(<span class="org-string">"cargo:rustc-link-lib=udev"</span>);
+
+    <span class="org-rust-builtin-formatting-macro">println!</span>(<span class="org-string">"cargo:rustc-link-search=."</span>);
+
+    <span class="org-comment-delimiter">// </span><span class="org-comment">compile again if changes made to header</span>
+    <span class="org-rust-builtin-formatting-macro">println!</span>(<span class="org-string">"cargo:rerun-if-changed=src/wrapper.h"</span>);
+
+    <span class="org-keyword">let</span> <span class="org-variable-name">bindings</span> = <span class="org-constant">bindgen</span>::<span class="org-type">Builder</span>::default()
+        .header(<span class="org-string">"src/wrapper.h"</span>)
+        .parse_callbacks(<span class="org-type">Box</span>::new(<span class="org-constant">bindgen</span>::<span class="org-type">CargoCallbacks</span>))
+        .generate()
+        .expect(<span class="org-string">"Unable to generate bindings"</span>);
+
+    <span class="org-keyword">let</span> <span class="org-variable-name">out_path</span> = <span class="org-type">PathBuf</span>::from(<span class="org-constant">env</span>::var(<span class="org-string">"OUT_DIR"</span>).unwrap());
+    bindings
+        .write_to_file(out_path.join(<span class="org-string">"bindings.rs"</span>))
+        .expect(<span class="org-string">"Couldn't write to bindings!"</span>);
+}
+</pre>
+</div>
+
+<p>
+To access the functions in Rust, you can declare the function prototypes in the header
+file and letting <code>bindgen</code> do all the work. Or, if you wish to suffer from an headache,
+you can declare them manually in the Rust source code after including the bindings:
+</p>
+
+<div class="org-src-container">
+<pre class="src src-rust"><span class="org-keyword">extern</span> <span class="org-string">"C"</span> {
+    <span class="org-keyword">pub</span> <span class="org-keyword">fn</span> <span class="org-function-name">get_child</span>(
+        <span class="org-variable-name">udev</span>: *<span class="org-keyword">mut</span> udev,
+        <span class="org-variable-name">parent</span>: *<span class="org-keyword">mut</span> udev_device,
+        <span class="org-variable-name">subsystem</span>: *<span class="org-keyword">const</span> ::<span class="org-constant">std</span>::<span class="org-constant">os</span>::<span class="org-constant">raw</span>::c_char,
+    ) -&gt; *<span class="org-keyword">mut</span> udev_device;
+
+    <span class="org-keyword">pub</span> <span class="org-keyword">fn</span> <span class="org-function-name">enumerate_usb_mass_storage</span>(<span class="org-variable-name">udev</span>: *<span class="org-keyword">mut</span> udev);
+
+    <span class="org-keyword">pub</span> <span class="org-keyword">fn</span> <span class="org-function-name">get_device_info_by_block</span>(<span class="org-variable-name">device_path</span>: *<span class="org-keyword">const</span> c_char) -&gt; *<span class="org-keyword">mut</span> <span class="org-type">DeviceInfo</span>;
+    <span class="org-keyword">pub</span> <span class="org-keyword">fn</span> <span class="org-function-name">get_device_info_by_vp</span>(
+        <span class="org-variable-name">id_vendor</span>: *<span class="org-keyword">const</span> c_char,
+        <span class="org-variable-name">id_product</span>: *<span class="org-keyword">const</span> c_char,
+    ) -&gt; *<span class="org-keyword">mut</span> <span class="org-type">DeviceInfo</span>;
+}
+</pre>
+</div>
+</div>
+</div>
+
+<div id="outline-container-org8cffab6" class="outline-2">
+<h2 id="org8cffab6">Usage</h2>
+<div class="outline-text-2" id="text-org8cffab6">
+<p>
+Using the functions generated by <code>bindgen</code> is different and arguably more annoying
+because we are now dealing directly with pointers and specific C types so it is up to
+the user if there is need to wrap the functions or structures into safer types, with the
+goal of centralizing the usage of <code>unsafe</code> scopes. Rust already helps us because we have
+access to the C types, we can verify if a pointer is null or not through <code>is_null()</code> and
+we can convert Rust types into C-specific types that are friendlier when using the
+bindings. As an example, when a binding need a <code>char*</code>, we can use a <code>CString</code> and pass
+it as a pointer. We can also convert a Rust <code>&amp;str</code> into a <code>CString</code>.
+</p>
+
+<p>
+As mentioned above, a structure called <code>DeviceInfo</code> was declared in the header file and
+is being returned as a pointer in a C function. It is also important to understand that
+there is memory being allocated for the structure, so there is the need to free it
+later. With this in mind, we can implement new methods for the structure without
+touching the C code, so it is possible to create functions to instantiate the structure,
+free the structure, etc. In my case, I created a <code>new</code> function, that creates a
+<code>DeviceInfo</code> object, a <code>get_device_node</code> function, that wraps the C function, and a
+drop= function with the purpose of cleaning the memory (because <code>Drop</code> trait doesn't
+work alongside <code>Copy</code> trait).
+</p>
+
+<p>
+In the example below, I was able to create a safe version of <code>DeviceInfo</code> through the
+<code>new</code> function. I get the object as a pointer, copy its contents to a new variable, then
+I free the pointer and return the variable that holds the copy. This way, no memory
+leaks related to the structure and now I have an instance of a <code>DeviceInfo</code> that I can
+use without writing <code>unsafe</code> in every line of code. Wrapping the
+<code>udev_device_get_devnode</code> function is also great for additional error checks and, once
+again, not having the need of writing the same keyword many times. The same for <code>drop</code>.
+</p>
+
+<div class="org-src-container">
+<pre class="src src-rust"><span class="org-keyword">impl</span> <span class="org-type">DeviceInfo</span> {
+    <span class="org-keyword">fn</span> <span class="org-function-name">new</span>(<span class="org-variable-name">id_vendor</span>: &amp;<span class="org-type">str</span>, <span class="org-variable-name">id_product</span>: &amp;<span class="org-type">str</span>) -&gt; <span class="org-type">Result</span>&lt;<span class="org-type">DeviceInfo</span>&gt; {
+        <span class="org-keyword">let</span> <span class="org-variable-name">id_vendor_cs</span> = <span class="org-type">CString</span>::new(id_vendor).map_err(<span class="org-type">Error</span>::<span class="org-type">CStringInit</span>)<span class="org-rust-question-mark">?</span>;
+        <span class="org-keyword">let</span> <span class="org-variable-name">id_product_cs</span> = <span class="org-type">CString</span>::new(id_product).map_err(<span class="org-type">Error</span>::<span class="org-type">CStringInit</span>)<span class="org-rust-question-mark">?</span>;
+        <span class="org-keyword">let</span> <span class="org-variable-name">device_info</span> =
+            <span class="org-rust-unsafe">unsafe</span> { get_device_info_by_vp(id_vendor_cs.as_ptr(), id_product_cs.as_ptr()) };
+
+        <span class="org-keyword">if</span> device_info.is_null() {
+            <span class="org-type">Err</span>(<span class="org-type">Error</span>::<span class="org-type">Block</span>(<span class="org-string">"devnode is null"</span>))
+        } <span class="org-keyword">else</span> {
+            <span class="org-keyword">let</span> <span class="org-variable-name">deref</span> = <span class="org-rust-unsafe">unsafe</span> { *device_info };
+
+            <span class="org-comment-delimiter">// </span><span class="org-comment">free original copy</span>
+            <span class="org-rust-unsafe">unsafe</span> { <span class="org-constant">libc</span>::free(device_info <span class="org-keyword">as</span> *<span class="org-keyword">mut</span> _ <span class="org-keyword">as</span> *<span class="org-keyword">mut</span> <span class="org-constant">libc</span>::c_void) };
+
+            <span class="org-type">Ok</span>(deref)
+        }
+    }
+
+    <span class="org-keyword">fn</span> <span class="org-function-name">get_device_node</span>(&amp;<span class="org-keyword">self</span>) -&gt; <span class="org-type">Result</span>&lt;<span class="org-type">String</span>&gt; {
+        <span class="org-keyword">if</span> <span class="org-keyword">self</span>.block.is_null() {
+            <span class="org-keyword">return</span> <span class="org-type">Err</span>(<span class="org-type">Error</span>::<span class="org-type">Block</span>(<span class="org-string">"block is null"</span>));
+        }
+
+        <span class="org-keyword">let</span> <span class="org-variable-name">devnode</span> = <span class="org-rust-unsafe">unsafe</span> { udev_device_get_devnode(<span class="org-keyword">self</span>.block) };
+
+        <span class="org-keyword">if</span> devnode.is_null() {
+            <span class="org-keyword">return</span> <span class="org-type">Err</span>(<span class="org-type">Error</span>::<span class="org-type">Block</span>(<span class="org-string">"devnode is null"</span>));
+        }
+
+        <span class="org-type">Ok</span>(cchar_to_string(devnode <span class="org-keyword">as</span> *<span class="org-keyword">const</span> c_char))
+    }
+
+    <span class="org-keyword">fn</span> <span class="org-function-name">drop</span>(&amp;<span class="org-keyword">mut</span> <span class="org-keyword">self</span>) {
+        <span class="org-keyword">if</span> !<span class="org-keyword">self</span>.block.is_null() {
+            <span class="org-rust-unsafe">unsafe</span> {
+                udev_device_unref(<span class="org-keyword">self</span>.block);
+            };
+        }
+
+        <span class="org-keyword">if</span> !<span class="org-keyword">self</span>.scsi.is_null() {
+            <span class="org-rust-unsafe">unsafe</span> {
+                udev_device_unref(<span class="org-keyword">self</span>.scsi);
+            };
+        }
+
+        <span class="org-keyword">if</span> !<span class="org-keyword">self</span>.udev.is_null() {
+            <span class="org-rust-unsafe">unsafe</span> {
+                udev_unref(<span class="org-keyword">self</span>.udev);
+            };
+        }
+    }
+}
+</pre>
+</div>
+
+<p>
+All the code from this article can be found <a href="https://github.com/RomeuG/write-to-usb">here</a>.
+</p>
+</div>
+</div>
+
+<div id="outline-container-org082953f" class="outline-2">
+<h2 id="org082953f">Bonus</h2>
+<div class="outline-text-2" id="text-org082953f">
+<p>
+In this bonus section, I will show a simple example on how to do the reverse: calling
+Rust code from C. I have a very simple Rust crate that has a function that adds two
+numbers. The goal is to use that same function from C. To start, we need to make sure
+that the function name is not mangled and it is declared wit the <code>extern</code> keyword:
+</p>
+
+<div class="org-src-container">
+<pre class="src src-rust"><span class="org-preprocessor">#[no_mangle]</span>
+<span class="org-keyword">pub</span> <span class="org-keyword">extern</span> <span class="org-string">"C"</span> <span class="org-keyword">fn</span> <span class="org-function-name">add</span>(<span class="org-variable-name">a</span>: <span class="org-type">u32</span>, <span class="org-variable-name">b</span>: <span class="org-type">u32</span>) -&gt; <span class="org-type">u32</span> {
+    a + b
+}
+</pre>
+</div>
+
+<p>
+The next step is to tell <code>Cargo</code> that we want it to generate a shared library or a
+static library. The following has to be added to the <code>Cargo.toml</code> file of the crate and
+the <code>crate-type</code> should be defined according to the type of the result object file:
+</p>
+
+<div class="org-src-container">
+<pre class="src src-toml">[<span class="org-type">lib</span>]
+<span class="org-variable-name">name</span> = <span class="org-string">"sum"</span>
+<span class="org-variable-name">crate-type</span> = [<span class="org-string">"cdylib"</span>] <span class="org-comment-delimiter"># </span><span class="org-comment">creates dynamic lib</span>
+<span class="org-comment-delimiter"># </span><span class="org-comment">crate-type = ["staticlib"] # creates static lib</span>
+</pre>
+</div>
+
+<p>
+When building the crate, it will automatically generate the library files. In this case,
+since the <code>crate-type</code> is <code>cdylib</code>, it will generate a shared object in
+<code>target/release/libsum.so</code>. To use this in the C code, we have to have a corresponding
+header file with the function prototypes. This is possible to do using a tool called
+<a href="https://github.com/eqrion/cbindgen">cbindgen</a> and running it on the crate root
+directory. On the following command, I reference the crate name, the output header file
+name and the fact that I want it to output explicitly in C.
+</p>
+
+<div class="org-src-container">
+<pre class="src src-sh">$ cbindgen --crate sum --output sum.h --lang c
+</pre>
+</div>
+
+<p>
+The generated header file:
+</p>
+
+<div class="org-src-container">
+<pre class="src src-c"><span class="org-preprocessor">#include</span> <span class="org-string">&lt;stdarg.h&gt;</span>
+<span class="org-preprocessor">#include</span> <span class="org-string">&lt;stdbool.h&gt;</span>
+<span class="org-preprocessor">#include</span> <span class="org-string">&lt;stdint.h&gt;</span>
+<span class="org-preprocessor">#include</span> <span class="org-string">&lt;stdlib.h&gt;</span>
+
+<span class="org-type">uint32_t</span> <span class="org-function-name">add</span>(<span class="org-type">uint32_t</span> <span class="org-variable-name">a</span>, <span class="org-type">uint32_t</span> <span class="org-variable-name">b</span>);
+</pre>
+</div>
+
+<p>
+Both the shared object and the header file can now be used in a C project directly and
+compile it with the command <code>gcc main.c -lsum -L./rust-sum/target/release</code>:
+</p>
+
+<div class="org-src-container">
+<pre class="src src-c"><span class="org-preprocessor">#include</span> <span class="org-string">"sum.h"</span>
+<span class="org-preprocessor">#include</span> <span class="org-string">&lt;assert.h&gt;</span>
+<span class="org-preprocessor">#include</span> <span class="org-string">&lt;stdio.h&gt;</span>
+
+<span class="org-type">int</span> <span class="org-function-name">main</span>() {
+    <span class="org-type">uint32_t</span> <span class="org-variable-name">result</span> = add(2, 2);
+    assert(result == 4);
+
+    printf(<span class="org-string">"Result: %d\n"</span>, result);
+
+    <span class="org-keyword">return</span> 0;
+}
+</pre>
+</div>
+
+<p>
+Then, with the shared object in the same directory, run the executable:
+</p>
+
+<div class="org-src-container">
+<pre class="src src-sh">$ ./a.out
+Result: 4
+</pre>
+</div>
+</div>
+</div>
+
+<hr>
+<footer>
+<div class="container">
+<ul class="menu-list-wide">
+<li class="menu-list-item flex-basis-100-margin fit-content">
+<a href="/index.html" class="test">Home</a>
+</li>
+<li class="menu-list-item flex-basis-100-margin fit-content">
+<a href="/articles">Articles</a>
+</li>
+<li class="menu-list-item flex-basis-100-margin fit-content">
+<a href="/writeups/htb/index.html">Write-Ups</a>
+</li>
+<li class="menu-list-item flex-basis-100-margin fit-content">
+<a class="inactive-link">20-03-2022</a>
+</li>
+</ul>
+</div>
+</footer>
+</div>
+</body>
+</html>

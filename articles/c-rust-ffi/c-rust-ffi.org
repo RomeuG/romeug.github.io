@@ -1,0 +1,398 @@
+#+AUTHOR: Romeu Vieira
+
+#+OPTIONS: html-style:nil
+#+OPTIONS: html-scripts:nil
+
+#+OPTIONS: author:nil
+#+OPTIONS: email:nil
+#+OPTIONS: date:nil
+#+OPTIONS: toc:nil
+
+#+PROPERTY: header-args :eval no
+
+#+HTML_HEAD: <link rel="stylesheet" type="text/css" href="/style.css"/>
+
+#+HTML_HEAD: <meta name="theme-color" content="#7c6f64" />
+
+#+TITLE: C to Rust FFI
+#+DATE: 20-03-2022
+#+EXPORT_FILE_NAME: c-rust-ffi
+
+#+BEGIN_EXPORT html
+<p class="spacing-64" \>
+#+END_EXPORT
+
+#+TOC: headlines 2
+
+#+BEGIN_EXPORT html
+<p class="spacing-64" \>
+#+END_EXPORT
+
+* Motivation
+
+  Recently I wanted to develop a small program to write raw bytes directly do a USB device
+  file, like =/dev/sdg=, by providing its =vendorid= and =productid= and then ask for
+  write confirmation. The reason for this is that it is very risky to just use =dd= by
+  checking the device file through =lsblk= or a similar program. Plugging the USB device
+  in and out might change the device it points to.
+
+  I wanted to use my programming language of choice: Rust. At the same time, I had to use
+  =udev= library to access the information regarding the connected USB devices. I did find
+  a [[https://crates.io/crates/udev][Rust crate]] that works as a wrapper and had
+  everything I needed, but I thought that this could be an opportunity to actually learn
+  something about FFI (Foreign Function Interface).
+
+* How To
+
+  I found a great [[https://rust-lang.github.io/rust-bindgen/introduction.html][Rust book]]
+  called =The `bindgen` User Guide= and it had a great tutorial on how to start with FFI in
+  Rust.
+  So, after starting a new project, I immediately added =bindgen= library to =Cargo.toml=:
+
+  #+BEGIN_SRC yaml
+[build-dependencies]
+bindgen = "0.59.2"
+cc = { version = "1.0", features = ["parallel"] }
+  #+END_SRC
+
+  I created a C header file named =wrapper.h= in the =src= folder:
+
+  #+BEGIN_SRC c
+#include <libudev.h>
+  #+END_SRC
+
+  Alongside, I also created a =build.rs= build file in the root directory of the project:
+
+  #+BEGIN_SRC rust
+use std::env;
+use std::path::PathBuf;
+
+fn main() {
+
+    // udev lib linkage
+    println!("cargo:rustc-link-lib=udev");
+
+    println!("cargo:rustc-link-search=.");
+
+    // compile again if changes made to header
+    println!("cargo:rerun-if-changed=src/wrapper.h");
+
+    let bindings = bindgen::Builder::default()
+        .header("src/wrapper.h")
+        .parse_callbacks(Box::new(bindgen::CargoCallbacks))
+        .generate()
+        .expect("Unable to generate bindings");
+
+    let out_path = PathBuf::from(env::var("OUT_DIR").unwrap());
+    bindings
+        .write_to_file(out_path.join("bindings.rs"))
+        .expect("Couldn't write to bindings!");
+}
+  #+END_SRC
+
+  The code above run when using the =cargo build= command, and it will re-run if the
+  =wrapper.h= suffers any changes. It will generate a =bindings.rs= file in the build path
+  (e.g.: =./target/debug/build/write-to-device-89d0f8bcd824fd52/out/bindings.rs=). This file
+  contains everything related to whatever is included in the header file. In this case, it
+  will convert every relevant =udev= code to Rust. The generated code respects the arguments
+  and their type, so pointers and the use of =unsafe= scope are inevitable. Structures
+  respect the C contract and implement the =Debug=, =Copy= and =Clone= traits. Here is a
+  sample:
+
+  #+BEGIN_SRC rust
+#[repr(C)]
+#[derive(Debug, Copy, Clone)]
+pub struct udev_device {
+    _unused: [u8; 0],
+}
+
+extern "C" {
+    pub fn udev_device_ref(udev_device: *mut udev_device) -> *mut udev_device;
+    pub fn udev_device_unref(udev_device: *mut udev_device) -> *mut udev_device;
+    pub fn udev_device_get_udev(udev_device: *mut udev_device) -> *mut udev;
+
+    pub fn udev_device_new_from_syspath(
+        udev: *mut udev,
+        syspath: *const ::std::os::raw::c_char,
+    ) -> *mut udev_device;
+
+    pub fn udev_device_new_from_devnum(
+        udev: *mut udev,
+        type_: ::std::os::raw::c_char,
+        devnum: dev_t,
+    ) -> *mut udev_device;
+}
+  #+END_SRC
+
+  Lastly, I just included the bindings file at the top of the main project file so I can
+  use everything declared in it:
+
+  #+BEGIN_SRC rust
+#![allow(non_upper_case_globals)]
+#![allow(non_camel_case_types)]
+#![allow(non_snake_case)]
+#![allow(dead_code)]
+#![allow(improper_ctypes)]
+
+// include the bindings
+include!(concat!(env!("OUT_DIR"), "/bindings.rs"));
+  #+END_SRC
+
+  The project is now ready and now I can use every function and structure from the =udev=
+  library! But there is still something that hasn't been covered: you can have your own C
+  source file with your own functions and use it. For instance, you can declare new structs
+  in your header file. In the following code from =wrapper.h=, I added a struct called
+  =DeviceInfo=, which now can be used directly through the Rust code:
+
+  #+BEGIN_SRC c
+#include <libudev.h>
+
+struct DeviceInfo {
+    struct udev* udev;
+    struct udev_device* block;
+    struct udev_device* scsi;
+    struct udev_device* usb;
+};
+  #+END_SRC
+
+  New functions can also be added to the header file and the process is similar. In case a
+  user wants to have the functions implemented in a C file, lets say =src/libdevice.c=, the
+  =build.rs= needs to be changed so a static library can be generated through the C file and
+  then integrated into the final binary:
+
+  #+BEGIN_SRC rust
+use std::env;
+use std::path::PathBuf;
+
+fn main() {
+
+    cc::Build::new().file("src/libdevice.c").compile("libdevice.a");
+
+    // udev lib linkage
+    println!("cargo:rustc-link-lib=udev");
+
+    println!("cargo:rustc-link-search=.");
+
+    // compile again if changes made to header
+    println!("cargo:rerun-if-changed=src/wrapper.h");
+
+    let bindings = bindgen::Builder::default()
+        .header("src/wrapper.h")
+        .parse_callbacks(Box::new(bindgen::CargoCallbacks))
+        .generate()
+        .expect("Unable to generate bindings");
+
+    let out_path = PathBuf::from(env::var("OUT_DIR").unwrap());
+    bindings
+        .write_to_file(out_path.join("bindings.rs"))
+        .expect("Couldn't write to bindings!");
+}
+  #+END_SRC
+
+  To access the functions in Rust, you can declare the function prototypes in the header
+  file and letting =bindgen= do all the work. Or, if you wish to suffer from an headache,
+  you can declare them manually in the Rust source code after including the bindings:
+
+  #+BEGIN_SRC rust
+extern "C" {
+    pub fn get_child(
+        udev: *mut udev,
+        parent: *mut udev_device,
+        subsystem: *const ::std::os::raw::c_char,
+    ) -> *mut udev_device;
+
+    pub fn enumerate_usb_mass_storage(udev: *mut udev);
+
+    pub fn get_device_info_by_block(device_path: *const c_char) -> *mut DeviceInfo;
+    pub fn get_device_info_by_vp(
+        id_vendor: *const c_char,
+        id_product: *const c_char,
+    ) -> *mut DeviceInfo;
+}
+  #+END_SRC
+
+* Usage
+
+  Using the functions generated by =bindgen= is different and arguably more annoying
+  because we are now dealing directly with pointers and specific C types so it is up to
+  the user if there is need to wrap the functions or structures into safer types, with the
+  goal of centralizing the usage of =unsafe= scopes. Rust already helps us because we have
+  access to the C types, we can verify if a pointer is null or not through =is_null()= and
+  we can convert Rust types into C-specific types that are friendlier when using the
+  bindings. As an example, when a binding need a =char*=, we can use a =CString= and pass
+  it as a pointer. We can also convert a Rust =&str= into a =CString=.
+
+  As mentioned above, a structure called =DeviceInfo= was declared in the header file and
+  is being returned as a pointer in a C function. It is also important to understand that
+  there is memory being allocated for the structure, so there is the need to free it
+  later. With this in mind, we can implement new methods for the structure without
+  touching the C code, so it is possible to create functions to instantiate the structure,
+  free the structure, etc. In my case, I created a =new= function, that creates a
+  =DeviceInfo= object, a =get_device_node= function, that wraps the C function, and a
+  drop= function with the purpose of cleaning the memory (because =Drop= trait doesn't
+  work alongside =Copy= trait).
+
+  In the example below, I was able to create a safe version of =DeviceInfo= through the
+  =new= function. I get the object as a pointer, copy its contents to a new variable, then
+  I free the pointer and return the variable that holds the copy. This way, no memory
+  leaks related to the structure and now I have an instance of a =DeviceInfo= that I can
+  use without writing =unsafe= in every line of code. Wrapping the
+  =udev_device_get_devnode= function is also great for additional error checks and, once
+  again, not having the need of writing the same keyword many times. The same for =drop=.
+
+  #+BEGIN_SRC rust
+impl DeviceInfo {
+    fn new(id_vendor: &str, id_product: &str) -> Result<DeviceInfo> {
+        let id_vendor_cs = CString::new(id_vendor).map_err(Error::CStringInit)?;
+        let id_product_cs = CString::new(id_product).map_err(Error::CStringInit)?;
+        let device_info =
+            unsafe { get_device_info_by_vp(id_vendor_cs.as_ptr(), id_product_cs.as_ptr()) };
+
+        if device_info.is_null() {
+            Err(Error::Block("devnode is null"))
+        } else {
+            let deref = unsafe { *device_info };
+
+            // free original copy
+            unsafe { libc::free(device_info as *mut _ as *mut libc::c_void) };
+
+            Ok(deref)
+        }
+    }
+
+    fn get_device_node(&self) -> Result<String> {
+        if self.block.is_null() {
+            return Err(Error::Block("block is null"));
+        }
+
+        let devnode = unsafe { udev_device_get_devnode(self.block) };
+
+        if devnode.is_null() {
+            return Err(Error::Block("devnode is null"));
+        }
+
+        Ok(cchar_to_string(devnode as *const c_char))
+    }
+
+    fn drop(&mut self) {
+        if !self.block.is_null() {
+            unsafe {
+                udev_device_unref(self.block);
+            };
+        }
+
+        if !self.scsi.is_null() {
+            unsafe {
+                udev_device_unref(self.scsi);
+            };
+        }
+
+        if !self.udev.is_null() {
+            unsafe {
+                udev_unref(self.udev);
+            };
+        }
+    }
+}
+  #+END_SRC
+
+  All the code from this article can be found [[https://github.com/RomeuG/write-to-usb][here]].
+
+* Bonus
+
+  In this bonus section, I will show a simple example on how to do the reverse: calling
+  Rust code from C. I have a very simple Rust crate that has a function that adds two
+  numbers. The goal is to use that same function from C. To start, we need to make sure
+  that the function name is not mangled and it is declared wit the =extern= keyword:
+
+  #+BEGIN_SRC rust
+#[no_mangle]
+pub extern "C" fn add(a: u32, b: u32) -> u32 {
+    a + b
+}
+  #+END_SRC
+
+  The next step is to tell =Cargo= that we want it to generate a shared library or a
+  static library. The following has to be added to the =Cargo.toml= file of the crate and
+  the =crate-type= should be defined according to the type of the result object file:
+
+  #+BEGIN_SRC toml
+[lib]
+name = "sum"
+crate-type = ["cdylib"] # creates dynamic lib
+# crate-type = ["staticlib"] # creates static lib
+  #+END_SRC
+
+  When building the crate, it will automatically generate the library files. In this case,
+  since the =crate-type= is =cdylib=, it will generate a shared object in
+  =target/release/libsum.so=. To use this in the C code, we have to have a corresponding
+  header file with the function prototypes. This is possible to do using a tool called
+  [[https://github.com/eqrion/cbindgen][cbindgen]] and running it on the crate root
+  directory. On the following command, I reference the crate name, the output header file
+  name and the fact that I want it to output explicitly in C.
+
+  #+BEGIN_SRC sh
+$ cbindgen --crate sum --output sum.h --lang c
+  #+END_SRC
+
+  The generated header file:
+
+  #+BEGIN_SRC c
+#include <stdarg.h>
+#include <stdbool.h>
+#include <stdint.h>
+#include <stdlib.h>
+
+uint32_t add(uint32_t a, uint32_t b);
+  #+END_SRC
+
+  Both the shared object and the header file can now be used in a C project directly and
+  compile it with the command =gcc main.c -lsum -L./rust-sum/target/release=:
+
+  #+BEGIN_SRC c
+#include "sum.h"
+#include <assert.h>
+#include <stdio.h>
+
+int main() {
+    uint32_t result = add(2, 2);
+    assert(result == 4);
+
+    printf("Result: %d\n", result);
+
+    return 0;
+}
+  #+END_SRC
+
+  Then, with the shared object in the same directory, run the executable:
+
+  #+BEGIN_SRC sh
+$ ./a.out
+Result: 4
+  #+END_SRC
+
+* FOOTER                                                                                              :ignore:
+:PROPERTIES:
+:clearpage: t
+:END:
+#+BEGIN_EXPORT html
+<hr>
+<footer>
+<div class="container">
+<ul class="menu-list">
+<li class="menu-list-item flex-basis-100-margin fit-content">
+<a href="/index.html" class="test">Home</a>
+</li>
+<li class="menu-list-item flex-basis-100-margin fit-content">
+<a href="/articles/articles.html">Articles</a>
+</li>
+<li class="menu-list-item flex-basis-100-margin fit-content">
+<a href="/writeups/htb/index.html">Write-Ups</a>
+</li>
+<li class="menu-list-item flex-basis-100-margin fit-content">
+<a class="inactive-link">20-03-2022</a>
+</li>
+</ul>
+</div>
+</footer>
+#+END_EXPORT
