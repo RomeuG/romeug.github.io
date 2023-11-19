@@ -45,20 +45,20 @@ WARNING: THIS PAGE USES JAVASCRIPT!
 <h2>Table of Contents</h2>
 <div id="text-table-of-contents" role="doc-toc">
 <ul>
-<li><a href="#org366d0ae">Org-Mode and MathJax</a></li>
-<li><a href="#orgeed2137">MathJax Extensions</a></li>
-<li><a href="#org157bd23">Export Settings</a></li>
-<li><a href="#orgcefa3d3">MathJax &amp; Unsupported Extensions</a></li>
-<li><a href="#org70241ee">A Javascript-less Method</a></li>
+<li><a href="#orgd846910">Org-Mode and MathJax</a></li>
+<li><a href="#org1f1c482">MathJax Extensions</a></li>
+<li><a href="#orgfc39c07">Export Settings</a></li>
+<li><a href="#org77b3ea0">MathJax &amp; Unsupported Extensions</a></li>
+<li><a href="#orgdd0a602">A Javascript-less Method</a></li>
 </ul>
 </div>
 </div>
 
 <p class="spacing-64" \>
 
-<div id="outline-container-org366d0ae" class="outline-2">
-<h2 id="org366d0ae">Org-Mode and MathJax</h2>
-<div class="outline-text-2" id="text-org366d0ae">
+<div id="outline-container-orgd846910" class="outline-2">
+<h2 id="orgd846910">Org-Mode and MathJax</h2>
+<div class="outline-text-2" id="text-orgd846910">
 <p>
 Documentation to use and export LaTeX math formulas (and formulas from
 extensions) from Org-Mode to HTML is sparse.
@@ -84,9 +84,9 @@ And this is the result:
 </div>
 </div>
 
-<div id="outline-container-orgeed2137" class="outline-2">
-<h2 id="orgeed2137">MathJax Extensions</h2>
-<div class="outline-text-2" id="text-orgeed2137">
+<div id="outline-container-org1f1c482" class="outline-2">
+<h2 id="org1f1c482">MathJax Extensions</h2>
+<div class="outline-text-2" id="text-org1f1c482">
 <p>
 Things get more complicated when trying to use formulas from LaTeX extensions.
 One good extension when doing chemistry equations is <code>mhchem</code>. This can also be
@@ -164,16 +164,16 @@ This is the result:
 </p>
 
 
-<div id="orgbbb8304" class="figure">
+<div id="orgb95c88e" class="figure">
 <p><img src="./images/img1.png" alt="img1.png" />
 </p>
 </div>
 </div>
 </div>
 
-<div id="outline-container-org157bd23" class="outline-2">
-<h2 id="org157bd23">Export Settings</h2>
-<div class="outline-text-2" id="text-org157bd23">
+<div id="outline-container-orgfc39c07" class="outline-2">
+<h2 id="orgfc39c07">Export Settings</h2>
+<div class="outline-text-2" id="text-orgfc39c07">
 <p>
 The result is far from good because the background may not match the websites
 background, foreground the same and the image is trimmed without any padding.
@@ -191,16 +191,16 @@ changed into: <code>convert -density %D -trim -border 10 -bordercolor white
 </p>
 
 
-<div id="orgfa645ae" class="figure">
+<div id="org3c32f8c" class="figure">
 <p><img src="./images/img2.png" alt="img2.png" />
 </p>
 </div>
 </div>
 </div>
 
-<div id="outline-container-orgcefa3d3" class="outline-2">
-<h2 id="orgcefa3d3">MathJax &amp; Unsupported Extensions</h2>
-<div class="outline-text-2" id="text-orgcefa3d3">
+<div id="outline-container-org77b3ea0" class="outline-2">
+<h2 id="org77b3ea0">MathJax &amp; Unsupported Extensions</h2>
+<div class="outline-text-2" id="text-org77b3ea0">
 <p>
 Because of available and unavailable extensions for MathJax, there may be the
 need to use both MathJax compatible formulas and images. Users may try to set
@@ -215,9 +215,9 @@ compatible.
 </div>
 </div>
 
-<div id="outline-container-org70241ee" class="outline-2">
-<h2 id="org70241ee">A Javascript-less Method</h2>
-<div class="outline-text-2" id="text-org70241ee">
+<div id="outline-container-orgdd0a602" class="outline-2">
+<h2 id="orgdd0a602">A Javascript-less Method</h2>
+<div class="outline-text-2" id="text-orgdd0a602">
 <p>
 If you are like me and you don’t want JavaScript polluting your website, there
 is a method to generate images with <code>ImageMagick</code> that respect the website
@@ -266,7 +266,7 @@ as the website: <code>convert -density %D -trim -border 10 -bordercolor \"#1d202
 </p>
 
 
-<div id="org439a84b" class="figure">
+<div id="org8d12370" class="figure">
 <p><img src="./images/img3.png" alt="img3.png" />
 </p>
 </div>
@@ -287,7 +287,7 @@ $$\pagecolor{myBackground}\highlight{\color{myForeground}S0(x)=(x &gt;&gt;&gt; 2
 </pre>
 
 
-<div id="orgc23a10c" class="figure">
+<div id="orga9e0961" class="figure">
 <p><img src="./images/img4.png" alt="img4.png" />
 </p>
 </div>
@@ -301,7 +301,7 @@ This second method was provided by a user on StackOverflow: <a href="https://tex
 <hr>
 <footer>
 <div class="container">
-<ul class="menu-list">
+<ul class="menu-list-wide">
 <li class="menu-list-item flex-basis-100-margin fit-content">
 <a href="/index.html" class="test">Home</a>
 </li>

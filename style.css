@@ -194,7 +194,7 @@ li ul li ul li::marker {
   }
 }
 
-@media only screen and (min-width: 900px) {
+@media only screen and (min-width: 700px) {
   .menu-list-wide {
     flex-wrap: nowrap;
   }
